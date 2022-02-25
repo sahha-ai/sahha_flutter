@@ -28,7 +28,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.sahha.sahha_flutter
+        package: com.sahha.flutter
         pluginClass: SahhaFlutterPlugin
       ios:
         pluginClass: SahhaFlutterPlugin
