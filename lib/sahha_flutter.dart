@@ -2,8 +2,28 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+enum ActivityStatus { pending, unavailable, disabled, enabled }
+
 class SahhaFlutter {
   static const MethodChannel _channel = MethodChannel('sahha_flutter');
+
+  static void configure() {}
+
+  static Future<String> authenticate(
+      String customerId, String profileId) async {
+    String token = '';
+    return token;
+  }
+
+  static Future<String> get analysis async {
+    var data = "";
+    return data;
+  }
+
+  static Future<ActivityStatus> get activityStatus async {
+    ActivityStatus value = ActivityStatus.enabled;
+    return value;
+  }
 
   static Future<String?> get platformVersion async {
     final String? version = await _channel.invokeMethod('getPlatformVersion');

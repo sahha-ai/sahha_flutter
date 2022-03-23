@@ -19,11 +19,14 @@ class _MyAppState extends State<MyApp> {
   String _bundleId = 'Unknown app';
   String _platformVersion = 'Unknown';
   String _batteryLevel = 'Unknown battery level.';
+  ActivityStatus _activityStatus = ActivityStatus.pending;
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
+
+    SahhaFlutter.configure();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -42,6 +45,14 @@ class _MyAppState extends State<MyApp> {
 
     String bundleId = await SahhaFlutter.bundleId;
 
+    String token = await SahhaFlutter.authenticate("CUSTOMER_ID", "PROFILE_ID");
+
+    var response = await SahhaFlutter.analysis;
+    print(response);
+
+    ActivityStatus activityStatus = await SahhaFlutter.activityStatus;
+    print(activityStatus);
+
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
@@ -51,6 +62,7 @@ class _MyAppState extends State<MyApp> {
       _platformVersion = platformVersion;
       _batteryLevel = batteryLevel;
       _bundleId = bundleId;
+      _activityStatus = activityStatus;
     });
   }
 
@@ -59,7 +71,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Sahha Example'),
+          title: const Text('Sahha Demo'),
         ),
         body: Center(
           child: Column(children: <Widget>[
@@ -67,6 +79,7 @@ class _MyAppState extends State<MyApp> {
             Text('$_bundleId\n'),
             Text('Running on: $_platformVersion\n'),
             Text('$_batteryLevel\n'),
+            Text('Activity Status: $_activityStatus\n')
           ]),
         ),
       ),
