@@ -1,88 +1,42 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
+import 'package:sahha_flutter_example/Views/HomeView.dart';
+import 'package:sahha_flutter_example/Views/AuthenticationView.dart';
+import 'package:sahha_flutter_example/Views/HealthView.dart';
+import 'package:sahha_flutter_example/Views/MotionView.dart';
+import 'package:sahha_flutter_example/Views/AnalyzationView.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const App());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<App> createState() => AppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  String _bundleId = 'Unknown app';
-  String _platformVersion = 'Unknown';
-  String _batteryLevel = 'Unknown battery level.';
-  ActivityStatus _activityStatus = ActivityStatus.pending;
-
+class AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    initPlatformState();
 
     SahhaFlutter.configure();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await SahhaFlutter.platformVersion ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    String batteryLevel = await SahhaFlutter.batteryLevel;
-
-    String bundleId = await SahhaFlutter.bundleId;
-
-    String token = await SahhaFlutter.authenticate("CUSTOMER_ID", "PROFILE_ID");
-
-    var response = await SahhaFlutter.analysis;
-    print(response);
-
-    ActivityStatus activityStatus = await SahhaFlutter.activityStatus;
-    print(activityStatus);
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-      _batteryLevel = batteryLevel;
-      _bundleId = bundleId;
-      _activityStatus = activityStatus;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Sahha Demo'),
-        ),
-        body: Center(
-          child: Column(children: <Widget>[
-            const Text("Hello\n"),
-            Text('$_bundleId\n'),
-            Text('Running on: $_platformVersion\n'),
-            Text('$_batteryLevel\n'),
-            Text('Activity Status: $_activityStatus\n')
-          ]),
-        ),
-      ),
+      initialRoute: '/',
+      routes: <String, WidgetBuilder>{
+        '/': (BuildContext context) => const HomeView(),
+        '/authentication': (BuildContext context) => const AuthenticationView(),
+        '/health': (BuildContext context) => const HealthView(),
+        '/motion': (BuildContext context) => const MotionView(),
+        '/analyzation': (BuildContext context) => const AnalyzationView(),
+      },
     );
   }
 }

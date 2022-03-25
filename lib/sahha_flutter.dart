@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 enum ActivityStatus { pending, unavailable, disabled, enabled }
@@ -11,13 +11,22 @@ class SahhaFlutter {
 
   static Future<String> authenticate(
       String customerId, String profileId) async {
-    String token = '';
-    return token;
+    try {
+      String token =
+          await _channel.invokeMethod('authenticate', [customerId, profileId]);
+      return token;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
   }
 
-  static Future<String> get analysis async {
-    var data = "";
-    return data;
+  static Future<String> analyze() async {
+    try {
+      String value = await _channel.invokeMethod('analyze');
+      return value;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
   }
 
   static Future<ActivityStatus> get activityStatus async {
@@ -25,9 +34,14 @@ class SahhaFlutter {
     return value;
   }
 
-  static Future<String?> get platformVersion async {
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
+  static Future<String> get platformVersion async {
+    String value;
+    try {
+      value = await _channel.invokeMethod('getPlatformVersion');
+    } on PlatformException catch (e) {
+      value = "Failed to get platformVersion: '${e.message}'.";
+    }
+    return value;
   }
 
   static Future<String> get bundleId async {
