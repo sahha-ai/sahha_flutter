@@ -24,6 +24,12 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSHealthShareUsageDescription</key>
+	<string>This app would like access to your health activity for analysis.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>This app would like access to your health activity for analysis.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app would like access to your motion activity for analysis.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

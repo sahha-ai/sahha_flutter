@@ -2,12 +2,15 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-enum ActivityStatus { pending, unavailable, disabled, enabled }
+enum SahhaActivity { motion, health }
+enum SahhaActivityStatus { pending, unavailable, disabled, enabled }
 
 class SahhaFlutter {
   static const MethodChannel _channel = MethodChannel('sahha_flutter');
 
-  static void configure() {}
+  static void configure() {
+    _channel.invokeMethod('configure');
+  }
 
   static Future<String> authenticate(
       String customerId, String profileId) async {
@@ -20,6 +23,41 @@ class SahhaFlutter {
     }
   }
 
+  static Future<SahhaActivityStatus> activityStatus(
+      SahhaActivity activity) async {
+    try {
+      int statusInt = await _channel
+          .invokeMethod('activityStatus', [describeEnum(activity)]);
+      SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
+      return status;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<SahhaActivityStatus> activate(SahhaActivity activity) async {
+    try {
+      int statusInt =
+          await _channel.invokeMethod('activate', [describeEnum(activity)]);
+      SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
+      return status;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<SahhaActivityStatus> promptUserToActivate(
+      SahhaActivity activity) async {
+    try {
+      int statusInt = await _channel
+          .invokeMethod('promptUserToActivate', [describeEnum(activity)]);
+      SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
+      return status;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
   static Future<String> analyze() async {
     try {
       String value = await _channel.invokeMethod('analyze');
@@ -27,11 +65,6 @@ class SahhaFlutter {
     } on PlatformException catch (error) {
       return Future.error(error);
     }
-  }
-
-  static Future<ActivityStatus> get activityStatus async {
-    ActivityStatus value = ActivityStatus.enabled;
-    return value;
   }
 
   static Future<String> get platformVersion async {

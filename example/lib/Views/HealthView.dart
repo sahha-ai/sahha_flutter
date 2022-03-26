@@ -1,49 +1,39 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 
 class HealthView extends StatefulWidget {
   const HealthView({Key? key}) : super(key: key);
 
   @override
-  State<HealthView> createState() => _HealthViewState();
+  State<HealthView> createState() => HealthState();
 }
 
-class _HealthViewState extends State<HealthView> {
-  String _bundleId = 'Unknown app';
-  String _platformVersion = 'Unknown';
-  String _batteryLevel = 'Unknown battery level.';
-  ActivityStatus _activityStatus = ActivityStatus.pending;
+class HealthState extends State<HealthView> {
+  SahhaActivityStatus activityStatus = SahhaActivityStatus.pending;
 
   @override
   void initState() {
     super.initState();
-    initSahhaState();
+    debugPrint('init health');
+    SahhaFlutter.activityStatus(SahhaActivity.health).then((value) {
+      setState(() {
+        activityStatus = value;
+      });
+      debugPrint('init health ' + describeEnum(activityStatus));
+    }).catchError((error) {
+      debugPrint(error);
+    });
   }
 
-  // Sahha messages are asynchronous, so we initialize in an async method.
-  Future<void> initSahhaState() async {
-    String platformVersion = await SahhaFlutter.platformVersion;
-
-    String batteryLevel = await SahhaFlutter.batteryLevel;
-
-    String bundleId = await SahhaFlutter.bundleId;
-
-    String token = await SahhaFlutter.authenticate("CUSTOMER_ID", "PROFILE_ID");
-
-    ActivityStatus activityStatus = await SahhaFlutter.activityStatus;
-    print(activityStatus);
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-      _batteryLevel = batteryLevel;
-      _bundleId = bundleId;
-      _activityStatus = activityStatus;
+  onTapEnable(BuildContext context) {
+    SahhaFlutter.activate(SahhaActivity.health).then((value) {
+      setState(() {
+        activityStatus = value;
+      });
+      debugPrint('activate health ' + describeEnum(activityStatus));
+    }).catchError((error) {
+      debugPrint(error);
     });
   }
 
@@ -53,22 +43,38 @@ class _HealthViewState extends State<HealthView> {
       appBar: AppBar(
         title: const Text('Health'),
       ),
-      body: Center(
-        child: Column(children: <Widget>[
-          const Text("Hello\n"),
-          Text('$_bundleId\n'),
-          Text('Running on: $_platformVersion\n'),
-          Text('$_batteryLevel\n'),
-          Text('Activity Status: $_activityStatus\n'),
-          ElevatedButton(
-            // Within the `FirstScreen` widget
-            onPressed: () {
-              // Navigate to the second screen using a named route.
-              Navigator.pushNamed(context, '/authentication');
-            },
-            child: const Text('Authentication'),
-          ),
-        ]),
+      body: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Center(
+          child: Column(children: <Widget>[
+            const Spacer(),
+            const Icon(
+              Icons.favorite,
+              size: 64,
+            ),
+            const SizedBox(height: 20),
+            const Text('Activity Status',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            Text(describeEnum(activityStatus),
+                style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(40),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+              onPressed: activityStatus == SahhaActivityStatus.enabled
+                  ? null
+                  : () {
+                      onTapEnable(context);
+                    },
+              child: const Text('ENABLE'),
+            ),
+          ]),
+        ),
       ),
     );
   }

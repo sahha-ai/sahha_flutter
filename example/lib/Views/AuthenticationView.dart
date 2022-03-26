@@ -67,6 +67,11 @@ class AuthenticationState extends State<AuthenticationView> {
           child: Column(
             children: <Widget>[
               const Spacer(),
+              const Icon(
+                Icons.lock,
+                size: 64,
+              ),
+              const SizedBox(height: 20),
               TextField(
                 controller: customerController,
                 autocorrect: false,

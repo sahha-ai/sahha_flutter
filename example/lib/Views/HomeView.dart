@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'dart:io' show Platform;
-import 'package:sahha_flutter/sahha_flutter.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);

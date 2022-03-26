@@ -47,6 +47,15 @@ class AnalyzationView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Spacer(),
+                  const Icon(
+                    Icons.query_stats,
+                    size: 64,
+                  ),
+                  const SizedBox(height: 20),
+                  const Text('A new analysis will be available every 24 hours',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(40),
