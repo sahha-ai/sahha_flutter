@@ -23,7 +23,14 @@ class AppState extends State<App> {
   void initState() {
     super.initState();
 
-    SahhaFlutter.configure();
+    SahhaFlutter.configure(environment: SahhaEnvironment.development);
+
+    /*
+    SahhaFlutter.configure(
+        environment: SahhaEnvironment.production,
+        sensors: [SahhaSensor.device],
+        postActivityManually: true);
+        */
   }
 
   @override

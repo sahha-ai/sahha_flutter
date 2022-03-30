@@ -15,6 +15,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case activityStatus
         case activate
         case promptUserToActivate
+        case postActivity
         case analyze
     }
     
@@ -29,9 +30,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         
         switch method {
         case .configure:
-            Sahha.configure()
-            // Needed by Flutter since native iOS lifecycle is delayed
-            Sahha.onAppOpen()
+            configure(call.arguments, result: result)
         case .authenticate:
             authenticate(call.arguments, result: result)
         case .activityStatus:
@@ -40,10 +39,36 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             activate(call.arguments, result: result)
         case .promptUserToActivate:
             promptUserToActivate(call.arguments, result: result)
+        case .postActivity:
+            postActivity(call.arguments, result: result)
         case .analyze:
             analyze(result: result)
         default:
             result(FlutterMethodNotImplemented)
+        }
+    }
+    
+    private func configure(_ params: Any?, result: @escaping FlutterResult) {
+        if let values = params as? [Any?] {
+            if let environment = values[0] as? String, let configEnvironment = SahhaEnvironment(rawValue: environment), let sensors = values[1] as? [String], let postActivityManually = values[2] as? NSNumber {
+                
+                var configSensors: Set<SahhaSensor> = []
+                for sensor in sensors {
+                    if let configSensor = SahhaSensor(rawValue: sensor) {
+                        configSensors.insert(configSensor)
+                    }
+                }
+
+                Sahha.configure(environment: configEnvironment, sensors: configSensors, postActivityManually: postActivityManually.boolValue)
+                
+                // Needed by Flutter since native iOS lifecycle is delayed
+                Sahha.launch()
+            } else {
+                result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() paramaters are not valid", details: nil))
+            }
+        }
+        else {
+            result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() paramaters are missing", details: nil))
         }
     }
     
@@ -55,7 +80,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 } else if let value = value {
                     result(value)
                 } else {
-                    result(FlutterError(code: "Sahha Error", message: "Something went wrong", details: nil))
+                    result(FlutterError(code: "Sahha Error", message: "Sahha was unable to authenticate", details: nil))
                 }
             }
         } else {
@@ -103,6 +128,31 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             case .health:
                 Sahha.health.activate { activityStatus in
                     result(activityStatus.rawValue)
+                }
+            }
+        } else {
+            result(FlutterError(code: "Sahha Error", message: "Requested Sahha Activity not found", details: nil))
+        }
+    }
+    
+    private func postActivity(_ params: Any?, result: @escaping FlutterResult) {
+        if let values = params as? [Any?], let activityString = values[0] as? String, let activity = SahhaActivity(rawValue: activityString) {
+            switch activity {
+            case .motion:
+                Sahha.motion.postActivity { error, success in
+                    if let error = error {
+                        result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                    } else {
+                        result(success)
+                    }
+                }
+            case .health:
+                Sahha.health.postActivity { error, success in
+                    if let error = error {
+                        result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                    } else {
+                        result(success)
+                    }
                 }
             }
         } else {
