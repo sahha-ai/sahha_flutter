@@ -162,8 +162,14 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     private func analyze(result: @escaping FlutterResult) {
-        Sahha.analyze { value in
-            result(value)
+        Sahha.analyze { error, value in
+            if let error = error {
+                result(FlutterError(code: "Sahha Error", message: error, details: nil))
+            } else if let value = value {
+                result(value)
+            } else {
+                result(FlutterError(code: "Sahha Error", message: "Requested Sahha Analyzation not available", details: nil))
+            }
         }
     }
 }

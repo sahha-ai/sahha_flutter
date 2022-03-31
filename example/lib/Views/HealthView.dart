@@ -21,9 +21,9 @@ class HealthState extends State<HealthView> {
         activityStatus = value;
       });
       debugPrint('init health ' + describeEnum(activityStatus));
-    }).catchError((error) {
-      debugPrint(error);
-    });
+    }).catchError((error, stackTrace) => {
+        debugPrint(error.toString())
+      });
   }
 
   onTapEnable(BuildContext context) {
@@ -32,9 +32,9 @@ class HealthState extends State<HealthView> {
         activityStatus = value;
       });
       debugPrint('activate health ' + describeEnum(activityStatus));
-    }).catchError((error) {
-      debugPrint(error);
-    });
+    }).catchError((error, stackTrace) => {
+        debugPrint(error.toString())
+      });
   }
 
   @override

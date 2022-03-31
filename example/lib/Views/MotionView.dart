@@ -21,9 +21,9 @@ class MotionState extends State<MotionView> {
         activityStatus = value;
       });
       debugPrint('init motion ' + describeEnum(activityStatus));
-    }).catchError((error) {
-      debugPrint(error);
-    });
+    }).catchError((error, stackTrace) => {
+        debugPrint(error.toString())
+      });
   }
 
   onTapEnable(BuildContext context) {
@@ -33,8 +33,8 @@ class MotionState extends State<MotionView> {
           activityStatus = value;
         });
         debugPrint('activate motion ' + describeEnum(activityStatus));
-      }).catchError((error) {
-        debugPrint(error);
+      }).catchError((error, stackTrace) => {
+        debugPrint(error.toString())
       });
     } else {
       SahhaFlutter.activate(SahhaActivity.motion).then((value) {
@@ -42,8 +42,8 @@ class MotionState extends State<MotionView> {
           activityStatus = value;
         });
         debugPrint('activate motion ' + describeEnum(activityStatus));
-      }).catchError((error) {
-        debugPrint(error);
+      }).catchError((error, stackTrace) => {
+        debugPrint(error.toString())
       });
     }
   }

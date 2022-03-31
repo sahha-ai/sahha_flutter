@@ -4,11 +4,14 @@ PODS:
   - sahha_flutter (0.0.1):
     - Flutter
     - Sahha
+  - shared_preferences_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - Sahha (from `../../../sahha-swift`)
   - sahha_flutter (from `.symlinks/plugins/sahha_flutter/ios`)
+  - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
@@ -17,11 +20,14 @@ EXTERNAL SOURCES:
     :path: "../../../sahha-swift"
   sahha_flutter:
     :path: ".symlinks/plugins/sahha_flutter/ios"
+  shared_preferences_ios:
+    :path: ".symlinks/plugins/shared_preferences_ios/ios"
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   Sahha: 551a5b9d31f685c5d274294db51c80b57ae82fa0
   sahha_flutter: 7abc361e4da0fc01da3f638883fab70e8fd60edd
+  shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
 
 PODFILE CHECKSUM: 33b39e2a116ef5b17e451ef3fd9330c9f45d85f4
 

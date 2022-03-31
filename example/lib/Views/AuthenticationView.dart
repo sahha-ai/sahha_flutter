@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationView extends StatefulWidget {
   const AuthenticationView({Key? key}) : super(key: key);
@@ -17,26 +18,49 @@ class AuthenticationState extends State<AuthenticationView> {
   @override
   void initState() {
     super.initState();
+
+    getPrefs();
+  }
+
+  //Loading counter value on start
+  void getPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      customerId = (prefs.getString('customerId') ?? '');
+      customerController.text = customerId;
+      profileId = (prefs.getString('profileId') ?? '');
+      profileController.text = profileId;
+    });
+  }
+
+  //Incrementing counter after click
+  void setPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setString('customerId', customerId);
+      prefs.setString('profileId', profileId);
+    });
   }
 
   onTapLogin(BuildContext context) {
     if (customerId.isEmpty) {
-      showAlertDialog(context, "CUSTOMER ID");
+      showAlertDialog(context, 'MISSING INFO', "You need to input a CUSTOMER ID");
     } else if (profileId.isEmpty) {
-      showAlertDialog(context, "PROFILE ID");
+      showAlertDialog(context, 'MISSING INFO', "You need to input a PROFILE ID");
     } else {
+      setPrefs();
       SahhaFlutter.authenticate(customerId, profileId)
-          .then((value) => {showAlertDialog(context, value)})
-          .catchError((error) {
-        debugPrint(error);
+          .then((value) => {showAlertDialog(context, 'AUTHORIZED', value)})
+          .catchError((error, stackTrace) => {
+        debugPrint(error.toString())
       });
     }
   }
 
-  showAlertDialog(BuildContext context, String value) {
+  showAlertDialog(BuildContext context, String title, String message) {
     AlertDialog alert = AlertDialog(
-      title: const Text('MISSING INFO'),
-      content: Text("You need to input a $value"),
+      title: Text(title),
+      content: Text(message),
       actions: <Widget>[
         TextButton(
           child: const Text('OK'),

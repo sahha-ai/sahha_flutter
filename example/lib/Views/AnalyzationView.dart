@@ -7,8 +7,8 @@ class AnalyzationView extends StatelessWidget {
   onTapAnalyze(BuildContext context) {
     SahhaFlutter.analyze()
         .then((value) => {showAlertDialog(context, value)})
-        .catchError((error) {
-      debugPrint(error);
+        .catchError((error, stackTrace) => {
+          debugPrint(error.toString())
     });
   }
 
