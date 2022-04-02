@@ -67,6 +67,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 
                 // Needed by Flutter since native iOS lifecycle is delayed
                 Sahha.launch()
+                
+                result(true)
             } else {
                 result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() paramaters are not valid", details: nil))
             }

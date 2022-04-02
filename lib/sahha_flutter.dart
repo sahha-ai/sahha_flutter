@@ -15,14 +15,19 @@ class SahhaFlutter {
     SahhaSensor.device
   ];
 
-  static void configure(
+  static Future<bool> configure(
       {required SahhaEnvironment environment,
       List<SahhaSensor> sensors = sensorList,
-      bool postActivityManually = false}) {
+      bool postActivityManually = false}) async {
     // Convert to strings
     List<String> sensorStrings = sensors.map(describeEnum).toList();
-    _channel.invokeMethod('configure',
-        [describeEnum(environment), sensorStrings, postActivityManually]);
+    try {
+      bool success = await _channel.invokeMethod('configure',
+          [describeEnum(environment), sensorStrings, postActivityManually]);
+      return success;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
   }
 
   static Future<String> authenticate(
