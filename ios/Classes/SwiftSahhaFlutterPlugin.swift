@@ -17,6 +17,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case promptUserToActivate
         case postActivity
         case analyze
+        case openAppSettings
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -43,6 +44,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             postActivity(call.arguments, result: result)
         case .analyze:
             analyze(result: result)
+        case .openAppSettings:
+            Sahha.openAppSettings()
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -123,9 +126,10 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         if let values = params as? [Any?], let activityString = values[0] as? String, let activity = SahhaActivity(rawValue: activityString) {
             switch activity {
             case .motion:
-                Sahha.motion.promptUserToActivate { activityStatus in
+                Sahha.motion.activate { activityStatus in
                     result(activityStatus.rawValue)
                 }
+                break
             case .health:
                 Sahha.health.activate { activityStatus in
                     result(activityStatus.rawValue)

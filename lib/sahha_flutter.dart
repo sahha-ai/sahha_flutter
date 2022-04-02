@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -70,6 +69,10 @@ class SahhaFlutter {
     } on PlatformException catch (error) {
       return Future.error(error);
     }
+  }
+
+  static void openAppSettings() {
+    _channel.invokeMethod('openAppSettings');
   }
 
   static Future<bool> postActivity(SahhaActivity activity) async {
