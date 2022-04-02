@@ -12,6 +12,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     enum SahhaMethod: String {
         case configure
         case authenticate
+        case postDemographic
         case activityStatus
         case activate
         case promptUserToActivate
@@ -34,6 +35,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             configure(call.arguments, result: result)
         case .authenticate:
             authenticate(call.arguments, result: result)
+        case .postDemographic:
+            postDemographic(call.arguments, result: result)
         case .activityStatus:
             activityStatus(call.arguments, result: result)
         case .activate:
@@ -91,6 +94,26 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             }
         } else {
             result(FlutterError(code: "Sahha Error", message: "Something went wrong", details: nil))
+        }
+    }
+    
+    private func postDemographic(_ params: Any?, result: @escaping FlutterResult) {
+        if let values = params as? [Any?] {
+            var demographic = SahhaDemographic()
+            if let ageNumber = values[0] as? NSNumber {
+                let age = ageNumber.intValue
+                print("age", age)
+                demographic.age = age
+            }
+            if let gender = values[1] as? String {
+                print("gender", gender)
+                demographic.gender = gender
+            }
+            Sahha.postDemographic(demographic) { error, success in
+                
+            }
+        } else {
+            result(FlutterError(code: "Sahha Error", message: "Sahha demographic not valid", details: nil))
         }
     }
     

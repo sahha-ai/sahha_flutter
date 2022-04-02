@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:sahha_flutter_example/Views/HomeView.dart';
 import 'package:sahha_flutter_example/Views/AuthenticationView.dart';
+import 'package:sahha_flutter_example/Views/ProfileView.dart';
 import 'package:sahha_flutter_example/Views/HealthView.dart';
 import 'package:sahha_flutter_example/Views/MotionView.dart';
 import 'package:sahha_flutter_example/Views/AnalyzationView.dart';
@@ -42,6 +42,7 @@ class AppState extends State<App> {
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) => const HomeView(),
         '/authentication': (BuildContext context) => const AuthenticationView(),
+        '/profile': (BuildContext context) => const ProfileView(),
         '/health': (BuildContext context) => const HealthView(),
         '/motion': (BuildContext context) => const MotionView(),
         '/analyzation': (BuildContext context) => const AnalyzationView(),

@@ -20,6 +20,8 @@ dependencies:
 
   shared_preferences: ^2.0.13
 
+  flutter_picker: ^2.0.3
+
   sahha_flutter:
     # When depending on this package from a real application you should use:
     #   sahha_flutter: ^x.y.z

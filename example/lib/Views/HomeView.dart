@@ -32,6 +32,22 @@ class HomeView extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.person,
+                      size: 32,
+                    ),
+                    label: const Text('Profile'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      padding: const EdgeInsets.all(20),
+                      textStyle: const TextStyle(fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/profile');
+                    },
+                  ),
+                  const SizedBox(height: 20),
                   if (Platform.isIOS)
                     ElevatedButton.icon(
                       icon: const Icon(

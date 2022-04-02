@@ -41,6 +41,16 @@ class SahhaFlutter {
     }
   }
 
+  static Future<bool> postDemographic({int? age, String? gender}) async {
+    try {
+      bool success =
+          await _channel.invokeMethod('postDemographic', [age, gender]);
+      return success;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
   static Future<SahhaActivityStatus> activityStatus(
       SahhaActivity activity) async {
     try {
