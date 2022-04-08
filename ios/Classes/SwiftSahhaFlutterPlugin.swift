@@ -65,7 +65,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                     }
                 }
 
-                let settings = SahhaSettings(environment: configEnvironment, sensors: configSensors, postActivityManually: postActivityManually.boolValue)
+                var settings = SahhaSettings(environment: configEnvironment, sensors: configSensors, postActivityManually: postActivityManually.boolValue)
+                settings.framework = .flutter
                 Sahha.configure(settings)
                 
                 // Needed by Flutter since native iOS lifecycle is delayed
