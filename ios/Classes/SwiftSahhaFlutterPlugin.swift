@@ -84,8 +84,12 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     
     private func authenticate(_ params: Any?, result: @escaping FlutterResult) {
         if let values = params as? [Any?], let token = values[0] as? String, let refreshToken = values[1] as? String {
-            Sahha.authenticate(token: token, refreshToken: refreshToken)
-            result(true)
+            let success = Sahha.authenticate(token: token, refreshToken: refreshToken)
+            if success {
+                result(true)
+            } else {
+                result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.authenticate() parameters are not valid", details: nil))
+            }
         } else {
             result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.authenticate() parameters are missing", details: nil))
         }
