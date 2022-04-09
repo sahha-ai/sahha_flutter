@@ -10,10 +10,10 @@ class AuthenticationView extends StatefulWidget {
 }
 
 class AuthenticationState extends State<AuthenticationView> {
-  TextEditingController customerController = TextEditingController();
-  TextEditingController profileController = TextEditingController();
-  String customerId = '';
-  String profileId = '';
+  TextEditingController tokenController = TextEditingController();
+  TextEditingController refreshTokenController = TextEditingController();
+  String token = '';
+  String refreshToken = '';
 
   @override
   void initState() {
@@ -26,10 +26,10 @@ class AuthenticationState extends State<AuthenticationView> {
   void getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      customerId = (prefs.getString('customerId') ?? '');
-      customerController.text = customerId;
-      profileId = (prefs.getString('profileId') ?? '');
-      profileController.text = profileId;
+      token = (prefs.getString('token') ?? '');
+      tokenController.text = token;
+      refreshToken = (prefs.getString('refreshToken') ?? '');
+      refreshTokenController.text = refreshToken;
     });
   }
 
@@ -37,23 +37,23 @@ class AuthenticationState extends State<AuthenticationView> {
   void setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      prefs.setString('customerId', customerId);
-      prefs.setString('profileId', profileId);
+      prefs.setString('token', token);
+      prefs.setString('refreshToken', refreshToken);
     });
   }
 
-  onTapLogin(BuildContext context) {
-    if (customerId.isEmpty) {
-      showAlertDialog(context, 'MISSING INFO', "You need to input a CUSTOMER ID");
-    } else if (profileId.isEmpty) {
-      showAlertDialog(context, 'MISSING INFO', "You need to input a PROFILE ID");
+  onTapAuthenticate(BuildContext context) {
+    if (token.isEmpty) {
+      showAlertDialog(context, 'MISSING INFO', "You need to input a TOKEN");
+    } else if (refreshToken.isEmpty) {
+      showAlertDialog(
+          context, 'MISSING INFO', "You need to input a REFRESH TOKEN");
     } else {
       setPrefs();
-      SahhaFlutter.authenticate(customerId, profileId)
-          .then((value) => {showAlertDialog(context, 'AUTHORIZED', value)})
-          .catchError((error, stackTrace) => {
-        debugPrint(error.toString())
-      });
+      SahhaFlutter.authenticate(token, refreshToken)
+          .then((success) =>
+              {showAlertDialog(context, 'AUTHORIZED', success.toString())})
+          .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
   }
 
@@ -97,24 +97,24 @@ class AuthenticationState extends State<AuthenticationView> {
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: customerController,
+                controller: tokenController,
                 autocorrect: false,
                 enableSuggestions: false,
-                decoration: const InputDecoration(labelText: "CUSTOMER ID"),
+                decoration: const InputDecoration(labelText: "TOKEN"),
                 onChanged: (text) {
                   setState(() {
-                    customerId = customerController.text;
+                    token = tokenController.text;
                   });
                 },
               ),
               TextField(
-                controller: profileController,
+                controller: refreshTokenController,
                 autocorrect: false,
                 enableSuggestions: false,
-                decoration: const InputDecoration(labelText: "PROFILE ID"),
+                decoration: const InputDecoration(labelText: "REFRESH TOKEN"),
                 onChanged: (text) {
                   setState(() {
-                    profileId = profileController.text;
+                    refreshToken = refreshTokenController.text;
                   });
                 },
               ),
@@ -127,9 +127,9 @@ class AuthenticationState extends State<AuthenticationView> {
                   textStyle: const TextStyle(fontSize: 16),
                 ),
                 onPressed: () {
-                  onTapLogin(context);
+                  onTapAuthenticate(context);
                 },
-                child: const Text('LOGIN'),
+                child: const Text('AUTHENTICATE'),
               ),
             ],
           ),

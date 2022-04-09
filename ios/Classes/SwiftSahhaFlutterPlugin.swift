@@ -74,27 +74,20 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 
                 result(true)
             } else {
-                result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() paramaters are not valid", details: nil))
+                result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() parameters are not valid", details: nil))
             }
         }
         else {
-            result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() paramaters are missing", details: nil))
+            result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() parameters are missing", details: nil))
         }
     }
     
     private func authenticate(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [Any?], let customerId = values[0] as? String, let profileId = values[1] as? String {
-            Sahha.authenticate(customerId: customerId, profileId: profileId) { error, value in
-                if let error = error {
-                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
-                } else if let value = value {
-                    result(value)
-                } else {
-                    result(FlutterError(code: "Sahha Error", message: "Sahha was unable to authenticate", details: nil))
-                }
-            }
+        if let values = params as? [Any?], let token = values[0] as? String, let refreshToken = values[1] as? String {
+            Sahha.authenticate(token: token, refreshToken: refreshToken)
+            result(true)
         } else {
-            result(FlutterError(code: "Sahha Error", message: "Something went wrong", details: nil))
+            result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.authenticate() parameters are missing", details: nil))
         }
     }
     

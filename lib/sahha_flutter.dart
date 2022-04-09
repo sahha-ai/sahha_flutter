@@ -30,12 +30,11 @@ class SahhaFlutter {
     }
   }
 
-  static Future<String> authenticate(
-      String customerId, String profileId) async {
+  static Future<bool> authenticate(String token, String refreshToken) async {
     try {
-      String value =
-          await _channel.invokeMethod('authenticate', [customerId, profileId]);
-      return value;
+      bool success =
+          await _channel.invokeMethod('authenticate', [token, refreshToken]);
+      return success;
     } on PlatformException catch (error) {
       return Future.error(error);
     }
