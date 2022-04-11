@@ -1,16 +1,17 @@
-# sahha_flutter_example
+# Sahha Demo App for Flutter
 
-Demonstrates how to use the sahha_flutter plugin.
+The Sahha Demo App provides a convenient way to try the features of the Sahha SDK.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Installation
 
-A few resources to get you started if this is your first Flutter project:
+Run `flutter pub get` inside the `example` project folder.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+### iOS
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Run `pod install` inside the `example/ios` project folder.
+
+---
+
+Copyright © 2022 Sahha. All rights reserved.

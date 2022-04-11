@@ -1,15 +1,25 @@
-# sahha_flutter
+# Sahha SDK for Flutter Apps
 
-A new flutter plugin project.
+The Sahha SDK provides a convenient way for Flutter apps to connect to the Sahha API.
 
-## Getting Started
+[Sahha API](https://sandbox-api.sahha.ai/index.html)
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+---
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Docs
 
+The Sahha Docs provide detailed instructions for installation and usage of the Sahha SDK.
+
+[Sahha Docs](https://developer.sahha.ai/docs/flutter.html)
+
+---
+
+## Example
+
+The Sahha Demo App provides a convenient way to try the features of the Sahha SDK.
+
+[Sahha Demo App](https://github.com/sahha-ai/sahha_flutter/tree/master/example)
+
+---
+
+Copyright © 2022 Sahha. All rights reserved.
