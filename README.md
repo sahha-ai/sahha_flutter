@@ -2,7 +2,7 @@
 
 The Sahha SDK provides a convenient way for Flutter apps to connect to the Sahha API.
 
-[Sahha API](https://sandbox-api.sahha.ai/index.html)
+[Sahha API](https://sandbox-api.sahha.ai/api-docs/index.html)
 
 ---
 
