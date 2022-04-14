@@ -23,15 +23,19 @@ class AppState extends State<App> {
   void initState() {
     super.initState();
 
+    // Use default values
     SahhaFlutter.configure(environment: SahhaEnvironment.development)
         .then((success) => {debugPrint(success.toString())})
         .catchError((error, stackTrace) => {debugPrint(error.toString())});
 
-    /*
+/*
+    // Use custom values
     SahhaFlutter.configure(
-        environment: SahhaEnvironment.production,
-        sensors: [SahhaSensor.device],
-        postActivityManually: true);
+            environment: SahhaEnvironment.production,
+            sensors: [SahhaSensor.device],
+            postActivityManually: true)
+        .then((success) => {debugPrint(success.toString())})
+        .catchError((error, stackTrace) => {debugPrint(error.toString())});
         */
   }
 
