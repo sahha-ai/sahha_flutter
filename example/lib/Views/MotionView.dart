@@ -27,14 +27,6 @@ class MotionState extends State<MotionView> {
   onTapEnable(BuildContext context) {
     if (activityStatus == SahhaActivityStatus.disabled) {
       SahhaFlutter.openAppSettings();
-      /*
-      SahhaFlutter.promptUserToActivate(SahhaActivity.motion).then((value) {
-        setState(() {
-          activityStatus = value;
-        });
-        debugPrint('activate motion ' + describeEnum(activityStatus));
-      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
-      */
     } else {
       SahhaFlutter.activate(SahhaActivity.motion).then((value) {
         setState(() {
