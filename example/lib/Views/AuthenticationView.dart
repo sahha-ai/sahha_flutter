@@ -12,7 +12,7 @@ class AuthenticationView extends StatefulWidget {
 class AuthenticationState extends State<AuthenticationView> {
   TextEditingController tokenController = TextEditingController();
   TextEditingController refreshTokenController = TextEditingController();
-  String token = '';
+  String accessToken = '';
   String refreshToken = '';
 
   @override
@@ -26,8 +26,8 @@ class AuthenticationState extends State<AuthenticationView> {
   void getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      token = (prefs.getString('token') ?? '');
-      tokenController.text = token;
+      accessToken = (prefs.getString('accessToken') ?? '');
+      tokenController.text = accessToken;
       refreshToken = (prefs.getString('refreshToken') ?? '');
       refreshTokenController.text = refreshToken;
     });
@@ -37,20 +37,21 @@ class AuthenticationState extends State<AuthenticationView> {
   void setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      prefs.setString('token', token);
+      prefs.setString('accessToken', accessToken);
       prefs.setString('refreshToken', refreshToken);
     });
   }
 
   onTapAuthenticate(BuildContext context) {
-    if (token.isEmpty) {
-      showAlertDialog(context, 'MISSING INFO', "You need to input a TOKEN");
+    if (accessToken.isEmpty) {
+      showAlertDialog(
+          context, 'MISSING INFO', "You need to input an ACCESS TOKEN");
     } else if (refreshToken.isEmpty) {
       showAlertDialog(
           context, 'MISSING INFO', "You need to input a REFRESH TOKEN");
     } else {
       setPrefs();
-      SahhaFlutter.authenticate(token, refreshToken)
+      SahhaFlutter.authenticate(accessToken, refreshToken)
           .then((success) =>
               {showAlertDialog(context, 'AUTHORIZED', success.toString())})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
@@ -100,10 +101,10 @@ class AuthenticationState extends State<AuthenticationView> {
                 controller: tokenController,
                 autocorrect: false,
                 enableSuggestions: false,
-                decoration: const InputDecoration(labelText: "TOKEN"),
+                decoration: const InputDecoration(labelText: "ACCESS TOKEN"),
                 onChanged: (text) {
                   setState(() {
-                    token = tokenController.text;
+                    accessToken = tokenController.text;
                   });
                 },
               ),
