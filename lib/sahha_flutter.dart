@@ -18,32 +18,45 @@ class SahhaFlutter {
   static Future<bool> configure(
       {required SahhaEnvironment environment,
       List<SahhaSensor> sensors = sensorList,
-      bool postActivityManually = false}) async {
+      bool postSensorDataManually = false}) async {
     // Convert to strings
     List<String> sensorStrings = sensors.map(describeEnum).toList();
     try {
-      bool success = await _channel.invokeMethod('configure',
-          [describeEnum(environment), sensorStrings, postActivityManually]);
+      bool success = await _channel.invokeMethod('configure', {
+        'environment': describeEnum(environment),
+        'sensors': sensorStrings,
+        'postSensorDataManually': postSensorDataManually
+      });
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);
     }
   }
 
-  static Future<bool> authenticate(String token, String refreshToken) async {
+  static Future<bool> authenticate(
+      String profileToken, String refreshToken) async {
     try {
-      bool success =
-          await _channel.invokeMethod('authenticate', [token, refreshToken]);
+      bool success = await _channel.invokeMethod('authenticate',
+          {'profileToken': profileToken, 'refreshToken': refreshToken});
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);
     }
   }
 
-  static Future<bool> postDemographic({int? age, String? gender}) async {
+  static Future<String> getDemographic() async {
+    try {
+      String value = await _channel.invokeMethod('getDemographic');
+      return value;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<bool> postDemographic(Map demographic) async {
     try {
       bool success =
-          await _channel.invokeMethod('postDemographic', [age, gender]);
+          await _channel.invokeMethod('postDemographic', demographic);
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);
@@ -54,7 +67,7 @@ class SahhaFlutter {
       SahhaActivity activity) async {
     try {
       int statusInt = await _channel
-          .invokeMethod('activityStatus', [describeEnum(activity)]);
+          .invokeMethod('activityStatus', {'activity': describeEnum(activity)});
       SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
       return status;
     } on PlatformException catch (error) {
@@ -64,20 +77,8 @@ class SahhaFlutter {
 
   static Future<SahhaActivityStatus> activate(SahhaActivity activity) async {
     try {
-      int statusInt =
-          await _channel.invokeMethod('activate', [describeEnum(activity)]);
-      SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
-      return status;
-    } on PlatformException catch (error) {
-      return Future.error(error);
-    }
-  }
-
-  static Future<SahhaActivityStatus> promptUserToActivate(
-      SahhaActivity activity) async {
-    try {
       int statusInt = await _channel
-          .invokeMethod('promptUserToActivate', [describeEnum(activity)]);
+          .invokeMethod('activate', {'activity': describeEnum(activity)});
       SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
       return status;
     } on PlatformException catch (error) {
@@ -89,10 +90,13 @@ class SahhaFlutter {
     _channel.invokeMethod('openAppSettings');
   }
 
-  static Future<bool> postActivity(SahhaActivity activity) async {
+  static Future<bool> postSensorData(
+      {List<SahhaSensor> sensors = sensorList}) async {
     try {
-      bool success =
-          await _channel.invokeMethod('postActivity', [describeEnum(activity)]);
+      // Convert to strings
+      List<String> sensorStrings = sensors.map(describeEnum).toList();
+      bool success = await _channel
+          .invokeMethod('postSensorData', {'sensors': sensorStrings});
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);

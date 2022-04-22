@@ -10,9 +10,9 @@ class AuthenticationView extends StatefulWidget {
 }
 
 class AuthenticationState extends State<AuthenticationView> {
-  TextEditingController tokenController = TextEditingController();
+  TextEditingController profileTokenController = TextEditingController();
   TextEditingController refreshTokenController = TextEditingController();
-  String accessToken = '';
+  String profileToken = '';
   String refreshToken = '';
 
   @override
@@ -26,8 +26,8 @@ class AuthenticationState extends State<AuthenticationView> {
   void getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      accessToken = (prefs.getString('accessToken') ?? '');
-      tokenController.text = accessToken;
+      profileToken = (prefs.getString('profileToken') ?? '');
+      profileTokenController.text = profileToken;
       refreshToken = (prefs.getString('refreshToken') ?? '');
       refreshTokenController.text = refreshToken;
     });
@@ -37,21 +37,21 @@ class AuthenticationState extends State<AuthenticationView> {
   void setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      prefs.setString('accessToken', accessToken);
+      prefs.setString('profileToken', profileToken);
       prefs.setString('refreshToken', refreshToken);
     });
   }
 
-  onTapAuthenticate(BuildContext context) {
-    if (accessToken.isEmpty) {
+  onTapSave(BuildContext context) {
+    if (profileToken.isEmpty) {
       showAlertDialog(
-          context, 'MISSING INFO', "You need to input an ACCESS TOKEN");
+          context, 'MISSING INFO', "You need to input an PROFILE TOKEN");
     } else if (refreshToken.isEmpty) {
       showAlertDialog(
           context, 'MISSING INFO', "You need to input a REFRESH TOKEN");
     } else {
       setPrefs();
-      SahhaFlutter.authenticate(accessToken, refreshToken)
+      SahhaFlutter.authenticate(profileToken, refreshToken)
           .then((success) =>
               {showAlertDialog(context, 'AUTHORIZED', success.toString())})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
@@ -98,13 +98,13 @@ class AuthenticationState extends State<AuthenticationView> {
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: tokenController,
+                controller: profileTokenController,
                 autocorrect: false,
                 enableSuggestions: false,
-                decoration: const InputDecoration(labelText: "ACCESS TOKEN"),
+                decoration: const InputDecoration(labelText: "PROFILE TOKEN"),
                 onChanged: (text) {
                   setState(() {
-                    accessToken = tokenController.text;
+                    profileToken = profileTokenController.text;
                   });
                 },
               ),
@@ -128,9 +128,25 @@ class AuthenticationState extends State<AuthenticationView> {
                   textStyle: const TextStyle(fontSize: 16),
                 ),
                 onPressed: () {
-                  onTapAuthenticate(context);
+                  onTapSave(context);
                 },
-                child: const Text('AUTHENTICATE'),
+                child: const Text('SAVE'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(40),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                onPressed: () {
+                  setState(() {
+                    profileTokenController.text = '';
+                    refreshTokenController.text = '';
+                  });
+                },
+                child: const Text('DELETE'),
               ),
             ],
           ),

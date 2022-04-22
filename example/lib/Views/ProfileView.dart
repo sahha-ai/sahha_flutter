@@ -22,6 +22,10 @@ class ProfileState extends State<ProfileView> {
   void initState() {
     super.initState();
 
+    SahhaFlutter.getDemographic()
+        .then((value) => {debugPrint(value)})
+        .catchError((error, stackTrace) => {debugPrint(error.toString())});
+
     getPrefs();
   }
 
@@ -68,7 +72,8 @@ class ProfileState extends State<ProfileView> {
       showAlertDialog(context, 'MISSING INFO', "You need to input a GENDER");
     } else {
       setPrefs();
-      SahhaFlutter.postDemographic(age: int.tryParse(ageString), gender: gender)
+      var demographic = {'age': int.tryParse(ageString), 'gender': gender};
+      SahhaFlutter.postDemographic(demographic)
           .then((success) => {debugPrint(success.toString())})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
