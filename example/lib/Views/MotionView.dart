@@ -20,12 +20,17 @@ class MotionState extends State<MotionView> {
       setState(() {
         activityStatus = value;
       });
+      if (value == SahhaActivityStatus.enabled) {
+        SahhaFlutter.postSensorData(
+            sensors: [SahhaSensor.pedometer, SahhaSensor.device]);
+      }
       debugPrint('init motion ' + describeEnum(activityStatus));
     }).catchError((error, stackTrace) => {debugPrint(error.toString())});
   }
 
   onTapEnable(BuildContext context) {
     if (activityStatus == SahhaActivityStatus.disabled) {
+      debugPrint('openAppSettings');
       SahhaFlutter.openAppSettings();
     } else {
       SahhaFlutter.activate(SahhaActivity.motion).then((value) {

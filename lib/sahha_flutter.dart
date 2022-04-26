@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
+import 'package:permission_handler/permission_handler.dart';
 
 enum SahhaEnvironment { development, production }
 enum SahhaSensor { sleep, pedometer, device }
@@ -65,24 +67,65 @@ class SahhaFlutter {
 
   static Future<SahhaActivityStatus> activityStatus(
       SahhaActivity activity) async {
-    try {
-      int statusInt = await _channel
-          .invokeMethod('activityStatus', {'activity': describeEnum(activity)});
-      SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
-      return status;
-    } on PlatformException catch (error) {
-      return Future.error(error);
+    if (Platform.isAndroid) {
+      bool isPending =
+          await Permission.activityRecognition.shouldShowRequestRationale;
+      if (isPending) {
+        return SahhaActivityStatus.pending;
+      }
+      var status = await Permission.activityRecognition.status;
+      switch (status) {
+        case PermissionStatus.restricted:
+          return SahhaActivityStatus.unavailable;
+        case PermissionStatus.denied:
+          return SahhaActivityStatus.pending;
+        case PermissionStatus.permanentlyDenied:
+          return SahhaActivityStatus.disabled;
+        case PermissionStatus.limited:
+          return SahhaActivityStatus.enabled;
+        case PermissionStatus.granted:
+          return SahhaActivityStatus.enabled;
+        default:
+          return SahhaActivityStatus.pending;
+      }
+    } else {
+      try {
+        int statusInt = await _channel.invokeMethod(
+            'activityStatus', {'activity': describeEnum(activity)});
+        SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
+        return status;
+      } on PlatformException catch (error) {
+        return Future.error(error);
+      }
     }
   }
 
   static Future<SahhaActivityStatus> activate(SahhaActivity activity) async {
-    try {
-      int statusInt = await _channel
-          .invokeMethod('activate', {'activity': describeEnum(activity)});
-      SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
-      return status;
-    } on PlatformException catch (error) {
-      return Future.error(error);
+    if (Platform.isAndroid) {
+      var status = await Permission.activityRecognition.request();
+      switch (status) {
+        case PermissionStatus.restricted:
+          return SahhaActivityStatus.unavailable;
+        case PermissionStatus.denied:
+          return SahhaActivityStatus.pending;
+        case PermissionStatus.permanentlyDenied:
+          return SahhaActivityStatus.disabled;
+        case PermissionStatus.limited:
+          return SahhaActivityStatus.enabled;
+        case PermissionStatus.granted:
+          return SahhaActivityStatus.enabled;
+        default:
+          return SahhaActivityStatus.pending;
+      }
+    } else {
+      try {
+        int statusInt = await _channel
+            .invokeMethod('activate', {'activity': describeEnum(activity)});
+        SahhaActivityStatus status = SahhaActivityStatus.values[statusInt];
+        return status;
+      } on PlatformException catch (error) {
+        return Future.error(error);
+      }
     }
   }
 

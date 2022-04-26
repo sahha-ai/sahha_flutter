@@ -20,10 +20,11 @@ class HealthState extends State<HealthView> {
       setState(() {
         activityStatus = value;
       });
+      if (value == SahhaActivityStatus.enabled) {
+        SahhaFlutter.postSensorData(sensors: [SahhaSensor.sleep]);
+      }
       debugPrint('init health ' + describeEnum(activityStatus));
-    }).catchError((error, stackTrace) => {
-        debugPrint(error.toString())
-      });
+    }).catchError((error, stackTrace) => {debugPrint(error.toString())});
   }
 
   onTapEnable(BuildContext context) {
@@ -32,9 +33,7 @@ class HealthState extends State<HealthView> {
         activityStatus = value;
       });
       debugPrint('activate health ' + describeEnum(activityStatus));
-    }).catchError((error, stackTrace) => {
-        debugPrint(error.toString())
-      });
+    }).catchError((error, stackTrace) => {debugPrint(error.toString())});
   }
 
   @override

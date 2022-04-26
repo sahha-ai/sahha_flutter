@@ -177,7 +177,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             if sahhaSensors.isEmpty {
                 result(FlutterError(code: "Sahha Error", message: "Sahha Sensors parameter is empty", details: nil))
             } else {
-                Sahha.postSensorData { error, success in
+                Sahha.postSensorData(sahhaSensors) { error, success in
                     if let error = error {
                         result(FlutterError(code: "Sahha Error", message: error, details: nil))
                     } else {

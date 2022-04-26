@@ -1,19 +1,22 @@
 package com.sahha.flutter
 
 import android.app.Activity
+import android.app.ActivityManager
+import android.app.Application
 import android.content.Context
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.annotation.NonNull
 import com.google.gson.Gson
 import io.flutter.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.android.FlutterFragmentActivity;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-
 import sdk.sahha.android.source.*
 
 /** SahhaFlutterPlugin */
@@ -36,14 +39,13 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel: MethodChannel
-  private var activity: Activity? = null
   private lateinit var context: Context
+  private var flutterActivity: Activity? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "sahha_flutter")
     channel.setMethodCallHandler(this)
     context = flutterPluginBinding.applicationContext
-    Log.d("Sahha", context.toString())
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
@@ -52,7 +54,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onDetachedFromActivity() {
     Log.d("Sahha", "onDetachedFromActivity")
-    activity = null
+    flutterActivity = null
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
@@ -62,8 +64,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     Log.d("Sahha", "onAttachedToActivity")
-    activity = binding.activity
-    Log.d("Sahha", activity.toString())
+    flutterActivity = binding.activity
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
@@ -114,16 +115,21 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         return
       }
 
-      var settings = SahhaSettings(sahhaEnvironment,
+      var sahhaSettings = SahhaSettings(sahhaEnvironment,
               SahhaFramework.flutter,
               sahhaSensors,
               postSensorDataManually
       )
 
       try {
-        Log.d("Sahha", activity.toString())
-        Sahha.configure(activity as ComponentActivity, settings)
-        result.success(true)
+        var app = flutterActivity?.application
+        if (app != null) {
+          Log.d("Sahha", "Application is OK")
+          Sahha.configure(app, sahhaSettings)
+          result.success(true)
+        } else {
+          Log.e("Sahha", "Application is null")
+        }
       } catch(e: IllegalArgumentException) {
         Log.e("Sahha", e.message ?: "Activity error")
         result.error("Sahha Error", "SahhaFlutter.configure() Android activity is not valid", null)
@@ -213,8 +219,12 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         var sahhaActivity = SahhaActivity.valueOf(activityName)
         when (sahhaActivity) {
           SahhaActivity.motion -> {
-            Sahha.motion.activate { newStatus ->
-              result.success(newStatus.ordinal)
+            Sahha.motion.activate { error, newStatus ->
+              if (error != null) {
+                result.error("Sahha Error", error, null)
+              } else {
+                result.success(newStatus.ordinal)
+              }
             }
           }
           else -> {
@@ -266,9 +276,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun openAppSettings(@NonNull call: MethodCall, @NonNull result: Result) {
-    Sahha.motion.promptUserToActivate { _ ->
-      result.success(true)
-    }
+    Sahha.openAppSettings(context);
   }
 
 }
