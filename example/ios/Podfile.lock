@@ -1,15 +1,8 @@
 PODS:
-  - AppCenter (4.4.2):
-    - AppCenter/Analytics (= 4.4.2)
-    - AppCenter/Crashes (= 4.4.2)
-  - AppCenter/Analytics (4.4.2):
-    - AppCenter/Core
-  - AppCenter/Core (4.4.2)
-  - AppCenter/Crashes (4.4.2):
-    - AppCenter/Core
   - Flutter (1.0.0)
-  - Sahha (0.0.0):
-    - AppCenter
+  - permission_handler_apple (9.0.4):
+    - Flutter
+  - Sahha (0.0.2)
   - sahha_flutter (0.0.1):
     - Flutter
     - Sahha
@@ -18,31 +11,31 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - Sahha (from `../../../sahha-swift`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - sahha_flutter (from `.symlinks/plugins/sahha_flutter/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
 
 SPEC REPOS:
   trunk:
-    - AppCenter
+    - Sahha
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  Sahha:
-    :path: "../../../sahha-swift"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   sahha_flutter:
     :path: ".symlinks/plugins/sahha_flutter/ios"
   shared_preferences_ios:
     :path: ".symlinks/plugins/shared_preferences_ios/ios"
 
 SPEC CHECKSUMS:
-  AppCenter: b0eca112a27b71e97488ffa1949ee38c7abd4b79
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  Sahha: 8417145b62c7ff0f3ec8a26844547081036a0804
+  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
+  Sahha: 2001d2c3f4913eb32085a178211b0aa3d534a06e
   sahha_flutter: 7abc361e4da0fc01da3f638883fab70e8fd60edd
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
 
-PODFILE CHECKSUM: 5ba18bc8164f57e90ea65b0e93fdc771637dec1f
+PODFILE CHECKSUM: 1c37a75bef797a021544940ad10145e56e85f594
 
 COCOAPODS: 1.11.3
