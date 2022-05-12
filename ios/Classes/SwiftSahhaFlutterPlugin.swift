@@ -13,8 +13,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case authenticate
         case getDemographic
         case postDemographic
-        case activityStatus
-        case activate
+        case getSensorStatus
+        case enableSensor
         case postSensorData
         case analyze
         case openAppSettings
@@ -38,10 +38,10 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             getDemographic(result: result)
         case .postDemographic:
             postDemographic(call.arguments, result: result)
-        case .activityStatus:
-            activityStatus(call.arguments, result: result)
-        case .activate:
-            activate(call.arguments, result: result)
+        case .getSensorStatus:
+            getSensorStatus(call.arguments, result: result)
+        case .enableSensor:
+            enableSensor(call.arguments, result: result)
         case .postSensorData:
             postSensorData(call.arguments, result: result)
         case .analyze:
@@ -133,33 +133,23 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func activityStatus(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let activityString = values["activity"] as? String, let activity = SahhaActivity(rawValue: activityString) {
-            switch activity {
-            case .motion:
-                result(Sahha.motion.activityStatus.rawValue)
-            case .health:
-                result(Sahha.health.activityStatus.rawValue)
+    private func getSensorStatus(_ params: Any?, result: @escaping FlutterResult) {
+        if let values = params as? [String: Any?], let sensorString = values["sensor"] as? String, let sensor = SahhaSensor(rawValue: sensorString) {
+            Sahha.getSensorStatus(sensor) { sensorStatus in
+                result(sensorStatus.rawValue)
             }
         } else {
-            result(FlutterError(code: "Sahha Error", message: "Requested Sahha Activity not found", details: nil))
+            result(FlutterError(code: "Sahha Error", message: "Sahha Sensor parameter is not valid", details: nil))
         }
     }
 
-    private func activate(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let activityString = values["activity"] as? String, let activity = SahhaActivity(rawValue: activityString) {
-            switch activity {
-            case .motion:
-                Sahha.motion.activate { activityStatus in
-                    result(activityStatus.rawValue)
-                }
-            case .health:
-                Sahha.health.activate { activityStatus in
-                    result(activityStatus.rawValue)
-                }
+    private func enableSensor(_ params: Any?, result: @escaping FlutterResult) {
+        if let values = params as? [String: Any?], let sensorString = values["sensor"] as? String, let sensor = SahhaSensor(rawValue: sensorString) {
+            Sahha.enableSensor(sensor) { sensorStatus in
+                result(sensorStatus.rawValue)
             }
         } else {
-            result(FlutterError(code: "Sahha Error", message: "Requested Sahha Activity not found", details: nil))
+            result(FlutterError(code: "Sahha Error", message: "Sahha Sensor parameter is not valid", details: nil))
         }
     }
 

@@ -12,18 +12,17 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - Sahha (from `../../../sahha-swift`)
   - sahha_flutter (from `.symlinks/plugins/sahha_flutter/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
-
-SPEC REPOS:
-  trunk:
-    - Sahha
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  Sahha:
+    :path: "../../../sahha-swift"
   sahha_flutter:
     :path: ".symlinks/plugins/sahha_flutter/ios"
   shared_preferences_ios:
@@ -36,6 +35,6 @@ SPEC CHECKSUMS:
   sahha_flutter: 7abc361e4da0fc01da3f638883fab70e8fd60edd
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
 
-PODFILE CHECKSUM: 1c37a75bef797a021544940ad10145e56e85f594
+PODFILE CHECKSUM: 5ba18bc8164f57e90ea65b0e93fdc771637dec1f
 
 COCOAPODS: 1.11.3

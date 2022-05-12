@@ -27,8 +27,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     authenticate,
     getDemographic,
     postDemographic,
-    activityStatus,
-    activate,
+    getSensorStatus,
+    enableSensor,
     postSensorData,
     analyze,
     openAppSettings
@@ -80,8 +80,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       SahhaMethod.authenticate.name -> {authenticate(call, result)}
       SahhaMethod.getDemographic.name -> {getDemographic(call, result)}
       SahhaMethod.postDemographic.name -> {postDemographic(call, result)}
-      SahhaMethod.activityStatus.name -> {activityStatus(call, result)}
-      SahhaMethod.activate.name -> {activate(call, result)}
+      SahhaMethod.getSensorStatus.name -> {getSensorStatus(call, result)}
+      SahhaMethod.enableSensor.name -> {enableSensor(call, result)}
       SahhaMethod.postSensorData.name -> {postSensorData(call, result)}
       SahhaMethod.analyze.name -> {analyze(call, result)}
       SahhaMethod.openAppSettings.name -> {openAppSettings(call, result)}
@@ -187,55 +187,47 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
   }
 
-  private fun activityStatus(@NonNull call: MethodCall, @NonNull result: Result) {
+  private fun getSensorStatus(@NonNull call: MethodCall, @NonNull result: Result) {
 
-    var activityName: String? = call.argument<String>("activity")
+    var sensorName: String? = call.argument<String>("sensor")
 
-    if (activityName != null) {
+    if (sensorName != null) {
       try {
-        var sahhaActivity = SahhaActivity.valueOf(activityName)
-        when (sahhaActivity) {
-          SahhaActivity.motion -> {
-            result.success(Sahha.motion.activityStatus.ordinal)
-          }
-          else -> {
-            result.error("Sahha Error", "SahhaFlutter activity parameter is not valid", null)
+        var sahhaSensor = SahhaSensor.valueOf(sensorName)
+        Sahha.getSensorStatus(context, sahhaSensor) { error, sensorStatus ->
+          if (error != null) {
+            result.error("Sahha Error", error, null)
+          } else {
+            result.success(sensorStatus.ordinal)
           }
         }
       } catch (e: IllegalArgumentException) {
-        result.error("Sahha Error", "SahhaFlutter activity parameter is not valid", null)
+        result.error("Sahha Error", "SahhaFlutter sensor parameter is not valid", null)
       }
     } else {
-      result.error("Sahha Error", "SahhaFlutter activity parameter is missing", null)
+      result.error("Sahha Error", "SahhaFlutter sensor parameter is missing", null)
     }
   }
 
-  private fun activate(@NonNull call: MethodCall, @NonNull result: Result) {
+  private fun enableSensor(@NonNull call: MethodCall, @NonNull result: Result) {
 
-    var activityName: String? = call.argument<String>("activity")
+    var sensorName: String? = call.argument<String>("sensor")
 
-    if (activityName != null) {
+    if (sensorName != null) {
       try {
-        var sahhaActivity = SahhaActivity.valueOf(activityName)
-        when (sahhaActivity) {
-          SahhaActivity.motion -> {
-            Sahha.motion.activate { error, newStatus ->
-              if (error != null) {
-                result.error("Sahha Error", error, null)
-              } else {
-                result.success(newStatus.ordinal)
-              }
-            }
-          }
-          else -> {
-            result.error("Sahha Error", "SahhaFlutter activity parameter is not valid", null)
+        var sahhaSensor = SahhaSensor.valueOf(sensorName)
+        Sahha.enableSensor(context, sahhaSensor,) { error, sensorStatus ->
+          if (error != null) {
+            result.error("Sahha Error", error, null)
+          } else {
+            result.success(sensorStatus.ordinal)
           }
         }
       } catch (e: IllegalArgumentException) {
-        result.error("Sahha Error", "SahhaFlutter activity parameter is not valid", null)
+        result.error("Sahha Error", "SahhaFlutter sensor parameter is not valid", null)
       }
     } else {
-      result.error("Sahha Error", "SahhaFlutter activity parameter is missing", null)
+      result.error("Sahha Error", "SahhaFlutter sensor parameter is missing", null)
     }
   }
 
@@ -254,13 +246,24 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         result.error("Sahha Error", "SahhaFlutter.postSensorData() sensor parameter is not valid", null)
         return
       }
-    }
 
-    /*
-    Sahha.postSensorData(sahhaSensors) { error, success ->
+      Sahha.postSensorData(sahhaSensors) { error, success ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(success)
+        }
+      }
+
+    } else {
+      Sahha.postSensorData { error, success ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(success)
+        }
+      }
     }
-     */
-    result.success(true)
   }
 
   private fun analyze(@NonNull call: MethodCall, @NonNull result: Result) {

@@ -48,30 +48,12 @@ class HomeView extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 20),
-                  if (Platform.isIOS)
-                    ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.favorite,
-                        size: 32,
-                      ),
-                      label: const Text('Health'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 20),
-                        textStyle: const TextStyle(fontSize: 20),
-                      ),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/health');
-                      },
-                    ),
-                  if (Platform.isIOS) const SizedBox(height: 20),
                   ElevatedButton.icon(
                     icon: const Icon(
-                      Icons.directions_walk,
+                      Icons.dark_mode,
                       size: 32,
                     ),
-                    label: const Text('Motion'),
+                    label: const Text('Sleep'),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
                       padding: const EdgeInsets.symmetric(
@@ -79,7 +61,24 @@ class HomeView extends StatelessWidget {
                       textStyle: const TextStyle(fontSize: 20),
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/motion');
+                      Navigator.pushNamed(context, '/sleep');
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.directions_walk,
+                      size: 32,
+                    ),
+                    label: const Text('Pedometer'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 20),
+                      textStyle: const TextStyle(fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/pedometer');
                     },
                   ),
                   const SizedBox(height: 20),
