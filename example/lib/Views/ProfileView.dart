@@ -73,10 +73,24 @@ class ProfileState extends State<ProfileView> {
     } else {
       setPrefs();
       var demographic = {'age': int.tryParse(ageString), 'gender': gender};
-      SahhaFlutter.postDemographic(demographic)
-          .then((success) => {debugPrint(success.toString())})
-          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+      SahhaFlutter.postDemographic(demographic).then((success) {
+        debugPrint(success.toString());
+        showAlertDialog(context, "SAVE", success.toString());
+      }).catchError((error, stackTrace) {
+        debugPrint(error.toString());
+        showAlertDialog(context, "SAVE", "error");
+      });
     }
+  }
+
+  onTapFetch(BuildContext context) {
+    SahhaFlutter.getDemographic().then((value) {
+      debugPrint(value);
+      showAlertDialog(context, "FETCH", value);
+    }).catchError((error, stackTrace) {
+      debugPrint(error.toString());
+      showAlertDialog(context, "FETCH", "error");
+    });
   }
 
   showAlertDialog(BuildContext context, String title, String message) {
@@ -158,6 +172,19 @@ class ProfileState extends State<ProfileView> {
                   onTapSave(context);
                 },
                 child: const Text('SAVE'),
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(40),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                onPressed: () {
+                  onTapFetch(context);
+                },
+                child: const Text('FETCH'),
               ),
             ],
           ),
