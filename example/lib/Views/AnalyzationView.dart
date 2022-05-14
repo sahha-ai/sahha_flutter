@@ -4,12 +4,17 @@ import 'package:sahha_flutter/sahha_flutter.dart';
 class AnalyzationView extends StatelessWidget {
   const AnalyzationView({Key? key}) : super(key: key);
 
-  onTapAnalyze(BuildContext context) {
-    SahhaFlutter.analyze()
-        .then((value) => {showAlertDialog(context, value)})
-        .catchError((error, stackTrace) => {
-          debugPrint(error.toString())
-    });
+  onTapAnalyze(BuildContext context, bool isDaily) {
+    if (isDaily) {
+      SahhaFlutter.analyze()
+          .then((value) => {showAlertDialog(context, value)})
+          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+    } else {
+      var week = DateTime.now().subtract(Duration(days: 7));
+      SahhaFlutter.analyze(startDate: week, endDate: DateTime.now())
+          .then((value) => {showAlertDialog(context, value)})
+          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+    }
   }
 
   showAlertDialog(BuildContext context, String value) {
@@ -64,9 +69,22 @@ class AnalyzationView extends StatelessWidget {
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                     onPressed: () {
-                      onTapAnalyze(context);
+                      onTapAnalyze(context, false);
                     },
-                    child: const Text('ANALYZE'),
+                    child: const Text('ANALYZE PREVIOUS WEEK'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(40),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 20),
+                      textStyle: const TextStyle(fontSize: 16),
+                    ),
+                    onPressed: () {
+                      onTapAnalyze(context, true);
+                    },
+                    child: const Text('ANALYZE PREVIOUS DAY'),
                   ),
                 ]),
           ),

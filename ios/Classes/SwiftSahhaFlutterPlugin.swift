@@ -45,7 +45,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case .postSensorData:
             postSensorData(call.arguments, result: result)
         case .analyze:
-            analyze(result: result)
+            analyze(call.arguments, result: result)
         case .openAppSettings:
             Sahha.openAppSettings()
         default:
@@ -180,8 +180,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func analyze(result: @escaping FlutterResult) {
-        Sahha.analyze { error, value in
+    private func analyze(_ params: Any?, result: @escaping FlutterResult) {
             if let error = error {
                 result(FlutterError(code: "Sahha Error", message: error, details: nil))
             } else if let value = value {
