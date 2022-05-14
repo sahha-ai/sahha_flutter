@@ -18,6 +18,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import sdk.sahha.android.source.*
+import java.util.*
 
 /** SahhaFlutterPlugin */
 class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -94,65 +95,70 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     val environment: String? = call.argument<String>("environment")
     val sensors: List<String>? = call.argument<List<String>>("sensors")
     var postSensorDataManually: Boolean? = call.argument<Boolean>("postSensorDataManually")
-    if (environment != null && sensors != null && postSensorDataManually != null) {
 
-      var sahhaEnvironment: SahhaEnvironment
-      try {
-        sahhaEnvironment = SahhaEnvironment.valueOf(environment)
-      } catch(e: IllegalArgumentException) {
-        result.error("Sahha Error", "SahhaFlutter.configure() environment parameter is not valid", null)
-        return
-      }
-
-      var sahhaSensors: MutableSet<SahhaSensor> = mutableSetOf()
-      try {
-        sensors.forEach {
-          var sensor = SahhaSensor.valueOf(it)
-          sahhaSensors.add(sensor)
-        }
-      } catch(e: IllegalArgumentException) {
-        result.error("Sahha Error", "SahhaFlutter.configure() sensor parameter is not valid", null)
-        return
-      }
-
-      var sahhaSettings = SahhaSettings(sahhaEnvironment,
-              SahhaFramework.flutter,
-              sahhaSensors,
-              postSensorDataManually
-      )
-
-      try {
-        var app = flutterActivity?.application
-        if (app != null) {
-          Log.d("Sahha", "Application is OK")
-          Sahha.configure(app, sahhaSettings)
-          result.success(true)
-        } else {
-          Log.e("Sahha", "Application is null")
-        }
-      } catch(e: IllegalArgumentException) {
-        Log.e("Sahha", e.message ?: "Activity error")
-        result.error("Sahha Error", "SahhaFlutter.configure() Android activity is not valid", null)
-      }
-
-    } else {
+    if (environment == null || sensors == null || postSensorDataManually == null) {
       result.error("Sahha Error", "SahhaFlutter.configure() parameters are not valid", null)
+      return
+    }
+
+    var sahhaEnvironment: SahhaEnvironment
+    try {
+      sahhaEnvironment = SahhaEnvironment.valueOf(environment)
+    } catch (e: IllegalArgumentException) {
+      result.error(
+        "Sahha Error",
+        "SahhaFlutter.configure() environment parameter is not valid",
+        null
+      )
+      return
+    }
+
+    var sahhaSensors: MutableSet<SahhaSensor> = mutableSetOf()
+    try {
+      sensors.forEach {
+        var sensor = SahhaSensor.valueOf(it)
+        sahhaSensors.add(sensor)
+      }
+    } catch (e: IllegalArgumentException) {
+      result.error("Sahha Error", "SahhaFlutter.configure() sensor parameter is not valid", null)
+      return
+    }
+
+    var sahhaSettings = SahhaSettings(
+      sahhaEnvironment,
+      SahhaFramework.flutter,
+      sahhaSensors,
+      postSensorDataManually
+    )
+
+    try {
+      var app = flutterActivity?.application
+      if (app != null) {
+        Log.d("Sahha", "Application is OK")
+        Sahha.configure(app, sahhaSettings)
+        result.success(true)
+      } else {
+        Log.e("Sahha", "Application is null")
+      }
+    } catch (e: IllegalArgumentException) {
+      Log.e("Sahha", e.message ?: "Activity error")
+      result.error("Sahha Error", "SahhaFlutter.configure() Android activity is not valid", null)
     }
   }
 
   private fun authenticate(@NonNull call: MethodCall, @NonNull result: Result) {
     val profileToken: String? = call.argument<String>("profileToken")
     val refreshToken: String? = call.argument<String>("refreshToken")
-    if (profileToken != null && refreshToken != null) {
-      Sahha.authenticate(profileToken,refreshToken) { error, success ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(success)
-        }
-      }
-    } else {
+    if (profileToken == null || refreshToken == null) {
       result.error("Sahha Error", "SahhaFlutter.authenticate() parameters are not valid", null)
+      return
+    }
+    Sahha.authenticate(profileToken, refreshToken) { error, success ->
+      if (error != null) {
+        result.error("Sahha Error", error, null)
+      } else {
+        result.success(success)
+      }
     }
   }
 
@@ -191,21 +197,21 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     var sensorName: String? = call.argument<String>("sensor")
 
-    if (sensorName != null) {
-      try {
-        var sahhaSensor = SahhaSensor.valueOf(sensorName)
-        Sahha.getSensorStatus(context, sahhaSensor) { error, sensorStatus ->
-          if (error != null) {
-            result.error("Sahha Error", error, null)
-          } else {
-            result.success(sensorStatus.ordinal)
-          }
-        }
-      } catch (e: IllegalArgumentException) {
-        result.error("Sahha Error", "SahhaFlutter sensor parameter is not valid", null)
-      }
-    } else {
+    if (sensorName == null) {
       result.error("Sahha Error", "SahhaFlutter sensor parameter is missing", null)
+      return
+    }
+    try {
+      var sahhaSensor = SahhaSensor.valueOf(sensorName)
+      Sahha.getSensorStatus(context, sahhaSensor) { error, sensorStatus ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(sensorStatus.ordinal)
+        }
+      }
+    } catch (e: IllegalArgumentException) {
+      result.error("Sahha Error", "SahhaFlutter sensor parameter is not valid", null)
     }
   }
 
@@ -213,21 +219,21 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     var sensorName: String? = call.argument<String>("sensor")
 
-    if (sensorName != null) {
-      try {
-        var sahhaSensor = SahhaSensor.valueOf(sensorName)
-        Sahha.enableSensor(context, sahhaSensor,) { error, sensorStatus ->
-          if (error != null) {
-            result.error("Sahha Error", error, null)
-          } else {
-            result.success(sensorStatus.ordinal)
-          }
-        }
-      } catch (e: IllegalArgumentException) {
-        result.error("Sahha Error", "SahhaFlutter sensor parameter is not valid", null)
-      }
-    } else {
+    if (sensorName == null) {
       result.error("Sahha Error", "SahhaFlutter sensor parameter is missing", null)
+      return
+    }
+    try {
+      var sahhaSensor = SahhaSensor.valueOf(sensorName)
+      Sahha.enableSensor(context, sahhaSensor) { error, sensorStatus ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(sensorStatus.ordinal)
+        }
+      }
+    } catch (e: IllegalArgumentException) {
+      result.error("Sahha Error", "SahhaFlutter sensor parameter is not valid", null)
     }
   }
 
@@ -235,7 +241,15 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     val sensors: List<String>? = call.argument<List<String>>("sensors")
     var sahhaSensors: MutableSet<SahhaSensor>?
-    if (sensors != null) {
+    if (sensors == null) {
+      Sahha.postSensorData { error, success ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(success)
+        }
+      }
+    } else {
       sahhaSensors = mutableSetOf()
       try {
         sensors.forEach {
@@ -254,19 +268,16 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           result.success(success)
         }
       }
-
-    } else {
-      Sahha.postSensorData { error, success ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(success)
-        }
-      }
     }
   }
 
   private fun analyze(@NonNull call: MethodCall, @NonNull result: Result) {
+
+    var startDate: String = call.argument<String>("startDate") ?: "Missing start date"
+    var endDate: String = call.argument<String>("endDate") ?: "Missing end date"
+    Log.d("Sahha", "startDate $startDate")
+    Log.d("Sahha", "endDate $endDate")
+
     Sahha.analyze() { error, value ->
       if (error != null) {
         result.error("Sahha Error", error, null)
