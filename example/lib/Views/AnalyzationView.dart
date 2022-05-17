@@ -9,11 +9,6 @@ class AnalyzationView extends StatelessWidget {
       SahhaFlutter.analyze()
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
-    } else {
-      var week = DateTime.now().subtract(Duration(days: 7));
-      SahhaFlutter.analyze(startDate: week, endDate: DateTime.now())
-          .then((value) => {showAlertDialog(context, value)})
-          .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
   }
 
@@ -60,19 +55,6 @@ class AnalyzationView extends StatelessWidget {
                   const Text('A new analysis will be available every 24 hours',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 18)),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(40),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 20),
-                      textStyle: const TextStyle(fontSize: 16),
-                    ),
-                    onPressed: () {
-                      onTapAnalyze(context, false);
-                    },
-                    child: const Text('ANALYZE PREVIOUS WEEK'),
-                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(

@@ -101,17 +101,9 @@ class SahhaFlutter {
     }
   }
 
-  static Future<String> analyze(
-      {DateTime? startDate, DateTime? endDate}) async {
+  static Future<String> analyze() async {
     try {
-      String? startDateString;
-      String? endDateString;
-      if (startDate != null && endDate != null) {
-        startDateString = startDate.toIso8601String();
-        endDateString = endDate.toIso8601String();
-      }
-      String value = await _channel.invokeMethod(
-          'analyze', {'startDate': startDateString, 'endDate': endDateString});
+      String value = await _channel.invokeMethod('analyze');
       return value;
     } on PlatformException catch (error) {
       return Future.error(error);

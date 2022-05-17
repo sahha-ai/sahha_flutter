@@ -273,11 +273,6 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   private fun analyze(@NonNull call: MethodCall, @NonNull result: Result) {
 
-    var startDate: String = call.argument<String>("startDate") ?: "Missing start date"
-    var endDate: String = call.argument<String>("endDate") ?: "Missing end date"
-    Log.d("Sahha", "startDate $startDate")
-    Log.d("Sahha", "endDate $endDate")
-
     Sahha.analyze() { error, value ->
       if (error != null) {
         result.error("Sahha Error", error, null)
