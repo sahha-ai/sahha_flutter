@@ -1,7 +1,8 @@
 name: sahha_flutter
 description: Sahha Flutter Plugin
 version: 0.0.2
-homepage:
+homepage: https://sahha.ai
+repository: https://github.com/sahha-ai/sahha_flutter
 
 environment:
   sdk: ">=2.16.0 <3.0.0"
