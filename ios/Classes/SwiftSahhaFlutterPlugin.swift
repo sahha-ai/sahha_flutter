@@ -179,9 +179,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "Sahha Error", message: "Sahha Sensors parameter is missing", details: nil))
         }
     }
-    
+
     private func analyze(_ params: Any?, result: @escaping FlutterResult) {
-        Sahha.analyze { error, value in
             if let error = error {
                 result(FlutterError(code: "Sahha Error", message: error, details: nil))
             } else if let value = value {
