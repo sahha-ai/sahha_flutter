@@ -1,3 +1,20 @@
+## 0.0.3 alpha
+
+### Added
+
+- Health sensor data updates while app is in background (iOS)
+- Analyze endpoint takes an optional range of dates to include
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.0.2 alpha
 
 ### Added
