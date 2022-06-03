@@ -273,18 +273,39 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   private fun analyze(@NonNull call: MethodCall, @NonNull result: Result) {
 
-    var startDate: String = call.argument<String>("startDate") ?: "Missing start date"
-    var endDate: String = call.argument<String>("endDate") ?: "Missing end date"
-    Log.d("Sahha", "startDate $startDate")
-    Log.d("Sahha", "endDate $endDate")
+    val startDate: Long? = call.argument<Long>("startDate")
+    if (startDate != null) {
+      Log.d("Sahha", "startDate $startDate")
+    } else {
+      Log.d("Sahha", "startDate missing")
+    }
 
-    Sahha.analyze() { error, value ->
-      if (error != null) {
-        result.error("Sahha Error", error, null)
-      } else if (value != null) {
-        result.success(value)
-      } else {
-        result.error("Sahha Error", "Sahha Analyzation not available", null)
+    val endDate: Long? = call.argument<Long>("endDate")
+    if (endDate != null) {
+      Log.d("Sahha", "endDate $endDate")
+    } else {
+      Log.d("Sahha", "endDate missing")
+    }
+
+    if (startDate != null && endDate != null) {
+      Sahha.analyze(Pair(Date(startDate), Date(endDate))) { error, value ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else if (value != null) {
+          result.success(value)
+        } else {
+          result.error("Sahha Error", "Sahha Analyzation not available", null)
+        }
+      }
+    } else {
+      Sahha.analyze() { error, value ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else if (value != null) {
+          result.success(value)
+        } else {
+          result.error("Sahha Error", "Sahha Analyzation not available", null)
+        }
       }
     }
   }
