@@ -1,3 +1,19 @@
+## 0.0.4 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- Sensor permission error on Android
+
+---
+
 ## 0.0.3 alpha
 
 ### Added
