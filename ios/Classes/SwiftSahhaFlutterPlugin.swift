@@ -183,8 +183,10 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     private func analyze(_ params: Any?, result: @escaping FlutterResult) {
         var dates: (startDate: Date, endDate: Date)?
         if let values = params as? [String: Any?], let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
-            let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.intValue / 1000))
-            let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.intValue / 1000))
+            let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+            let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
+            print("startDate", startDate.toTimezoneFormat)
+            print("endDate", endDate.toTimezoneFormat)
             dates = (startDate, endDate)
             print(startDate, endDate)
         } else {
