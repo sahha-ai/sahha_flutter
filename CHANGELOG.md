@@ -1,3 +1,19 @@
+## 0.0.5 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- Changed analyze method to use double instead of long for iOS
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.0.4 alpha
 
 ### Added
