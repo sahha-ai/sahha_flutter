@@ -22,7 +22,6 @@ class AuthenticationState extends State<AuthenticationView> {
     getPrefs();
   }
 
-  //Loading counter value on start
   void getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -33,7 +32,6 @@ class AuthenticationState extends State<AuthenticationView> {
     });
   }
 
-  //Incrementing counter after click
   void setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {

@@ -1,17 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AnalyzationView extends StatelessWidget {
+class AnalyzationView extends StatefulWidget {
   const AnalyzationView({Key? key}) : super(key: key);
+
+  @override
+  AnalyzationState createState() => AnalyzationState();
+}
+
+class AnalyzationState extends State<AnalyzationView> {
+  bool includeSourceData = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getPrefs();
+  }
+
+  void getPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      includeSourceData = (prefs.getBool('includeSourceData') ?? false);
+    });
+  }
+
+  void setPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setBool('includeSourceData', includeSourceData);
+    });
+  }
 
   onTapAnalyze(BuildContext context, bool isDaily) {
     if (isDaily) {
-      SahhaFlutter.analyze()
+      SahhaFlutter.analyze(includeSourceData: includeSourceData)
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
       var week = DateTime.now().subtract(Duration(days: 7));
-      SahhaFlutter.analyze(startDate: week, endDate: DateTime.now())
+      SahhaFlutter.analyze(
+              startDate: week,
+              endDate: DateTime.now(),
+              includeSourceData: includeSourceData)
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
@@ -60,6 +92,17 @@ class AnalyzationView extends StatelessWidget {
                   const Text('A new analysis will be available every 24 hours',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 20),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    const Text('Include Source Data'),
+                    Checkbox(
+                        value: includeSourceData,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            includeSourceData = value!;
+                          });
+                        }),
+                  ]),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
