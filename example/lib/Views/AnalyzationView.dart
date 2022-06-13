@@ -101,6 +101,7 @@ class AnalyzationState extends State<AnalyzationView> {
                           setState(() {
                             includeSourceData = value!;
                           });
+                          setPrefs();
                         }),
                   ]),
                   const SizedBox(height: 20),
