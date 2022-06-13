@@ -121,6 +121,31 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             if let birthCountry = values["birthCountry"] as? String {
                 demographic.birthCountry = birthCountry
             }
+            if let ethnicity = values["ethnicity"] as? String {
+                demographic.ethnicity = ethnicity
+            }
+            if let occupation = values["occupation"] as? String {
+                demographic.occupation = occupation
+            }
+            if let industry = values["industry"] as? String {
+                demographic.industry = industry
+            }
+            if let incomeRange = values["incomeRange"] as? String {
+                demographic.incomeRange = incomeRange
+            }
+            if let education = values["education"] as? String {
+                demographic.education = education
+            }
+            if let relationship = values["relationship"] as? String {
+                demographic.relationship = relationship
+            }
+            if let locale = values["locale"] as? String {
+                demographic.locale = locale
+            }
+            if let livingArrangement = values["livingArrangement"] as? String {
+                demographic.livingArrangement = livingArrangement
+            }
+            
             Sahha.postDemographic(demographic) { error, success in
                 if let error = error {
                     result(FlutterError(code: "Sahha Error", message: error, details: nil))
