@@ -145,6 +145,9 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             if let livingArrangement = values["livingArrangement"] as? String {
                 demographic.livingArrangement = livingArrangement
             }
+            if let birthDate = values["birthDate"] as? String {
+                demographic.birthDate = birthDate
+            }
             
             Sahha.postDemographic(demographic) { error, success in
                 if let error = error {
