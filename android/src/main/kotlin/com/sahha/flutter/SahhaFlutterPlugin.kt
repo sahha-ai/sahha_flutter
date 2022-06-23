@@ -190,9 +190,10 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     val relationship: String? = call.argument<String>("relationship")
     val locale: String? = call.argument<String>("locale")
     val livingArrangement: String? = call.argument<String>("livingArrangement")
+    val birthDate: String? = call.argument<String>("birthDate")
+    var sahhaDemographic = SahhaDemographic(age, gender, country, birthCountry, ethnicity, occupation, industry, incomeRange, education, relationship, locale, livingArrangement, birthDate)
 
-    var demographic = SahhaDemographic(age, gender, country, birthCountry)
-    Sahha.postDemographic(demographic) { error, success ->
+    Sahha.postDemographic(sahhaDemographic) { error, success ->
       if (error != null) {
         result.error("Sahha Error", error, null)
       } else {
