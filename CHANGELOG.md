@@ -1,3 +1,21 @@
+## 0.0.6 alpha
+
+### Added
+
+- Added more demographic parameters
+- Added pedometer sensor
+- Added an optional list of sensor data used for analyzation
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- Fixed some issues with missing sensor data on Android and iOS
+
+---
+
 ## 0.0.5 alpha
 
 ### Added
