@@ -1,9 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 enum SahhaEnvironment { development, production }
+
 enum SahhaSensor { sleep, pedometer, device }
+
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
 
 class SahhaFlutter {
