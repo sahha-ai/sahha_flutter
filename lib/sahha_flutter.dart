@@ -6,6 +6,12 @@ enum SahhaEnvironment { development, production }
 enum SahhaSensor { sleep, pedometer, device }
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
 
+class SahhaNotificationSettings {
+  final String? icon, title, shortDescription;
+  const SahhaNotificationSettings(
+      {this.icon, this.title, this.shortDescription});
+}
+
 class SahhaFlutter {
   static const MethodChannel _channel = MethodChannel('sahha_flutter');
   static const List<SahhaSensor> sensorList = [
@@ -17,12 +23,15 @@ class SahhaFlutter {
   static Future<bool> configure(
       {required SahhaEnvironment environment,
       List<SahhaSensor> sensors = sensorList,
-      bool postSensorDataManually = false}) async {
+      bool postSensorDataManually = false,
+      Map<String, String> notificationSettings =
+          const <String, String>{}}) async {
     // Convert to strings
     List<String> sensorStrings = sensors.map(describeEnum).toList();
     try {
       bool success = await _channel.invokeMethod('configure', {
         'environment': describeEnum(environment),
+        'notificationSettings': notificationSettings,
         'sensors': sensorStrings,
         'postSensorDataManually': postSensorDataManually
       });

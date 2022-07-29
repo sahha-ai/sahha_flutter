@@ -93,10 +93,11 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   fun configure(@NonNull call: MethodCall, @NonNull result: Result) {
 
     val environment: String? = call.argument<String>("environment")
+    val notificationSettings: HashMap<String, String>? = call.argument<HashMap<String, String>>("notificationSettings")
     val sensors: List<String>? = call.argument<List<String>>("sensors")
-    var postSensorDataManually: Boolean? = call.argument<Boolean>("postSensorDataManually")
+    val postSensorDataManually: Boolean? = call.argument<Boolean>("postSensorDataManually")
 
-    if (environment == null || sensors == null || postSensorDataManually == null) {
+    if (environment == null || notificationSettings == null || sensors == null || postSensorDataManually == null) {
       result.error("Sahha Error", "SahhaFlutter.configure() parameters are not valid", null)
       return
     }
@@ -108,6 +109,32 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       result.error(
         "Sahha Error",
         "SahhaFlutter.configure() environment parameter is not valid",
+        null
+      )
+      return
+    }
+
+    var sahhaNotificationConfiguration: SahhaNotificationConfiguration? = null
+    try {
+      Log.d("Sahha", "notificationSettings")
+      notificationSettings.also { nSettings ->
+        val icon = nSettings.get("icon")
+        val title = nSettings.get("title")
+        val shortDescription = nSettings.get("shortDescription")
+
+        sahhaNotificationConfiguration = SahhaNotificationConfiguration(
+          SahhaConverterUtility.stringToDrawableResource(
+            context,
+            icon
+          ),
+          title,
+          shortDescription,
+        )
+      }
+    } catch (e: IllegalArgumentException) {
+      result.error(
+        "Sahha Error",
+        "SahhaFlutter.configure() notificationSettings parameter is not valid",
         null
       )
       return
@@ -126,6 +153,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     var sahhaSettings = SahhaSettings(
       sahhaEnvironment,
+      sahhaNotificationConfiguration,
       SahhaFramework.flutter,
       sahhaSensors,
       postSensorDataManually
