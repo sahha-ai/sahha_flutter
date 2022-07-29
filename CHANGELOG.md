@@ -1,3 +1,19 @@
+## 0.0.7 alpha
+
+### Added
+
+- Custom notification settings for Android
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.0.6 alpha
 
 ### Added
