@@ -1,3 +1,19 @@
+## 0.1.0 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- Refactored sensor methods
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.0.7 alpha
 
 ### Added
