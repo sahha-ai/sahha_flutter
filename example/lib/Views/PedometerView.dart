@@ -16,14 +16,10 @@ class PedometerState extends State<PedometerView> {
   void initState() {
     super.initState();
     debugPrint('init pedometer');
-    SahhaFlutter.getSensorStatus(SahhaSensor.pedometer).then((value) {
+    SahhaFlutter.getSensorStatus().then((value) {
       setState(() {
         sensorStatus = value;
       });
-      if (value == SahhaSensorStatus.enabled) {
-        SahhaFlutter.postSensorData(
-            sensors: [SahhaSensor.pedometer, SahhaSensor.device]);
-      }
       debugPrint('init pedometer ' + describeEnum(sensorStatus));
     }).catchError((error, stackTrace) => {debugPrint(error.toString())});
   }
@@ -32,7 +28,7 @@ class PedometerState extends State<PedometerView> {
     if (sensorStatus == SahhaSensorStatus.disabled) {
       openAppSettings(context);
     } else {
-      SahhaFlutter.enableSensor(SahhaSensor.pedometer).then((value) {
+      SahhaFlutter.enableSensors().then((value) {
         setState(() {
           sensorStatus = value;
         });

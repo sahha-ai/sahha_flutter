@@ -14,7 +14,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case getDemographic
         case postDemographic
         case getSensorStatus
-        case enableSensor
+        case enableSensors
         case postSensorData
         case analyze
         case openAppSettings
@@ -35,15 +35,15 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case .authenticate:
             authenticate(call.arguments, result: result)
         case .getDemographic:
-            getDemographic(result: result)
+            getDemographic(result)
         case .postDemographic:
             postDemographic(call.arguments, result: result)
         case .getSensorStatus:
-            getSensorStatus(call.arguments, result: result)
-        case .enableSensor:
-            enableSensor(call.arguments, result: result)
+            getSensorStatus(result)
+        case .enableSensors:
+            enableSensors(result)
         case .postSensorData:
-            postSensorData(call.arguments, result: result)
+            postSensorData(result)
         case .analyze:
             analyze(call.arguments, result: result)
         case .openAppSettings:
@@ -84,7 +84,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func getDemographic(result: @escaping FlutterResult) {
+    private func getDemographic(_ result: @escaping FlutterResult) {
         Sahha.getDemographic { error, value in
             if let error = error {
                 result(FlutterError(code: "Sahha Error", message: error, details: nil))
@@ -161,50 +161,25 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func getSensorStatus(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let sensorString = values["sensor"] as? String, let sensor = SahhaSensor(rawValue: sensorString) {
-            Sahha.getSensorStatus(sensor) { sensorStatus in
-                result(sensorStatus.rawValue)
-            }
-        } else {
-            result(FlutterError(code: "Sahha Error", message: "Sahha Sensor parameter is not valid", details: nil))
+    private func getSensorStatus(_ result: @escaping FlutterResult) {
+        Sahha.getSensorStatus { sensorStatus in
+            result(sensorStatus.rawValue)
         }
     }
-
-    private func enableSensor(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let sensorString = values["sensor"] as? String, let sensor = SahhaSensor(rawValue: sensorString) {
-            Sahha.enableSensor(sensor) { sensorStatus in
-                result(sensorStatus.rawValue)
-            }
-        } else {
-            result(FlutterError(code: "Sahha Error", message: "Sahha Sensor parameter is not valid", details: nil))
+    
+    private func enableSensors(_ result: @escaping FlutterResult) {
+        Sahha.enableSensors { sensorStatus in
+            result(sensorStatus.rawValue)
         }
     }
-
-    private func postSensorData(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let sensors = values["sensors"] as? [String] {
-            var sahhaSensors: Set<SahhaSensor> = []
-            for sensor in sensors {
-                if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-                    sahhaSensors.insert(sahhaSensor)
-                } else {
-                    result(FlutterError(code: "Sahha Error", message: "\(sensor) is not a valid Sahha Sensor", details: nil))
-                    return
-                }
-            }
-            if sahhaSensors.isEmpty {
-                result(FlutterError(code: "Sahha Error", message: "Sahha Sensors parameter is empty", details: nil))
+    
+    private func postSensorData(_ result: @escaping FlutterResult) {
+        Sahha.postSensorData { error, success in
+            if let error = error {
+                result(FlutterError(code: "Sahha Error", message: error, details: nil))
             } else {
-                Sahha.postSensorData(sahhaSensors) { error, success in
-                    if let error = error {
-                        result(FlutterError(code: "Sahha Error", message: error, details: nil))
-                    } else {
-                        result(success)
-                    }
-                }
+                result(success)
             }
-        } else {
-            result(FlutterError(code: "Sahha Error", message: "Sahha Sensors parameter is missing", details: nil))
         }
     }
 

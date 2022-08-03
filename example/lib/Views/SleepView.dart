@@ -16,13 +16,10 @@ class SleepState extends State<SleepView> {
   void initState() {
     super.initState();
     debugPrint('init sleep');
-    SahhaFlutter.getSensorStatus(SahhaSensor.sleep).then((value) {
+    SahhaFlutter.getSensorStatus().then((value) {
       setState(() {
         sensorStatus = value;
       });
-      if (value == SahhaSensorStatus.enabled) {
-        SahhaFlutter.postSensorData(sensors: [SahhaSensor.sleep]);
-      }
       debugPrint('init sleep ' + describeEnum(sensorStatus));
     }).catchError((error, stackTrace) => {debugPrint(error.toString())});
   }
@@ -31,7 +28,7 @@ class SleepState extends State<SleepView> {
     if (sensorStatus == SahhaSensorStatus.disabled) {
       openAppSettings(context);
     } else {
-      SahhaFlutter.enableSensor(SahhaSensor.sleep).then((value) {
+      SahhaFlutter.enableSensors().then((value) {
         setState(() {
           sensorStatus = value;
         });

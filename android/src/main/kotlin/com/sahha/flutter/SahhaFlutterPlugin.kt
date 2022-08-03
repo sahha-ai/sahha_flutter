@@ -29,7 +29,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     getDemographic,
     postDemographic,
     getSensorStatus,
-    enableSensor,
+    enableSensors,
     postSensorData,
     analyze,
     openAppSettings
@@ -82,7 +82,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       SahhaMethod.getDemographic.name -> {getDemographic(call, result)}
       SahhaMethod.postDemographic.name -> {postDemographic(call, result)}
       SahhaMethod.getSensorStatus.name -> {getSensorStatus(call, result)}
-      SahhaMethod.enableSensor.name -> {enableSensor(call, result)}
+      SahhaMethod.enableSensors.name -> {enableSensors(call, result)}
       SahhaMethod.postSensorData.name -> {postSensorData(call, result)}
       SahhaMethod.analyze.name -> {analyze(call, result)}
       SahhaMethod.openAppSettings.name -> {openAppSettings(call, result)}
@@ -231,79 +231,31 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun getSensorStatus(@NonNull call: MethodCall, @NonNull result: Result) {
-
-    var sensorName: String? = call.argument<String>("sensor")
-
-    if (sensorName == null) {
-      result.error("Sahha Error", "SahhaFlutter sensor parameter is missing", null)
-      return
-    }
-    try {
-      var sahhaSensor = SahhaSensor.valueOf(sensorName)
-      Sahha.getSensorStatus(context, sahhaSensor) { error, sensorStatus ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(sensorStatus.ordinal)
-        }
+    Sahha.getSensorStatus(context) { error, sensorStatus ->
+      if (error != null) {
+        result.error("Sahha Error", error, null)
+      } else {
+        result.success(sensorStatus.ordinal)
       }
-    } catch (e: IllegalArgumentException) {
-      result.error("Sahha Error", "SahhaFlutter sensor parameter is not valid", null)
     }
   }
 
-  private fun enableSensor(@NonNull call: MethodCall, @NonNull result: Result) {
-
-    var sensorName: String? = call.argument<String>("sensor")
-
-    if (sensorName == null) {
-      result.error("Sahha Error", "SahhaFlutter sensor parameter is missing", null)
-      return
-    }
-    try {
-      var sahhaSensor = SahhaSensor.valueOf(sensorName)
-      Sahha.enableSensor(context, sahhaSensor) { error, sensorStatus ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(sensorStatus.ordinal)
-        }
+  private fun enableSensors(@NonNull call: MethodCall, @NonNull result: Result) {
+    Sahha.enableSensors(context) { error, sensorStatus ->
+      if (error != null) {
+        result.error("Sahha Error", error, null)
+      } else {
+        result.success(sensorStatus.ordinal)
       }
-    } catch (e: IllegalArgumentException) {
-      result.error("Sahha Error", "SahhaFlutter sensor parameter is not valid", null)
     }
   }
 
   private fun postSensorData(@NonNull call: MethodCall, @NonNull result: Result) {
-
-    val sensors: List<String>? = call.argument<List<String>>("sensors")
-    var sahhaSensors: MutableSet<SahhaSensor>?
-    if (sensors == null) {
-      Sahha.postSensorData { error, success ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(success)
-        }
-      }
-    } else {
-      sahhaSensors = mutableSetOf()
-      try {
-        sensors.forEach {
-          var sensor = SahhaSensor.valueOf(it)
-          sahhaSensors.add(sensor)
-        }
-      } catch (e: IllegalArgumentException) {
-        result.error("Sahha Error", "SahhaFlutter.postSensorData() sensor parameter is not valid", null)
-        return
-      }
-
-      Sahha.postSensorData(sahhaSensors) { error, success ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(success)
-        }
+    Sahha.postSensorData() { error, success ->
+      if (error != null) {
+        result.error("Sahha Error", error, null)
+      } else {
+        result.success(success)
       }
     }
   }

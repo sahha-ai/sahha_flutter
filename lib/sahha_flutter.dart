@@ -71,10 +71,9 @@ class SahhaFlutter {
     }
   }
 
-  static Future<SahhaSensorStatus> getSensorStatus(SahhaSensor sensor) async {
+  static Future<SahhaSensorStatus> getSensorStatus() async {
     try {
-      int statusInt = await _channel
-          .invokeMethod('getSensorStatus', {'sensor': describeEnum(sensor)});
+      int statusInt = await _channel.invokeMethod('getSensorStatus');
       SahhaSensorStatus status = SahhaSensorStatus.values[statusInt];
       return status;
     } on PlatformException catch (error) {
@@ -82,10 +81,9 @@ class SahhaFlutter {
     }
   }
 
-  static Future<SahhaSensorStatus> enableSensor(SahhaSensor sensor) async {
+  static Future<SahhaSensorStatus> enableSensors() async {
     try {
-      int statusInt = await _channel
-          .invokeMethod('enableSensor', {'sensor': describeEnum(sensor)});
+      int statusInt = await _channel.invokeMethod('enableSensors');
       SahhaSensorStatus status = SahhaSensorStatus.values[statusInt];
       return status;
     } on PlatformException catch (error) {
@@ -97,13 +95,9 @@ class SahhaFlutter {
     _channel.invokeMethod('openAppSettings');
   }
 
-  static Future<bool> postSensorData(
-      {List<SahhaSensor> sensors = sensorList}) async {
+  static Future<bool> postSensorData() async {
     try {
-      // Convert to strings
-      List<String> sensorStrings = sensors.map(describeEnum).toList();
-      bool success = await _channel
-          .invokeMethod('postSensorData', {'sensors': sensorStrings});
+      bool success = await _channel.invokeMethod('postSensorData');
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);
