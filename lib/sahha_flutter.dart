@@ -65,6 +65,16 @@ class SahhaFlutter {
     }
   }
 
+  static Future<String> getSensorData(SahhaSensor sensor) async {
+    try {
+      String data = await _channel
+          .invokeMethod('getSensorData', {'sensor': describeEnum(sensor)});
+      return data;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
   static Future<SahhaSensorStatus> getSensorStatus(SahhaSensor sensor) async {
     try {
       int statusInt = await _channel

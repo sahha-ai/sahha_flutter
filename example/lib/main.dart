@@ -3,6 +3,7 @@ import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:sahha_flutter_example/Views/HomeView.dart';
 import 'package:sahha_flutter_example/Views/AuthenticationView.dart';
 import 'package:sahha_flutter_example/Views/ProfileView.dart';
+import 'package:sahha_flutter_example/Views/SensorDataView.dart';
 import 'package:sahha_flutter_example/Views/SleepView.dart';
 import 'package:sahha_flutter_example/Views/PedometerView.dart';
 import 'package:sahha_flutter_example/Views/AnalyzationView.dart';
@@ -50,6 +51,7 @@ class AppState extends State<App> {
         '/sleep': (BuildContext context) => const SleepView(),
         '/pedometer': (BuildContext context) => const PedometerView(),
         '/analyzation': (BuildContext context) => const AnalyzationView(),
+        '/sensor_data': (BuildContext context) => const SensorDataView()
       },
     );
   }

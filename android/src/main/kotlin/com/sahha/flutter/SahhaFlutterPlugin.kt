@@ -32,7 +32,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     enableSensor,
     postSensorData,
     analyze,
-    openAppSettings
+    openAppSettings,
+    getSensorData
   }
 
   /// The MethodChannel that will the communication between Flutter and native Android
@@ -86,7 +87,25 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       SahhaMethod.postSensorData.name -> {postSensorData(call, result)}
       SahhaMethod.analyze.name -> {analyze(call, result)}
       SahhaMethod.openAppSettings.name -> {openAppSettings(call, result)}
+      SahhaMethod.getSensorData.name -> {getSensorData(call, result)}
       else -> { result.notImplemented() }
+    }
+  }
+
+  fun getSensorData(@NonNull call: MethodCall, @NonNull result: Result) {
+    val sensor: String? = call.argument<String>("sensor")
+    if (sensor == null) {
+      result.error("Sahha Error", "SahhaFlutter sensor parameter is missing", null)
+      return
+    }
+
+    Sahha.getSensorData(SahhaSensor.valueOf(sensor)) { error: String?, success: String? ->
+      if(error != null) {
+        result.error("Sahha Error", error, null)
+        return@getSensorData
+      }
+
+      result.success(success ?: "No data was found")
     }
   }
 
@@ -125,10 +144,10 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     var sahhaSettings = SahhaSettings(
-      sahhaEnvironment,
-      SahhaFramework.flutter,
-      sahhaSensors,
-      postSensorDataManually
+      environment = sahhaEnvironment,
+      framework = SahhaFramework.flutter,
+      sensors = sahhaSensors,
+      postSensorDataManually = postSensorDataManually
     )
 
     try {

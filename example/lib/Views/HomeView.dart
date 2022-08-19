@@ -98,6 +98,23 @@ class HomeView extends StatelessWidget {
                       Navigator.pushNamed(context, '/analyzation');
                     },
                   ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.bar_chart,
+                      size: 32,
+                    ),
+                    label: const Text('View Sensor Data'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 20),
+                      textStyle: const TextStyle(fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/sensor_data');
+                    },
+                  ),
                 ]),
           ),
         ));
