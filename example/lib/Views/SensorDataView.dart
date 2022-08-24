@@ -26,17 +26,19 @@ class SensorDataState extends State<SensorDataView> {
         onConfirm: (Picker picker, List value) {
           var index = value[0];
           var string = sensors[index];
-          setState(() {
-            sensorController.text = string;
-            sensor = string;
-            var sensorString = sensors.indexOf(sensor);
-            debugPrint(sensorString.toString());
-            var sahhaSensor = SahhaSensor.values.elementAt(sensorString);
-            debugPrint(sahhaSensor.toString());
+          sensorController.text = string;
+          sensor = string;
+          var sensorString = sensors.indexOf(sensor);
+          debugPrint(sensorString.toString());
+          var sahhaSensor = SahhaSensor.values.elementAt(sensorString);
+          debugPrint(sahhaSensor.toString());
 
-            SahhaFlutter.getSensorData(sahhaSensor).then((data) {
+          SahhaFlutter.getSensorData(sahhaSensor).then((data) {
+            setState(() {
               sensorDataController.text = data;
-            }).onError((error, stackTrace) {
+            });
+          }).onError((error, stackTrace) {
+            setState(() {
               sensorDataController.text = "No data found";
             });
           });
@@ -45,6 +47,8 @@ class SensorDataState extends State<SensorDataView> {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height - 259;
+
     return Scaffold(
         appBar: AppBar(title: const Text('Sensor Data')),
         body: Padding(
@@ -66,7 +70,14 @@ class SensorDataState extends State<SensorDataView> {
                   },
                 ),
                 const SizedBox(height: 20),
-                Text(sensorDataController.text)
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: height,
+                 child: SingleChildScrollView(
+                   scrollDirection: Axis.vertical,
+                   child: Text(sensorDataController.text),
+                 ),
+                ),
               ],
             ))));
   }
