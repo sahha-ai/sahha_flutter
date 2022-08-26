@@ -163,8 +163,13 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       var app = flutterActivity?.application
       if (app != null) {
         Log.d("Sahha", "Application is OK")
-        Sahha.configure(app, sahhaSettings)
-        result.success(true)
+        Sahha.configure(app, sahhaSettings) { error, success ->
+          if (error != null) {
+            result.error("Sahha Error", error, null)
+          } else {
+            result.success(success)
+          }
+        }
       } else {
         Log.e("Sahha", "Application is null")
       }

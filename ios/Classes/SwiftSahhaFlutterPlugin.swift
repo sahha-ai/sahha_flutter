@@ -64,12 +64,13 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
 
             var settings = SahhaSettings(environment: configEnvironment, sensors: configSensors, postSensorDataManually: postSensorDataManually.boolValue)
             settings.framework = .flutter
-            Sahha.configure(settings)
+            
+            Sahha.configure(settings) {
+                result(true)
+            }
 
             // Needed by Flutter since native iOS lifecycle is delayed
             Sahha.launch()
-
-            result(true)
         } else {
             result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() parameters are not valid", details: nil))
         }
