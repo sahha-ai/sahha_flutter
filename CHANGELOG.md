@@ -1,3 +1,19 @@
+## 0.1.1 alpha
+
+### Added
+
+- Added callback to configure method
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.1.0 alpha
 
 ### Added
