@@ -1,3 +1,19 @@
+## 0.1.2 alpha
+
+### Added
+
+- Added user device information
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.1.1 alpha
 
 ### Added
