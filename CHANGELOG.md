@@ -1,3 +1,19 @@
+## 0.1.3 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (Android) Fixed sleep receiver crashing
+
+---
+
 ## 0.1.2 alpha
 
 ### Added
