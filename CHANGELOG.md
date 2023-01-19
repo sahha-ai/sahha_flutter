@@ -1,3 +1,19 @@
+## 0.1.4 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (iOS) Configuration callback possibly fired multiple times
+
+---
+
 ## 0.1.3 alpha
 
 ### Added
