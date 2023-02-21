@@ -66,11 +66,10 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             settings.framework = .flutter
             
             Sahha.configure(settings) {
+                print("Sahha | Flutter configured")
                 result(true)
             }
 
-            // Needed by Flutter since native iOS lifecycle is delayed
-            Sahha.launch()
         } else {
             result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() parameters are not valid", details: nil))
         }
