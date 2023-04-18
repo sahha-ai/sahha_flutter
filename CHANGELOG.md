@@ -1,3 +1,19 @@
+## 0.2.0 alpha
+
+### Added
+
+- Added `heart` and `blood` sensors
+
+### Changed
+
+- Changed `authenticate` method to take `appId, appSecret, externalId` as parameters
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.1.4 alpha
 
 ### Added
