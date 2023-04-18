@@ -95,9 +95,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     val environment: String? = call.argument<String>("environment")
     val notificationSettings: HashMap<String, String>? = call.argument<HashMap<String, String>>("notificationSettings")
     val sensors: List<String>? = call.argument<List<String>>("sensors")
-    val postSensorDataManually: Boolean? = call.argument<Boolean>("postSensorDataManually")
 
-    if (environment == null || notificationSettings == null || sensors == null || postSensorDataManually == null) {
+    if (environment == null || notificationSettings == null || sensors == null) {
       result.error("Sahha Error", "SahhaFlutter.configure() parameters are not valid", null)
       return
     }
@@ -155,8 +154,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       sahhaEnvironment,
       sahhaNotificationConfiguration,
       SahhaFramework.flutter,
-      sahhaSensors,
-      postSensorDataManually
+      sahhaSensors
     )
 
     try {
@@ -180,13 +178,14 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun authenticate(@NonNull call: MethodCall, @NonNull result: Result) {
-    val profileToken: String? = call.argument<String>("profileToken")
-    val refreshToken: String? = call.argument<String>("refreshToken")
-    if (profileToken == null || refreshToken == null) {
+    val appId: String? = call.argument<String>("appId")
+    val appSecret: String? = call.argument<String>("appSecret")
+    val externalId: String? = call.argument<String>("externalId")
+    if (appId == null || appSecret == null || externalId == null) {
       result.error("Sahha Error", "SahhaFlutter.authenticate() parameters are not valid", null)
       return
     }
-    Sahha.authenticate(profileToken, refreshToken) { error, success ->
+    Sahha.authenticate(appId, appSecret, externalId) { error, success ->
       if (error != null) {
         result.error("Sahha Error", error, null)
       } else {

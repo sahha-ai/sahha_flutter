@@ -10,7 +10,7 @@ class AnalyzationView extends StatefulWidget {
 }
 
 class AnalyzationState extends State<AnalyzationView> {
-  bool includeSourceData = false;
+  //bool includeSourceData = false;
 
   @override
   void initState() {
@@ -22,28 +22,25 @@ class AnalyzationState extends State<AnalyzationView> {
   void getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      includeSourceData = (prefs.getBool('includeSourceData') ?? false);
+      //includeSourceData = (prefs.getBool('includeSourceData') ?? false);
     });
   }
 
   void setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      prefs.setBool('includeSourceData', includeSourceData);
+      //prefs.setBool('includeSourceData', includeSourceData);
     });
   }
 
   onTapAnalyze(BuildContext context, bool isDaily) {
     if (isDaily) {
-      SahhaFlutter.analyze(includeSourceData: includeSourceData)
+      SahhaFlutter.analyze()
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
       var week = DateTime.now().subtract(Duration(days: 7));
-      SahhaFlutter.analyze(
-              startDate: week,
-              endDate: DateTime.now(),
-              includeSourceData: includeSourceData)
+      SahhaFlutter.analyze(startDate: week, endDate: DateTime.now())
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
@@ -93,6 +90,7 @@ class AnalyzationState extends State<AnalyzationView> {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 20),
+                  /*
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     const Text('Include Source Data'),
                     Checkbox(
@@ -104,6 +102,7 @@ class AnalyzationState extends State<AnalyzationView> {
                           setPrefs();
                         }),
                   ]),
+                  */
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(

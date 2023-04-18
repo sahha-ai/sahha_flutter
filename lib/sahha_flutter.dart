@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 enum SahhaEnvironment { development, production }
-enum SahhaSensor { sleep, pedometer, device }
+
+enum SahhaSensor { sleep, pedometer, device, heart, blood }
+
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
 
 class SahhaNotificationSettings {
@@ -17,13 +19,14 @@ class SahhaFlutter {
   static const List<SahhaSensor> sensorList = [
     SahhaSensor.sleep,
     SahhaSensor.pedometer,
-    SahhaSensor.device
+    SahhaSensor.device,
+    SahhaSensor.heart,
+    SahhaSensor.blood
   ];
 
   static Future<bool> configure(
       {required SahhaEnvironment environment,
       List<SahhaSensor> sensors = sensorList,
-      bool postSensorDataManually = false,
       Map<String, String> notificationSettings =
           const <String, String>{}}) async {
     // Convert to strings
@@ -32,8 +35,7 @@ class SahhaFlutter {
       bool success = await _channel.invokeMethod('configure', {
         'environment': describeEnum(environment),
         'notificationSettings': notificationSettings,
-        'sensors': sensorStrings,
-        'postSensorDataManually': postSensorDataManually
+        'sensors': sensorStrings
       });
       return success;
     } on PlatformException catch (error) {
@@ -42,10 +44,10 @@ class SahhaFlutter {
   }
 
   static Future<bool> authenticate(
-      String profileToken, String refreshToken) async {
+      String appId, String appSecret, String externalId) async {
     try {
       bool success = await _channel.invokeMethod('authenticate',
-          {'profileToken': profileToken, 'refreshToken': refreshToken});
+          {'appId': appId, 'appSecret': appSecret, 'externalId': externalId});
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);

@@ -54,7 +54,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     }
 
     private func configure(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let environment = values["environment"] as? String, let configEnvironment = SahhaEnvironment(rawValue: environment), let sensors = values["sensors"] as? [String], let postSensorDataManually = values["postSensorDataManually"] as? NSNumber {
+        if let values = params as? [String: Any?], let environment = values["environment"] as? String, let configEnvironment = SahhaEnvironment(rawValue: environment), let sensors = values["sensors"] as? [String] {
             var configSensors: Set<SahhaSensor> = []
             for sensor in sensors {
                 if let configSensor = SahhaSensor(rawValue: sensor) {
@@ -62,24 +62,28 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 }
             }
 
-            var settings = SahhaSettings(environment: configEnvironment, sensors: configSensors, postSensorDataManually: postSensorDataManually.boolValue)
+            var settings = SahhaSettings(environment: configEnvironment, sensors: configSensors)
             settings.framework = .flutter
             
             Sahha.configure(settings) {
                 result(true)
             }
 
-            // Needed by Flutter since native iOS lifecycle is delayed
-            Sahha.launch()
         } else {
             result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() parameters are not valid", details: nil))
         }
     }
-
+    
     private func authenticate(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let profileToken = values["profileToken"] as? String, let refreshToken = values["refreshToken"] as? String {
-            let success = Sahha.authenticate(profileToken: profileToken, refreshToken: refreshToken)
-            result(success)
+        if let values = params as? [String: Any?], let appId = values["appId"] as? String, let appSecret = values["appSecret"] as? String, let externalId = values["externalId"] as? String {
+            
+            Sahha.authenticate(appId: appId, appSecret: appSecret, externalId: externalId) { error, success in
+                if let error = error {
+                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                } else if success {
+                    result(success)
+                }
+            }
         } else {
             result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.authenticate() parameters are not valid", details: nil))
         }

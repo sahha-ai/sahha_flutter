@@ -10,10 +10,12 @@ class AuthenticationView extends StatefulWidget {
 }
 
 class AuthenticationState extends State<AuthenticationView> {
-  TextEditingController profileTokenController = TextEditingController();
-  TextEditingController refreshTokenController = TextEditingController();
-  String profileToken = '';
-  String refreshToken = '';
+  TextEditingController appIdController = TextEditingController();
+  TextEditingController appSecretController = TextEditingController();
+  TextEditingController externalIdController = TextEditingController();
+  String appId = '';
+  String appSecret = '';
+  String externalId = '';
 
   @override
   void initState() {
@@ -25,31 +27,36 @@ class AuthenticationState extends State<AuthenticationView> {
   void getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      profileToken = (prefs.getString('profileToken') ?? '');
-      profileTokenController.text = profileToken;
-      refreshToken = (prefs.getString('refreshToken') ?? '');
-      refreshTokenController.text = refreshToken;
+      appId = (prefs.getString('appId') ?? '');
+      appIdController.text = appId;
+      appSecret = (prefs.getString('appSecret') ?? '');
+      appSecretController.text = appSecret;
+      externalId = (prefs.getString('externalId') ?? '');
+      externalIdController.text = externalId;
     });
   }
 
   void setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      prefs.setString('profileToken', profileToken);
-      prefs.setString('refreshToken', refreshToken);
+      prefs.setString('appId', appId);
+      prefs.setString('appSecret', appSecret);
+      prefs.setString('externalId', externalId);
     });
   }
 
   onTapSave(BuildContext context) {
-    if (profileToken.isEmpty) {
+    if (appId.isEmpty) {
+      showAlertDialog(context, 'MISSING INFO', "You need to input an APP ID");
+    } else if (appSecret.isEmpty) {
       showAlertDialog(
-          context, 'MISSING INFO', "You need to input an PROFILE TOKEN");
-    } else if (refreshToken.isEmpty) {
+          context, 'MISSING INFO', "You need to input an APP SECRET");
+    } else if (externalId.isEmpty) {
       showAlertDialog(
-          context, 'MISSING INFO', "You need to input a REFRESH TOKEN");
+          context, 'MISSING INFO', "You need to input an EXTERNAL ID");
     } else {
       setPrefs();
-      SahhaFlutter.authenticate(profileToken, refreshToken)
+      SahhaFlutter.authenticate(appId, appSecret, externalId)
           .then((success) =>
               {showAlertDialog(context, 'AUTHORIZED', success.toString())})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
@@ -96,24 +103,35 @@ class AuthenticationState extends State<AuthenticationView> {
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: profileTokenController,
+                controller: appIdController,
                 autocorrect: false,
                 enableSuggestions: false,
-                decoration: const InputDecoration(labelText: "PROFILE TOKEN"),
+                decoration: const InputDecoration(labelText: "APP ID"),
                 onChanged: (text) {
                   setState(() {
-                    profileToken = profileTokenController.text;
+                    appId = appIdController.text;
                   });
                 },
               ),
               TextField(
-                controller: refreshTokenController,
+                controller: appSecretController,
                 autocorrect: false,
                 enableSuggestions: false,
-                decoration: const InputDecoration(labelText: "REFRESH TOKEN"),
+                decoration: const InputDecoration(labelText: "APP SECRET"),
                 onChanged: (text) {
                   setState(() {
-                    refreshToken = refreshTokenController.text;
+                    appSecret = appSecretController.text;
+                  });
+                },
+              ),
+              TextField(
+                controller: externalIdController,
+                autocorrect: false,
+                enableSuggestions: false,
+                decoration: const InputDecoration(labelText: "EXTERNAL ID"),
+                onChanged: (text) {
+                  setState(() {
+                    externalId = externalIdController.text;
                   });
                 },
               ),
@@ -140,8 +158,9 @@ class AuthenticationState extends State<AuthenticationView> {
                 ),
                 onPressed: () {
                   setState(() {
-                    profileTokenController.text = '';
-                    refreshTokenController.text = '';
+                    appIdController.text = '';
+                    appSecretController.text = '';
+                    externalIdController.text = '';
                   });
                 },
                 child: const Text('DELETE'),

@@ -40,7 +40,6 @@ class AppState extends State<App> {
     SahhaFlutter.configure(
             environment: SahhaEnvironment.production,
             sensors: [SahhaSensor.device],
-            postSensorDataManually: true,
             notificationSettings: notificationSettings)
         .then((success) => {debugPrint(success.toString())})
         .catchError((error, stackTrace) => {debugPrint(error.toString())});
