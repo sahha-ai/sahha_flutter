@@ -30,6 +30,13 @@
 	<string>This app would like access to your health activity for analysis.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>This app would like access to your motion activity for analysis.</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict/>
+	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

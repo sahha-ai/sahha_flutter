@@ -14,6 +14,38 @@
 
 ---
 
+## 0.1.6 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- (iOS) Improved background sensor data collection
+
+### Fixed
+
+- n/a
+
+---
+
+## 0.1.5 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- (iOS) lower minimum iOS version to 12
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.1.4 alpha
 
 ### Added

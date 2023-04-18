@@ -66,6 +66,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             settings.framework = .flutter
             
             Sahha.configure(settings) {
+                print("Sahha | Flutter configured")
                 result(true)
             }
 

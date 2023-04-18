@@ -2,15 +2,13 @@
 
 The Sahha SDK provides a convenient way for Flutter apps to connect to the Sahha API.
 
-[Sahha API](https://sandbox-api.sahha.ai/api-docs)
-
 ---
 
 ## Docs
 
 The Sahha Docs provide detailed instructions for installation and usage of the Sahha SDK.
 
-[Sahha Docs](https://developer.sahha.ai/docs/flutter)
+[Sahha Docs](https://developer.sahha.ai/docs)
 
 ---
 
@@ -22,4 +20,4 @@ The Sahha Demo App provides a convenient way to try the features of the Sahha SD
 
 ---
 
-Copyright © 2022 Sahha. All rights reserved.
+Copyright © 2022 - 2023 Sahha. All rights reserved.
