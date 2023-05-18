@@ -1,3 +1,20 @@
+## 0.2.1 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- (Android) Removed redundant sensor permissions from Android manifest
+- (Android) Improved how data is sent to the server
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.2.0 alpha
 
 ### Added
