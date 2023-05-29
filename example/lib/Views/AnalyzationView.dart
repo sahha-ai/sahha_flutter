@@ -10,8 +10,6 @@ class AnalyzationView extends StatefulWidget {
 }
 
 class AnalyzationState extends State<AnalyzationView> {
-  //bool includeSourceData = false;
-
   @override
   void initState() {
     super.initState();
@@ -22,14 +20,12 @@ class AnalyzationState extends State<AnalyzationView> {
   void getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      //includeSourceData = (prefs.getBool('includeSourceData') ?? false);
     });
   }
 
   void setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      //prefs.setBool('includeSourceData', includeSourceData);
     });
   }
 
@@ -90,19 +86,6 @@ class AnalyzationState extends State<AnalyzationView> {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 20),
-                  /*
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    const Text('Include Source Data'),
-                    Checkbox(
-                        value: includeSourceData,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            includeSourceData = value!;
-                          });
-                          setPrefs();
-                        }),
-                  ]),
-                  */
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(

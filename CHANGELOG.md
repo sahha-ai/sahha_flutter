@@ -1,3 +1,19 @@
+## 0.2.2 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- Removed redundant includeSourceData for calling analyze
+
+### Fixed
+
+- (Android) Fixed an issue that would sometimes cause the configure method to hang
+
+---
+
 ## 0.2.1 alpha
 
 ### Added
