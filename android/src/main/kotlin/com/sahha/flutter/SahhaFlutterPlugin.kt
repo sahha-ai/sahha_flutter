@@ -280,11 +280,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       Log.d("Sahha", "endDate missing")
     }
 
-    var includeSourceData: Boolean = call.argument<Boolean>("includeSourceData") ?: false
-    Log.d("Sahha", "includeSourceData " + includeSourceData.toString())
-
     if (startDate != null && endDate != null) {
-      Sahha.analyze(includeSourceData, Pair(Date(startDate), Date(endDate)), ) { error, value ->
+      Sahha.analyze(Pair(Date(startDate), Date(endDate)), ) { error, value ->
         if (error != null) {
           result.error("Sahha Error", error, null)
         } else if (value != null) {
@@ -294,7 +291,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
       }
     } else {
-      Sahha.analyze(includeSourceData) { error, value ->
+      Sahha.analyze { error, value ->
         if (error != null) {
           result.error("Sahha Error", error, null)
         } else if (value != null) {

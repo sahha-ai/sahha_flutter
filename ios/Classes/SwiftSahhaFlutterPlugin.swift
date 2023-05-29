@@ -191,7 +191,6 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
 
     private func analyze(_ params: Any?, result: @escaping FlutterResult) {
         var dates: (startDate: Date, endDate: Date)?
-        var includeSourceData: Bool = false
         if let values = params as? [String: Any?] {
             if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
                 let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
@@ -203,12 +202,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             } else {
                 print("no dates")
             }
-            if let boolValue = values["includeSourceData"] as? Bool {
-                includeSourceData = boolValue
-                print("includeSourceData",includeSourceData)
-            }
         }
-        Sahha.analyze(dates: dates, includeSourceData: includeSourceData) { error, value in
+        Sahha.analyze(dates: dates) { error, value in
             if let error = error {
                 result(FlutterError(code: "Sahha Error", message: error, details: nil))
             } else if let value = value {
