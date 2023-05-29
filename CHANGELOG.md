@@ -1,3 +1,19 @@
+## 0.2.3 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (Android) Fixed analyze call parameters
+
+---
+
 ## 0.2.2 alpha
 
 ### Added
