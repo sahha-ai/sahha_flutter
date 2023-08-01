@@ -26,6 +26,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   enum class SahhaMethod {
     configure,
     authenticate,
+    deauthenticate,
     getDemographic,
     postDemographic,
     getSensorStatus,
@@ -79,6 +80,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     when (call.method) {
       SahhaMethod.configure.name -> {configure(call, result)}
       SahhaMethod.authenticate.name -> {authenticate(call, result)}
+      SahhaMethod.deauthenticate.name -> {deauthenticate(call, result)}
       SahhaMethod.getDemographic.name -> {getDemographic(call, result)}
       SahhaMethod.postDemographic.name -> {postDemographic(call, result)}
       SahhaMethod.getSensorStatus.name -> {getSensorStatus(call, result)}
@@ -186,6 +188,16 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       return
     }
     Sahha.authenticate(appId, appSecret, externalId) { error, success ->
+      if (error != null) {
+        result.error("Sahha Error", error, null)
+      } else {
+        result.success(success)
+      }
+    }
+  }
+
+  private fun deauthenticate(@NonNull call: MethodCall, @NonNull result: Result) {
+    Sahha.deauthenticate() { error, success ->
       if (error != null) {
         result.error("Sahha Error", error, null)
       } else {

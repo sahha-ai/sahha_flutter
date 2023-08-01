@@ -11,6 +11,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     enum SahhaMethod: String {
         case configure
         case authenticate
+        case deauthenticate
         case getDemographic
         case postDemographic
         case getSensorStatus
@@ -34,6 +35,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             configure(call.arguments, result: result)
         case .authenticate:
             authenticate(call.arguments, result: result)
+        case .deauthenticate:
+            deauthenticate(result)
         case .getDemographic:
             getDemographic(result)
         case .postDemographic:
@@ -87,6 +90,16 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             }
         } else {
             result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.authenticate() parameters are not valid", details: nil))
+        }
+    }
+
+    private func deauthenticate(_ result: @escaping FlutterResult) {
+        Sahha.deauthenticate { error, success in
+            if let error = error {
+                result(FlutterError(code: "Sahha Error", message: error, details: nil))
+            } else {
+                result(success)
+            }
         }
     }
     

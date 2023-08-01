@@ -54,6 +54,15 @@ class SahhaFlutter {
     }
   }
 
+  static Future<bool> deauthenticate() async {
+    try {
+      bool success = await _channel.invokeMethod('deauthenticate');
+      return success;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
   static Future<String> getDemographic() async {
     try {
       String value = await _channel.invokeMethod('getDemographic');
@@ -115,10 +124,8 @@ class SahhaFlutter {
         startDateInt = startDate.millisecondsSinceEpoch;
         endDateInt = endDate.millisecondsSinceEpoch;
       }
-      String value = await _channel.invokeMethod('analyze', {
-        'startDate': startDateInt,
-        'endDate': endDateInt
-      });
+      String value = await _channel.invokeMethod(
+          'analyze', {'startDate': startDateInt, 'endDate': endDateInt});
       return value;
     } on PlatformException catch (error) {
       return Future.error(error);

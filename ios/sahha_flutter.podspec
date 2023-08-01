@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'sahha_flutter'
-  s.version          = '0.2.2'
+  s.version          = '0.2.3'
   s.summary          = 'Sahha Flutter SDK'
   s.description      = 'The Sahha SDK provides a convenient way for Flutter apps to connect to the Sahha API.'
   s.homepage         = 'https://sahha.ai'
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'Sahha', '~> 0.2.4'
+  s.dependency 'Sahha', '~> 0.2.5'
   s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.

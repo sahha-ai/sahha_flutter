@@ -55,11 +55,10 @@ class AuthenticationState extends State<AuthenticationView> {
       showAlertDialog(
           context, 'MISSING INFO', "You need to input an EXTERNAL ID");
     } else {
-      setPrefs();
-      SahhaFlutter.authenticate(appId, appSecret, externalId)
-          .then((success) =>
-              {showAlertDialog(context, 'AUTHORIZED', success.toString())})
-          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+      SahhaFlutter.authenticate(appId, appSecret, externalId).then((success) {
+        showAlertDialog(context, 'AUTHENTICATED', success.toString());
+        setPrefs();
+      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
   }
 
@@ -146,7 +145,7 @@ class AuthenticationState extends State<AuthenticationView> {
                 onPressed: () {
                   onTapSave(context);
                 },
-                child: const Text('SAVE'),
+                child: const Text('AUTHENTICATE'),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -157,13 +156,18 @@ class AuthenticationState extends State<AuthenticationView> {
                   textStyle: const TextStyle(fontSize: 16),
                 ),
                 onPressed: () {
-                  setState(() {
-                    appIdController.text = '';
-                    appSecretController.text = '';
-                    externalIdController.text = '';
-                  });
+                  SahhaFlutter.deauthenticate().then((success) {
+                    showAlertDialog(
+                        context, 'DEAUTHENTICATED', success.toString());
+                    setState(() {
+                      externalIdController.text = '';
+                      externalId = '';
+                    });
+                    setPrefs();
+                  }).catchError(
+                      (error, stackTrace) => {debugPrint(error.toString())});
                 },
-                child: const Text('DELETE'),
+                child: const Text('DEAUTHENTICATE'),
               ),
             ],
           ),
