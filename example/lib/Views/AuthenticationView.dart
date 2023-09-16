@@ -37,7 +37,6 @@ class AuthenticationState extends State<AuthenticationView> {
 
     SahhaFlutter.isAuthenticated().then((success) {
       showAlertDialog(context, 'AUTHENTICATED', success.toString());
-      setPrefs();
     }).catchError((error, stackTrace) => {debugPrint(error.toString())});
   }
 

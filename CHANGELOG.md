@@ -8,7 +8,7 @@
 
 ### Changed
 
-- Flutter library interface
+- Changed library interface
 
 ### Fixed
 
