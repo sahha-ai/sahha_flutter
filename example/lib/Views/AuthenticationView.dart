@@ -34,6 +34,11 @@ class AuthenticationState extends State<AuthenticationView> {
       externalId = (prefs.getString('externalId') ?? '');
       externalIdController.text = externalId;
     });
+
+    SahhaFlutter.isAuthenticated().then((success) {
+      showAlertDialog(context, 'AUTHENTICATED', success.toString());
+      setPrefs();
+    }).catchError((error, stackTrace) => {debugPrint(error.toString())});
   }
 
   void setPrefs() async {
@@ -55,7 +60,9 @@ class AuthenticationState extends State<AuthenticationView> {
       showAlertDialog(
           context, 'MISSING INFO', "You need to input an EXTERNAL ID");
     } else {
-      SahhaFlutter.authenticate(appId, appSecret, externalId).then((success) {
+      SahhaFlutter.authenticate(
+              appId: appId, appSecret: appSecret, externalId: externalId)
+          .then((success) {
         showAlertDialog(context, 'AUTHENTICATED', success.toString());
         setPrefs();
       }).catchError((error, stackTrace) => {debugPrint(error.toString())});

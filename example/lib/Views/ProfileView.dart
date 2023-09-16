@@ -49,7 +49,7 @@ class ProfileState extends State<ProfileView> {
 
   onTapPicker(BuildContext context) {
     Picker(
-        adapter: PickerDataAdapter<String>(pickerdata: genders),
+        adapter: PickerDataAdapter<String>(pickerData: genders),
         changeToFirst: true,
         hideHeader: false,
         title: const Text('GENDER'),
@@ -78,7 +78,7 @@ class ProfileState extends State<ProfileView> {
         showAlertDialog(context, "SAVE", success.toString());
       }).catchError((error, stackTrace) {
         debugPrint(error.toString());
-        showAlertDialog(context, "SAVE", "error");
+        showAlertDialog(context, "SAVE", error.toString());
       });
     }
   }
@@ -89,7 +89,7 @@ class ProfileState extends State<ProfileView> {
       showAlertDialog(context, "FETCH", value);
     }).catchError((error, stackTrace) {
       debugPrint(error.toString());
-      showAlertDialog(context, "FETCH", "error");
+      showAlertDialog(context, "FETCH", error.toString());
     });
   }
 

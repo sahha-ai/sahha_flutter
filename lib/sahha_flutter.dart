@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-enum SahhaEnvironment { development, production }
+enum SahhaEnvironment { sandbox, production }
 
 enum SahhaSensor { sleep, pedometer, device, heart, blood }
 
@@ -43,11 +43,33 @@ class SahhaFlutter {
     }
   }
 
+  static Future<bool> isAuthenticated() async {
+    try {
+      bool success = await _channel.invokeMethod('isAuthenticated');
+      return success;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
   static Future<bool> authenticate(
-      String appId, String appSecret, String externalId) async {
+      {required String appId,
+      required String appSecret,
+      required String externalId}) async {
     try {
       bool success = await _channel.invokeMethod('authenticate',
           {'appId': appId, 'appSecret': appSecret, 'externalId': externalId});
+      return success;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<bool> authenticateToken(
+      {required String profileToken, required String refreshToken}) async {
+    try {
+      bool success = await _channel.invokeMethod('authenticateToken',
+          {'profileToken': profileToken, 'refreshToken': refreshToken});
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);
@@ -115,17 +137,22 @@ class SahhaFlutter {
     }
   }
 
-  static Future<String> analyze(
-      {DateTime? startDate, DateTime? endDate}) async {
+  static Future<String> analyze() async {
     try {
-      int? startDateInt;
-      int? endDateInt;
-      if (startDate != null && endDate != null) {
-        startDateInt = startDate.millisecondsSinceEpoch;
-        endDateInt = endDate.millisecondsSinceEpoch;
-      }
-      String value = await _channel.invokeMethod(
-          'analyze', {'startDate': startDateInt, 'endDate': endDateInt});
+      String value = await _channel.invokeMethod('analyze');
+      return value;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<String> analyzeDateRange(
+      {required DateTime startDate, required DateTime endDate}) async {
+    try {
+      int startDateInt = startDate.millisecondsSinceEpoch;
+      int endDateInt = endDate.millisecondsSinceEpoch;
+      String value = await _channel.invokeMethod('analyzeDateRange',
+          {'startDate': startDateInt, 'endDate': endDateInt});
       return value;
     } on PlatformException catch (error) {
       return Future.error(error);

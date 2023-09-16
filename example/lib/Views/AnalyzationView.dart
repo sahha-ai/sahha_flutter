@@ -19,14 +19,12 @@ class AnalyzationState extends State<AnalyzationView> {
 
   void getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-    });
+    setState(() {});
   }
 
   void setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-    });
+    setState(() {});
   }
 
   onTapAnalyze(BuildContext context, bool isDaily) {
@@ -35,8 +33,8 @@ class AnalyzationState extends State<AnalyzationView> {
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
-      var week = DateTime.now().subtract(Duration(days: 7));
-      SahhaFlutter.analyze(startDate: week, endDate: DateTime.now())
+      var week = DateTime.now().subtract(const Duration(days: 7));
+      SahhaFlutter.analyzeDateRange(startDate: week, endDate: DateTime.now())
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }

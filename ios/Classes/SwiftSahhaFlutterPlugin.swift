@@ -10,7 +10,9 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
 
     enum SahhaMethod: String {
         case configure
+        case isAuthenticated
         case authenticate
+        case authenticateToken
         case deauthenticate
         case getDemographic
         case postDemographic
@@ -18,6 +20,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case enableSensors
         case postSensorData
         case analyze
+        case analyzeDateRange
         case openAppSettings
     }
 
@@ -33,7 +36,9 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         switch method {
         case .configure:
             configure(call.arguments, result: result)
-        case .authenticate:
+        case .isAuthenticated:
+            isAuthenticated(result: result)
+        case .authenticate, .authenticateToken:
             authenticate(call.arguments, result: result)
         case .deauthenticate:
             deauthenticate(result)
@@ -48,7 +53,9 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case .postSensorData:
             postSensorData(result)
         case .analyze:
-            analyze(call.arguments, result: result)
+            analyze(result)
+        case .analyzeDateRange:
+            analyzeDateRange(call.arguments, result: result)
         case .openAppSettings:
             Sahha.openAppSettings()
         default:
@@ -74,22 +81,46 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             }
 
         } else {
-            result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.configure() parameters are not valid", details: nil))
+            let message = "SahhaFlutter.configure() parameters are invalid"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "configure", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
     
+    private func isAuthenticated(result: @escaping FlutterResult) {
+        result(Sahha.isAuthenticated)
+    }
+    
     private func authenticate(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let appId = values["appId"] as? String, let appSecret = values["appSecret"] as? String, let externalId = values["externalId"] as? String {
+        if let values = params as? [String: Any?] {
             
-            Sahha.authenticate(appId: appId, appSecret: appSecret, externalId: externalId) { error, success in
-                if let error = error {
-                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
-                } else if success {
-                    result(success)
+            if let appId = values["appId"] as? String, let appSecret = values["appSecret"] as? String, let externalId = values["externalId"] as? String {
+                
+                Sahha.authenticate(appId: appId, appSecret: appSecret, externalId: externalId) { error, success in
+                    if let error = error {
+                        result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                    } else if success {
+                        result(success)
+                    }
                 }
+            } else if let profileToken = values["profileToken"] as? String, let refreshToken = values["refreshToken"] as? String {
+                
+                Sahha.authenticate(profileToken: profileToken, refreshToken: refreshToken) { error, success in
+                    if let error = error {
+                        result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                    } else if success {
+                        result(success)
+                    }
+                }
+            } else {
+                let message = "SahhaFlutter.authenticate() parameters are missing"
+                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "authenticate", body: "hidden")
+                result(FlutterError(code: "Sahha Error", message: message, details: nil))
             }
         } else {
-            result(FlutterError(code: "Sahha Error", message: "SahhaFlutter.authenticate() parameters are not valid", details: nil))
+            let message = "SahhaFlutter.authenticate() parameters are invalid"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "authenticate", body: "hidden")
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
 
@@ -105,6 +136,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     
     private func getDemographic(_ result: @escaping FlutterResult) {
         Sahha.getDemographic { error, value in
+            let body: String = value.debugDescription
             if let error = error {
                 result(FlutterError(code: "Sahha Error", message: error, details: nil))
             } else if let value = value {
@@ -116,10 +148,13 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                     result(string)
                 } catch let encodingError {
                     print(encodingError)
-                    result(FlutterError(code: "Sahha Error", message: "Requested Sahha Demographic decoding error", details: nil))
+                    Sahha.postError(framework: .flutter, message: encodingError.localizedDescription, path: "SwiftSahhaFlutterPlugin", method: "getDemographic", body: body)
+                    result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
                 }
             } else {
-                result(FlutterError(code: "Sahha Error", message: "Requested Sahha Demographic not available", details: nil))
+                let message: String = "Requested Sahha Demographic not available"
+                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getDemographic", body: body)
+                result(FlutterError(code: "Sahha Error", message: message, details: nil))
             }
         }
     }
@@ -176,19 +211,29 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 }
             }
         } else {
-            result(FlutterError(code: "Sahha Error", message: "Sahha demographic parameters are missing", details: nil))
+            let message: String = "Sahha demographic parameters are missing"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "postDemographic", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
 
     private func getSensorStatus(_ result: @escaping FlutterResult) {
-        Sahha.getSensorStatus { sensorStatus in
-            result(sensorStatus.rawValue)
+        Sahha.getSensorStatus { error, sensorStatus in
+            if let error = error {
+                result(FlutterError(code: "Sahha Error", message: error, details: nil))
+            } else {
+                result(sensorStatus.rawValue)
+            }
         }
     }
     
     private func enableSensors(_ result: @escaping FlutterResult) {
-        Sahha.enableSensors { sensorStatus in
-            result(sensorStatus.rawValue)
+        Sahha.enableSensors { error, sensorStatus in
+            if let error = error {
+                result(FlutterError(code: "Sahha Error", message: error, details: nil))
+            } else {
+                result(sensorStatus.rawValue)
+            }
         }
     }
     
@@ -201,8 +246,23 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             }
         }
     }
+    
+    private func analyze(_ result: @escaping FlutterResult) {
+        Sahha.analyze { error, value in
+            if let error = error {
+                result(FlutterError(code: "Sahha Error", message: error, details: nil))
+            } else if let value = value {
+                result(value)
+            } else {
+                let message: String = "Requested Sahha Analyzation not available"
+                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "analyze", body: "")
+                result(FlutterError(code: "Sahha Error", message: message, details: nil))
+            }
+        }
+    }
 
-    private func analyze(_ params: Any?, result: @escaping FlutterResult) {
+    private func analyzeDateRange(_ params: Any?, result: @escaping FlutterResult) {
+        Sahha.postError(framework: .flutter, message: "TEST", path: "SwiftSahhaFlutterPlugin", method: "analyzeDateRange", body: params.debugDescription)
         var dates: (startDate: Date, endDate: Date)?
         if let values = params as? [String: Any?] {
             if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
@@ -211,7 +271,6 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 print("startDate", startDate.toTimezoneFormat)
                 print("endDate", endDate.toTimezoneFormat)
                 dates = (startDate, endDate)
-                print(startDate, endDate)
             } else {
                 print("no dates")
             }
@@ -220,10 +279,11 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             if let error = error {
                 result(FlutterError(code: "Sahha Error", message: error, details: nil))
             } else if let value = value {
-                print(value)
                 result(value)
             } else {
-                result(FlutterError(code: "Sahha Error", message: "Requested Sahha Analyzation not available", details: nil))
+                let message: String = "Requested Sahha Analyzation not available"
+                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "analyzeDateRange", body: params.debugDescription)
+                result(FlutterError(code: "Sahha Error", message: message, details: nil))
             }
         }
     }
