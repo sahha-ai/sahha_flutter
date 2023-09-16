@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'sahha_flutter'
-  s.version          = '0.2.3'
+  s.version          = '0.2.4'
   s.summary          = 'Sahha Flutter SDK'
   s.description      = 'The Sahha SDK provides a convenient way for Flutter apps to connect to the Sahha API.'
   s.homepage         = 'https://sahha.ai'

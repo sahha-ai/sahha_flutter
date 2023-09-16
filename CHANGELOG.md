@@ -1,3 +1,21 @@
+## 0.2.4 alpha
+
+### Added
+
+- Added error logging
+- Added authenticate via profileToken
+- Added analyzeDateRange method
+
+### Changed
+
+- Flutter library interface
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.2.3 alpha
 
 ### Added
