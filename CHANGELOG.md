@@ -1,3 +1,19 @@
+## 0.3.0 alpha
+
+### Added
+
+- Added insights for sleep and steps
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.2.4 alpha
 
 ### Added
