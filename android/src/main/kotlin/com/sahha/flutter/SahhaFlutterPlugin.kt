@@ -1,24 +1,26 @@
 package com.sahha.flutter
 
 import android.app.Activity
-import android.app.ActivityManager
-import android.app.Application
 import android.content.Context
-import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.annotation.NonNull
 import com.google.gson.Gson
 import io.flutter.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.embedding.android.FlutterFragmentActivity;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import sdk.sahha.android.source.*
-import java.util.*
+import sdk.sahha.android.source.Sahha
+import sdk.sahha.android.source.SahhaConverterUtility
+import sdk.sahha.android.source.SahhaDemographic
+import sdk.sahha.android.source.SahhaEnvironment
+import sdk.sahha.android.source.SahhaFramework
+import sdk.sahha.android.source.SahhaNotificationConfiguration
+import sdk.sahha.android.source.SahhaSensor
+import sdk.sahha.android.source.SahhaSettings
+import java.util.Date
 
 /** SahhaFlutterPlugin */
 class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -99,7 +101,6 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   fun configure(@NonNull call: MethodCall, @NonNull result: Result) {
-
     val environment: String? = call.argument<String>("environment")
     val notificationSettings: HashMap<String, String>? = call.argument<HashMap<String, String>>("notificationSettings")
     val sensors: List<String>? = call.argument<List<String>>("sensors")
@@ -110,86 +111,34 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       return
     }
 
-    var sahhaEnvironment: SahhaEnvironment
-    try {
-      sahhaEnvironment = SahhaEnvironment.valueOf(environment)
-    } catch (e: IllegalArgumentException) {
-      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.configure() environment parameter invalid", "SahhaFlutterPlugin", "configure")
-      result.error(
-        "Sahha Error",
-        "SahhaFlutter.configure() environment parameter invalid",
-        null
-      )
-      return
-    }
-
-    var sahhaNotificationConfiguration: SahhaNotificationConfiguration? = null
-    try {
-      Log.d("Sahha", "notificationSettings")
-      notificationSettings.also { nSettings ->
-        val icon = nSettings.get("icon")
-        val title = nSettings.get("title")
-        val shortDescription = nSettings.get("shortDescription")
-
-        sahhaNotificationConfiguration = SahhaNotificationConfiguration(
-          SahhaConverterUtility.stringToDrawableResource(
-            context,
-            icon
-          ),
-          title,
-          shortDescription,
-        )
+      if(flutterActivity == null) {
+          result.error("Sahha Error", "flutterActivity was null", null)
+          return
       }
-    } catch (e: IllegalArgumentException) {
-      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.configure() notificationSettings parameter invalid", "SahhaFlutterPlugin", "configure")
-      result.error(
-        "Sahha Error",
-        "SahhaFlutter.configure() notificationSettings parameter invalid",
-        null
-      )
-      return
-    }
 
-    var sahhaSensors: MutableSet<SahhaSensor> = mutableSetOf()
-    try {
-      sensors.forEach {
-        var sensor = SahhaSensor.valueOf(it)
-        sahhaSensors.add(sensor)
-      }
-    } catch (e: IllegalArgumentException) {
-      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.configure() sensor parameter invalid", "SahhaFlutterPlugin", "configure")
-      result.error("Sahha Error", "SahhaFlutter.configure() sensor parameter invalid", null)
-      return
-    }
+      try {
+          val settings = SahhaSettings(
+              framework = SahhaFramework.flutter,
+              environment = SahhaEnvironment.valueOf(environment),
+              notificationSettings = SahhaNotificationConfiguration(
+                  icon = SahhaConverterUtility
+                      .stringToDrawableResource(
+                          context,
+                          notificationSettings["icon"]
+                      ),
+                  title = notificationSettings["title"],
+                  shortDescription = notificationSettings["shortDescription"]
+              )
+          )
 
-    var sahhaSettings = SahhaSettings(
-      sahhaEnvironment,
-      sahhaNotificationConfiguration,
-      SahhaFramework.flutter,
-      sahhaSensors
-    )
-
-    try {
-      var app = flutterActivity?.application
-      if (app != null) {
-        Log.d("Sahha", "Application is OK")
-        Sahha.configure(app, sahhaSettings) { error, success ->
-          if (error != null) {
-            result.error("Sahha Error", error, null)
-          } else {
-            result.success(success)
+          // null checked above ^^^
+          Sahha.configure(flutterActivity!!.application, settings) { error, success ->
+              if(!success) result.error("Sahha Error", error, null)
+              result.success(success)
           }
-        }
-      } else {
-        Sahha.postError(SahhaFramework.flutter, "Android activity application is null", "SahhaFlutterPlugin", "configure")
-        Log.e("Sahha", "Application is null")
-        result.error("Sahha Error", "Android activity application is null", null)
+      } catch (e: Exception) {
+          result.error("Sahha Error", e.message, e)
       }
-    } catch (e: IllegalArgumentException) {
-      Log.e("Sahha", e.message ?: "Activity error")
-      Sahha.postError(SahhaFramework.flutter, "Android activity error", "SahhaFlutterPlugin", "configure")
-      result.error("Sahha Error", "SahhaFlutter.configure() Android activity invalid", null)
-    }
   }
 
   private fun isAuthenticated(@NonNull result: Result) {
@@ -198,16 +147,16 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   private fun authenticate(@NonNull call: MethodCall, @NonNull result: Result) {
     Sahha.postError(SahhaFramework.flutter, "TEST", "SahhaFlutterPlugin", "authenticate")
+
     val appId: String? = call.argument<String>("appId")
     val appSecret: String? = call.argument<String>("appSecret")
     val externalId: String? = call.argument<String>("externalId")
+
     if (appId != null && appSecret != null && externalId != null) {
       Sahha.authenticate(appId, appSecret, externalId) { error, success ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(success)
-        }
+        if(!success) result.error("Sahha Error", error, null)
+        result.success(success)
+        return@authenticate
       }
     } else {
       Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.authenticate() parameters invalid", "SahhaFlutterPlugin", "authenticate", "hidden")
@@ -259,7 +208,6 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun postDemographic(@NonNull call: MethodCall, @NonNull result: Result) {
-
     val age: Int? = call.argument<Int>("age")
     val gender: String? = call.argument<String>("gender")
     val country: String? = call.argument<String>("country")
@@ -367,5 +315,4 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private fun openAppSettings() {
     Sahha.openAppSettings(context);
   }
-
 }
