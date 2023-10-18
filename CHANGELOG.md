@@ -1,3 +1,19 @@
+## 0.3.1 alpha
+
+### Added
+
+- (Android) Support for Health Connect on devices with Android 14
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.3.0 alpha
 
 ### Added
