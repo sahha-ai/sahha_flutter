@@ -18,7 +18,7 @@
 
 ### Added
 
-- (Android) Support for Health Connect on devices >= Android 14
+- (Android) Support for Health Connect on devices with Android 14
 
 ### Changed
 
