@@ -1,3 +1,19 @@
+## 0.3.1 alpha
+
+### Added
+
+- (Android) Support for Health Connect on devices below Android 14
+
+### Changed
+
+- (iOS) Changed sleep stage enum values
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.3.0 alpha
 
 ### Added
