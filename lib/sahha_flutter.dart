@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 enum SahhaEnvironment { sandbox, production }
 
-enum SahhaSensor { sleep, pedometer, device, heart, blood }
+enum SahhaSensor { sleep, activity, device, heart, blood, oxygen, energy, body }
 
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
 
@@ -18,10 +18,13 @@ class SahhaFlutter {
   static const MethodChannel _channel = MethodChannel('sahha_flutter');
   static const List<SahhaSensor> sensorList = [
     SahhaSensor.sleep,
-    SahhaSensor.pedometer,
+    SahhaSensor.activity,
     SahhaSensor.device,
     SahhaSensor.heart,
-    SahhaSensor.blood
+    SahhaSensor.blood,
+    SahhaSensor.oxygen,
+    SahhaSensor.energy,
+    SahhaSensor.body
   ];
 
   static Future<bool> configure(
