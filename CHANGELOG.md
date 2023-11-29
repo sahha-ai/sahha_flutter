@@ -1,3 +1,20 @@
+## 0.3.3 alpha
+
+### Added
+
+- Added new sensor types
+- Added new insights
+
+### Changed
+
+- Renamed `pedometer` sensor to `activity` sensor
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.3.2 alpha
 
 ### Added
