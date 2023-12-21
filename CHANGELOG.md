@@ -1,3 +1,23 @@
+## 0.3.4 alpha
+
+### Added
+
+- Added temperature sensor data
+- Added additional error logging
+
+### Changed
+
+- Renamed data_types and insight_types to snake_case
+- Removed manual postSensorData method
+
+### Fixed
+
+- (Android) Fixed some insights not posting correctly
+- (Android) Fixed some demographics not posting correctly
+- (iOS) Fixed some sensor data not posting correctly
+
+---
+
 ## 0.3.3 alpha
 
 ### Added
