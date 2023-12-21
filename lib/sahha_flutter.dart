@@ -131,15 +131,6 @@ class SahhaFlutter {
     _channel.invokeMethod('openAppSettings');
   }
 
-  static Future<bool> postSensorData() async {
-    try {
-      bool success = await _channel.invokeMethod('postSensorData');
-      return success;
-    } on PlatformException catch (error) {
-      return Future.error(error);
-    }
-  }
-
   static Future<String> analyze() async {
     try {
       String value = await _channel.invokeMethod('analyze');

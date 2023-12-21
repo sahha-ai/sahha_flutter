@@ -35,7 +35,6 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     postDemographic,
     getSensorStatus,
     enableSensors,
-    postSensorData,
     analyze,
     analyzeDateRange,
     openAppSettings
@@ -92,7 +91,6 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       SahhaMethod.postDemographic.name -> {postDemographic(call, result)}
       SahhaMethod.getSensorStatus.name -> {getSensorStatus(result)}
       SahhaMethod.enableSensors.name -> {enableSensors(result)}
-      SahhaMethod.postSensorData.name -> {postSensorData(result)}
       SahhaMethod.analyze.name -> {analyze(result)}
       SahhaMethod.analyzeDateRange.name -> {analyzeDateRange(call, result)}
       SahhaMethod.openAppSettings.name -> {openAppSettings()}
@@ -248,16 +246,6 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         result.error("Sahha Error", error, null)
       } else {
         result.success(sensorStatus.ordinal)
-      }
-    }
-  }
-
-  private fun postSensorData(@NonNull result: Result) {
-    Sahha.postSensorData() { error, success ->
-      if (error != null) {
-        result.error("Sahha Error", error, null)
-      } else {
-        result.success(success)
       }
     }
   }

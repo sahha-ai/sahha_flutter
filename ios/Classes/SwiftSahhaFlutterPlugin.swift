@@ -18,7 +18,6 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case postDemographic
         case getSensorStatus
         case enableSensors
-        case postSensorData
         case analyze
         case analyzeDateRange
         case openAppSettings
@@ -50,8 +49,6 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             getSensorStatus(result)
         case .enableSensors:
             enableSensors(result)
-        case .postSensorData:
-            postSensorData(result)
         case .analyze:
             analyze(result)
         case .analyzeDateRange:
@@ -237,16 +234,6 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func postSensorData(_ result: @escaping FlutterResult) {
-        Sahha.postSensorData { error, success in
-            if let error = error {
-                result(FlutterError(code: "Sahha Error", message: error, details: nil))
-            } else {
-                result(success)
-            }
-        }
-    }
-    
     private func analyze(_ result: @escaping FlutterResult) {
         Sahha.analyze { error, value in
             if let error = error {
@@ -268,11 +255,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
                 let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
                 let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
-                print("startDate", startDate.toTimezoneFormat)
-                print("endDate", endDate.toTimezoneFormat)
                 dates = (startDate, endDate)
-            } else {
-                print("no dates")
             }
         }
         Sahha.analyze(dates: dates) { error, value in
