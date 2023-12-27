@@ -34,6 +34,7 @@ class SahhaFlutter {
     SahhaSensor.blood,
     SahhaSensor.oxygen,
     SahhaSensor.energy,
+    SahhaSensor.temperature,
     SahhaSensor.body
   ];
 

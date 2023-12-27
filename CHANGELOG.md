@@ -1,3 +1,19 @@
+## 0.3.5 alpha
+
+### Added
+
+- Added `temperature` SahhaSensor enum
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (iOS) Fixed some insights not posting correctly
+
+---
+
 ## 0.3.4 alpha
 
 ### Added
