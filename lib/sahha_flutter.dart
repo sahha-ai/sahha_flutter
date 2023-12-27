@@ -4,7 +4,17 @@ import 'package:flutter/services.dart';
 
 enum SahhaEnvironment { sandbox, production }
 
-enum SahhaSensor { sleep, activity, device, heart, blood, oxygen, energy, body }
+enum SahhaSensor {
+  sleep,
+  activity,
+  device,
+  heart,
+  blood,
+  oxygen,
+  energy,
+  temperature,
+  body
+}
 
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
 
