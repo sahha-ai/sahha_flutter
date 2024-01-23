@@ -152,7 +152,10 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     if (appId != null && appSecret != null && externalId != null) {
       Sahha.authenticate(appId, appSecret, externalId) { error, success ->
-        if(!success) result.error("Sahha Error", error, null)
+        if(!success) {
+          result.error("Sahha Error", error, null)
+          return@authenticate
+        }
         result.success(success)
         return@authenticate
       }
