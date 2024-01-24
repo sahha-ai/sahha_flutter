@@ -1,3 +1,20 @@
+## 0.3.7 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- (iOS) Deauthorize user if API returns 410 error code
+
+### Fixed
+
+- (iOS) Fixed frequency of some insights
+- (Android) Fixed configuration callback error
+
+---
+
 ## 0.3.5 alpha
 
 ### Added
