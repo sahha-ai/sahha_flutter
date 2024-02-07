@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
-import 'package:sahha_flutter_example/Views/HomeView.dart';
+import 'package:sahha_flutter_example/Views/AnalyzationView.dart';
 import 'package:sahha_flutter_example/Views/AuthenticationView.dart';
+import 'package:sahha_flutter_example/Views/HomeView.dart';
 import 'package:sahha_flutter_example/Views/ProfileView.dart';
 import 'package:sahha_flutter_example/Views/SensorPermissionView.dart';
-import 'package:sahha_flutter_example/Views/SleepView.dart';
-import 'package:sahha_flutter_example/Views/PedometerView.dart';
-import 'package:sahha_flutter_example/Views/AnalyzationView.dart';
 
 void main() {
   runApp(const App());
@@ -25,7 +23,9 @@ class AppState extends State<App> {
     super.initState();
 
     // Use default values
-    SahhaFlutter.configure(environment: SahhaEnvironment.sandbox)
+    SahhaFlutter.configure(
+      environment: SahhaEnvironment.sandbox,
+    )
         .then((success) => {debugPrint(success.toString())})
         .catchError((error, stackTrace) => {debugPrint(error.toString())});
 

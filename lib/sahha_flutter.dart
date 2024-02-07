@@ -44,10 +44,10 @@ class SahhaFlutter {
       Map<String, String> notificationSettings =
           const <String, String>{}}) async {
     // Convert to strings
-    List<String> sensorStrings = sensors.map(describeEnum).toList();
+    List<String> sensorStrings = sensors.map((sensor) => sensor.name).toList();
     try {
       bool success = await _channel.invokeMethod('configure', {
-        'environment': describeEnum(environment),
+        'environment': environment.name,
         'notificationSettings': notificationSettings,
         'sensors': sensorStrings
       });
