@@ -115,6 +115,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
 
       try {
+        val sensorsEnum = sensors.map { SahhaSensor.valueOf(it) }.toSet()
           val settings = SahhaSettings(
               framework = SahhaFramework.flutter,
               environment = SahhaEnvironment.valueOf(environment),
@@ -126,7 +127,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                       ),
                   title = notificationSettings["title"],
                   shortDescription = notificationSettings["shortDescription"]
-              )
+              ),
+            sensors = sensorsEnum
           )
 
           // null checked above ^^^

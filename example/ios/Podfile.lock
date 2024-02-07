@@ -26,10 +26,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   Sahha: 3941b283cf608c0637e41f31566b10e693923f7a
   sahha_flutter: 410ee1a8f6f83610902d6846637f2e5c1632da60
-  shared_preferences_foundation: 8da9db25511127fe6c63b88c6fe580e09061eb5b
+  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
 
 PODFILE CHECKSUM: 0cde445877ddd46eb6b7a9e792d054f59cc717eb
 
