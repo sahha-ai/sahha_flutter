@@ -1,3 +1,22 @@
+## 0.3.8 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- (Android) Improvements to ensure important background tasks continue running
+- (Android) Upgraded to latest Gradle version
+
+### Fixed
+
+- (Android) Fixed a bug that would sometimes crash on initial launch
+- (Android) Fixed a bug that could lock up the UI on lower Android OS versions
+- (Android) Fixed a bug where permission status would return disabled when it should be unavailable on lower Android OS versions
+
+---
+
 ## 0.3.7 alpha
 
 ### Added
