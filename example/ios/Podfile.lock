@@ -1,9 +1,9 @@
 PODS:
   - Flutter (1.0.0)
-  - Sahha (0.3.7)
-  - sahha_flutter (0.3.7):
+  - Sahha (0.3.9)
+  - sahha_flutter (0.3.9):
     - Flutter
-    - Sahha (= 0.3.7)
+    - Sahha (= 0.3.9)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -26,10 +26,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  Sahha: 3941b283cf608c0637e41f31566b10e693923f7a
-  sahha_flutter: 410ee1a8f6f83610902d6846637f2e5c1632da60
-  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Sahha: 360e7608fb653e5c9c4371afa477442cec98e55c
+  sahha_flutter: 598abc7cc202717352f6e2c32aec29bb9fb7aafb
+  shared_preferences_foundation: 8da9db25511127fe6c63b88c6fe580e09061eb5b
 
 PODFILE CHECKSUM: 0cde445877ddd46eb6b7a9e792d054f59cc717eb
 

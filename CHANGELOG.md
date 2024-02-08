@@ -1,3 +1,20 @@
+## 0.3.9 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- (Android) Permissions must be added manually by the developer to AndroidManifest.xml
+- (iOS) Using configure method with an empty sensor value returns a pending sensor status
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.3.8 alpha
 
 ### Added
