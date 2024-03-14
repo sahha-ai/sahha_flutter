@@ -13,7 +13,8 @@ enum SahhaSensor {
   oxygen,
   energy,
   temperature,
-  body
+  body,
+  exercise
 }
 
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
@@ -35,7 +36,8 @@ class SahhaFlutter {
     SahhaSensor.oxygen,
     SahhaSensor.energy,
     SahhaSensor.temperature,
-    SahhaSensor.body
+    SahhaSensor.body,
+    SahhaSensor.exercise
   ];
 
   static Future<bool> configure(
