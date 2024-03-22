@@ -1,3 +1,25 @@
+## 0.4.0 alpha
+
+### Added
+
+- Added exercise sensor
+- (iOS) Collected gender and birth date from HealthKit
+
+### Changed
+
+- Improved batching of sensor data uploads
+- (Android) Permissions must be added manually by the developer to AndroidManifest.xml
+- (Android) Improved how Health Connect data is queried
+- (Android) Adjusted how sensor data percentages are formatted
+- (iOS) Increased historical sensor data from 7 days to 30 days
+
+### Fixed
+
+- (Android) Fixed sleep value formatting
+- (Android) Fixed a bug which caused diastolic blood pressure data to be missing
+
+---
+
 ## 0.3.9 alpha
 
 ### Added
