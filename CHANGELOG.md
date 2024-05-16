@@ -1,3 +1,20 @@
+## 0.4.1 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- (Android) Improved how Health Connect is queried in the background, removing the need for exact alarms and its manifest permission
+
+### Fixed
+
+- (iOS) Fixed device info uploading duplicate entries 
+- (iOS) Fixed HKObserverQuery callback not firing after error
+
+---
+
 ## 0.4.0 alpha
 
 ### Added
