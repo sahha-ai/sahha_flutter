@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 
 class SensorPermissionView extends StatefulWidget {
@@ -15,26 +14,85 @@ class SensorPermissionState extends State<SensorPermissionView> {
   @override
   void initState() {
     super.initState();
-    debugPrint('init permissions');
+    onTapGetAll(context);
+  }
+
+  onTapGetAll(BuildContext context) {
     SahhaFlutter.getSensorStatus().then((value) {
       setState(() {
         sensorStatus = value;
       });
-      debugPrint('init permissions ' + describeEnum(sensorStatus));
-    }).catchError((error, stackTrace) => {debugPrint(error.toString())});
+      debugPrint('Get All Sensors ' + sensorStatus.name);
+    }).catchError((error) {
+      debugPrint(error.toString());
+    });
   }
 
-  onTapEnable(BuildContext context) {
+  onTapGetSome(BuildContext context) {
+    SahhaFlutter.getSensorStatus(sensors: [
+      SahhaSensor.sleep,
+      SahhaSensor.step_count,
+      SahhaSensor.heart_rate
+    ]).then((value) {
+      setState(() {
+        sensorStatus = value;
+      });
+      debugPrint('Get Some Sensors ' + sensorStatus.name);
+    }).catchError((error) {
+      debugPrint(error.toString());
+    });
+  }
+
+  onTapGetEmpty(BuildContext context) {
+    SahhaFlutter.getSensorStatus(sensors: []).then((value) {
+      setState(() {
+        sensorStatus = value;
+      });
+      debugPrint('Get Empty Sensors ' + sensorStatus.name);
+    }).catchError((error) {
+      debugPrint(error.toString());
+    });
+  }
+
+  onTapEnableAll(BuildContext context) {
     SahhaFlutter.enableSensors().then((value) {
       setState(() {
         sensorStatus = value;
       });
-      debugPrint('activate pedometer ' + describeEnum(sensorStatus));
-    }).catchError((error, stackTrace) => {debugPrint(error.toString())});
+      debugPrint('Enable All Sensors ' + sensorStatus.name);
+    }).catchError((error) {
+      debugPrint(error.toString());
+    });
+  }
+
+  onTapEnableSome(BuildContext context) {
+    SahhaFlutter.enableSensors(sensors: [
+      SahhaSensor.sleep,
+      SahhaSensor.step_count,
+      SahhaSensor.heart_rate
+    ]).then((value) {
+      setState(() {
+        sensorStatus = value;
+      });
+      debugPrint('Enable Some Sensors ' + sensorStatus.name);
+    }).catchError((error) {
+      debugPrint(error.toString());
+    });
+  }
+
+  onTapEnableEmpty(BuildContext context) {
+    SahhaFlutter.enableSensors(sensors: []).then((value) {
+      setState(() {
+        sensorStatus = value;
+      });
+      debugPrint('Enable Empty Sensors ' + sensorStatus.name);
+    }).catchError((error) {
+      debugPrint(error.toString());
+    });
   }
 
   openAppSettings(BuildContext context) {
-    debugPrint('openAppSettings');
+    debugPrint('Open App Settings');
     SahhaFlutter.openAppSettings();
   }
 
@@ -44,52 +102,102 @@ class SensorPermissionState extends State<SensorPermissionView> {
       appBar: AppBar(
         title: const Text('Sensor Permissions'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Center(
-          child: Column(children: <Widget>[
-            const Spacer(),
-            const Icon(
-              Icons.sensors,
-              size: 64,
-            ),
-            const SizedBox(height: 20),
-            const Text('Sensor Status',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            Text(describeEnum(sensorStatus),
-                style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(40),
-                padding:
-                const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                textStyle: const TextStyle(fontSize: 16),
-              ),
-              onPressed: sensorStatus == SahhaSensorStatus.enabled
-                  ? null
-                  : () {
-                onTapEnable(context);
-              },
-              child: const Text('ENABLE'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(40),
-                padding:
-                const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                textStyle: const TextStyle(fontSize: 16),
-              ),
-              onPressed: () {
-                openAppSettings(context);
-              },
-              child: const Text('OPEN APP SETTINGS'),
-            ),
-          ]),
+      body: ListView(padding: const EdgeInsets.all(40), children: <Widget>[
+        const Spacer(),
+        const Icon(
+          Icons.sensors,
+          size: 64,
         ),
-      ),
+        const SizedBox(height: 20),
+        const Text('Sensor Status',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 20),
+        Text(sensorStatus.name, style: const TextStyle(fontSize: 18)),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(40),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+          onPressed: () {
+            onTapGetEmpty(context);
+          },
+          child: const Text('GET EMPTY'),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(40),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+          onPressed: () {
+            onTapGetSome(context);
+          },
+          child: const Text('GET SOME'),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(40),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+          onPressed: () {
+            onTapGetAll(context);
+          },
+          child: const Text('GET ALL'),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(40),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+          onPressed: () {
+            onTapEnableEmpty(context);
+          },
+          child: const Text('ENABLE EMPTY'),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(40),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+          onPressed: () {
+            onTapEnableSome(context);
+          },
+          child: const Text('ENABLE SOME'),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(40),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+          onPressed: () {
+            onTapEnableAll(context);
+          },
+          child: const Text('ENABLE ALL'),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(40),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+          onPressed: () {
+            openAppSettings(context);
+          },
+          child: const Text('OPEN APP SETTINGS'),
+        ),
+      ]),
     );
   }
 }

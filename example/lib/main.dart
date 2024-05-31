@@ -4,6 +4,7 @@ import 'package:sahha_flutter_example/Views/AnalyzationView.dart';
 import 'package:sahha_flutter_example/Views/AuthenticationView.dart';
 import 'package:sahha_flutter_example/Views/HomeView.dart';
 import 'package:sahha_flutter_example/Views/ProfileView.dart';
+import 'package:sahha_flutter_example/Views/WebView.dart';
 import 'package:sahha_flutter_example/Views/SensorPermissionView.dart';
 
 void main() {
@@ -57,6 +58,7 @@ class AppState extends State<App> {
         '/profile': (BuildContext context) => const ProfileView(),
         '/permissions': (BuildContext context) => const SensorPermissionView(),
         '/analyzation': (BuildContext context) => const AnalyzationView(),
+        '/web': (BuildContext context) => const WebView(),
       },
     );
   }

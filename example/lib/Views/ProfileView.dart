@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_picker/flutter_picker.dart';
+import 'package:selectpicker/models/select_picker_item.dart';
+import 'package:selectpicker/selectpicker.dart';
+import 'package:selectpicker/styles/input_style.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -12,11 +14,9 @@ class ProfileView extends StatefulWidget {
 
 class ProfileState extends State<ProfileView> {
   TextEditingController ageController = TextEditingController();
-  TextEditingController genderController = TextEditingController();
   String ageString = '';
   int age = 0;
   String gender = '';
-  var genders = ["Male", "Female", "Gender Diverse"];
 
   @override
   void initState() {
@@ -35,7 +35,6 @@ class ProfileState extends State<ProfileView> {
       ageString = (prefs.getString('age') ?? '');
       ageController.text = ageString;
       gender = (prefs.getString('gender') ?? '');
-      genderController.text = gender;
     });
   }
 
@@ -45,22 +44,6 @@ class ProfileState extends State<ProfileView> {
       prefs.setString('age', ageString);
       prefs.setString('gender', gender);
     });
-  }
-
-  onTapPicker(BuildContext context) {
-    Picker(
-        adapter: PickerDataAdapter<String>(pickerData: genders),
-        changeToFirst: true,
-        hideHeader: false,
-        title: const Text('GENDER'),
-        onConfirm: (Picker picker, List value) {
-          var index = value[0];
-          var string = genders[index];
-          setState(() {
-            genderController.text = string;
-            gender = string;
-          });
-        }).showModal(this.context);
   }
 
   onTapSave(BuildContext context) {
@@ -86,7 +69,7 @@ class ProfileState extends State<ProfileView> {
   onTapFetch(BuildContext context) {
     SahhaFlutter.getDemographic().then((value) {
       debugPrint(value);
-      showAlertDialog(context, "FETCH", value);
+      showAlertDialog(context, "FETCH", value ?? "empty");
     }).catchError((error, stackTrace) {
       debugPrint(error.toString());
       showAlertDialog(context, "FETCH", error.toString());
@@ -148,17 +131,22 @@ class ProfileState extends State<ProfileView> {
                 },
               ),
               const SizedBox(height: 20),
-              GestureDetector(
-                child: TextField(
-                  controller: genderController,
-                  enabled: false,
-                  autocorrect: false,
-                  enableSuggestions: false,
-                  decoration: const InputDecoration(labelText: "GENDER"),
-                ),
-                onTap: () {
-                  onTapPicker(context);
+              SelectPicker(
+                hint: gender.isEmpty ? "GENDER" : gender,
+                list: [
+                  SelectPickerItem("Male", "male", null),
+                  SelectPickerItem("Female", "female", null),
+                  SelectPickerItem("Gender Diverse", "gender diverse", null),
+                ],
+                selectFirst: false,
+                showId: false,
+                onSelect: (value) {
+                  setState(() {
+                    gender = value.title.toString();
+                  });
                 },
+                selectPickerInputStyle: SelectPickerInputStyle(),
+                initialItem: gender,
               ),
               const SizedBox(height: 40),
               ElevatedButton(

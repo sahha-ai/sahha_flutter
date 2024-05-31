@@ -14,6 +14,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case authenticate
         case authenticateToken
         case deauthenticate
+        case getProfileToken
         case getDemographic
         case postDemographic
         case getSensorStatus
@@ -41,14 +42,16 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             authenticate(call.arguments, result: result)
         case .deauthenticate:
             deauthenticate(result)
+        case .getProfileToken:
+            getProfileToken(result)
         case .getDemographic:
             getDemographic(result)
         case .postDemographic:
             postDemographic(call.arguments, result: result)
         case .getSensorStatus:
-            getSensorStatus(result)
+            getSensorStatus(call.arguments, result: result)
         case .enableSensors:
-            enableSensors(result)
+            enableSensors(call.arguments, result: result)
         case .analyze:
             analyze(result)
         case .analyzeDateRange:
@@ -61,15 +64,9 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     }
 
     private func configure(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let environment = values["environment"] as? String, let configEnvironment = SahhaEnvironment(rawValue: environment), let sensors = values["sensors"] as? [String] {
-            var configSensors: Set<SahhaSensor> = []
-            for sensor in sensors {
-                if let configSensor = SahhaSensor(rawValue: sensor) {
-                    configSensors.insert(configSensor)
-                }
-            }
+        if let values = params as? [String: Any?], let environment = values["environment"] as? String, let configEnvironment = SahhaEnvironment(rawValue: environment) {
 
-            var settings = SahhaSettings(environment: configEnvironment, sensors: configSensors)
+            var settings = SahhaSettings(environment: configEnvironment)
             settings.framework = .flutter
             
             Sahha.configure(settings) {
@@ -129,6 +126,10 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 result(success)
             }
         }
+    }
+    
+    private func getProfileToken(_ result: @escaping FlutterResult) {
+        result(Sahha.profileToken)
     }
     
     private func getDemographic(_ result: @escaping FlutterResult) {
@@ -214,23 +215,63 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func getSensorStatus(_ result: @escaping FlutterResult) {
-        Sahha.getSensorStatus { error, sensorStatus in
-            if let error = error {
-                result(FlutterError(code: "Sahha Error", message: error, details: nil))
-            } else {
-                result(sensorStatus.rawValue)
+    private func getSensorStatus(_ params: Any?, result: @escaping FlutterResult) {
+        
+        if let values = params as? [String: Any?] {
+            
+            var configSensors: Set<SahhaSensor>? = nil
+            
+            if let sensors = values["sensors"] as? [String] {
+                configSensors = []
+                for sensor in sensors {
+                    if let configSensor = SahhaSensor(rawValue: sensor) {
+                        configSensors?.insert(configSensor)
+                    }
+                }
             }
+            
+            Sahha.getSensorStatus(configSensors) { error, sensorStatus in
+                if let error = error {
+                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                } else {
+                    result(sensorStatus.rawValue)
+                }
+            }
+
+        } else {
+            let message = "SahhaFlutter.getSensorStatus() parameters are invalid"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getSensorStatus", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
     
-    private func enableSensors(_ result: @escaping FlutterResult) {
-        Sahha.enableSensors { error, sensorStatus in
-            if let error = error {
-                result(FlutterError(code: "Sahha Error", message: error, details: nil))
-            } else {
-                result(sensorStatus.rawValue)
+    private func enableSensors(_ params: Any?, result: @escaping FlutterResult) {
+        
+        if let values = params as? [String: Any?] {
+            
+            var configSensors: Set<SahhaSensor>? = nil
+            
+            if let sensors = values["sensors"] as? [String] {
+                configSensors = []
+                for sensor in sensors {
+                    if let configSensor = SahhaSensor(rawValue: sensor) {
+                        configSensors?.insert(configSensor)
+                    }
+                }
             }
+            
+            Sahha.enableSensors(configSensors) { error, sensorStatus in
+                if let error = error {
+                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                } else {
+                    result(sensorStatus.rawValue)
+                }
+            }
+
+        } else {
+            let message = "SahhaFlutter.enableSensors() parameters are invalid"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "enableSensors", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
     

@@ -31,6 +31,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     authenticate,
     authenticateToken,
     deauthenticate,
+    getProfileToken,
     getDemographic,
     postDemographic,
     getSensorStatus,
@@ -87,10 +88,11 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       SahhaMethod.authenticate.name -> {authenticate(call, result)}
       SahhaMethod.authenticateToken.name -> {authenticateToken(call, result)}
       SahhaMethod.deauthenticate.name -> {deauthenticate(result)}
+      SahhaMethod.getProfileToken.name -> {getProfileToken(result)}
       SahhaMethod.getDemographic.name -> {getDemographic(result)}
       SahhaMethod.postDemographic.name -> {postDemographic(call, result)}
-      SahhaMethod.getSensorStatus.name -> {getSensorStatus(result)}
-      SahhaMethod.enableSensors.name -> {enableSensors(result)}
+      SahhaMethod.getSensorStatus.name -> {getSensorStatus(call, result)}
+      SahhaMethod.enableSensors.name -> {enableSensors(call, result)}
       SahhaMethod.analyze.name -> {analyze(result)}
       SahhaMethod.analyzeDateRange.name -> {analyzeDateRange(call, result)}
       SahhaMethod.openAppSettings.name -> {openAppSettings()}
@@ -101,9 +103,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   fun configure(@NonNull call: MethodCall, @NonNull result: Result) {
     val environment: String? = call.argument<String>("environment")
     val notificationSettings: HashMap<String, String>? = call.argument<HashMap<String, String>>("notificationSettings")
-    val sensors: List<String>? = call.argument<List<String>>("sensors")
 
-    if (environment == null || notificationSettings == null || sensors == null) {
+    if (environment == null || notificationSettings == null) {
       Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.configure() parameters invalid", "SahhaFlutterPlugin", "configure")
       result.error("Sahha Error", "SahhaFlutter.configure() parameters invalid", null)
       return
@@ -115,7 +116,6 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
 
       try {
-        val sensorsEnum = sensors.map { SahhaSensor.valueOf(it) }.toSet()
           val settings = SahhaSettings(
               framework = SahhaFramework.flutter,
               environment = SahhaEnvironment.valueOf(environment),
@@ -127,8 +127,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                       ),
                   title = notificationSettings["title"],
                   shortDescription = notificationSettings["shortDescription"]
-              ),
-            sensors = sensorsEnum
+              )
           )
 
           // null checked above ^^^
@@ -194,6 +193,10 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
   }
 
+  private fun getProfileToken(@NonNull result: Result) {
+    result.success(Sahha.profileToken)
+  }
+
   private fun getDemographic(@NonNull result: Result) {
     Sahha.getDemographic() { error, demographic ->
       if (error != null) {
@@ -204,8 +207,7 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         Log.d("Sahha", demographicJson)
         result.success(demographicJson)
       } else {
-        Sahha.postError(SahhaFramework.flutter, "Sahha Demographic not available", "SahhaFlutterPlugin", "getDemographic")
-        result.error("Sahha Error", "Sahha Demographic not available", null)
+        result.success(null)
       }
     }
   }
@@ -235,24 +237,70 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
   }
 
-  private fun getSensorStatus(@NonNull result: Result) {
-    Sahha.getSensorStatus(context) { error, sensorStatus ->
-      if (error != null) {
-        result.error("Sahha Error", error, null)
-      } else {
-        result.success(sensorStatus.ordinal)
+  private fun getSensorStatus(@NonNull call: MethodCall, @NonNull result: Result) {
+    val sensors: List<String>? = call.argument<List<String>>("sensors")
+
+    if (sensors == null) {
+      Sahha.getSensorStatus(context, null) { error, sensorStatus ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(sensorStatus.ordinal)
+        }
       }
+      return
     }
+
+    try {
+      val sensorsList = sensors.map { SahhaSensor.valueOf(it) }.toSet()
+
+      Sahha.getSensorStatus(context, sensorsList) { error, sensorStatus ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(sensorStatus.ordinal)
+        }
+      }
+
+    } catch (e: Exception) {
+      result.error("Sahha Error", e.message, e)
+    }
+
   }
 
-  private fun enableSensors(@NonNull result: Result) {
-    Sahha.enableSensors(context) { error, sensorStatus ->
-      if (error != null) {
-        result.error("Sahha Error", error, null)
-      } else {
-        result.success(sensorStatus.ordinal)
+  private fun enableSensors(@NonNull call: MethodCall, @NonNull result: Result) {
+    val sensors: List<String>? = call.argument<List<String>>("sensors")
+
+    if (sensors == null) {
+      Sahha.enableSensors(context, null) { error, sensorStatus ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(sensorStatus.ordinal)
+        }
       }
+      return
     }
+
+    try {
+      val sensorsList = sensors.map { SahhaSensor.valueOf(it) }.toSet()
+
+      Sahha.enableSensors(context, sensorsList) { error, sensorStatus ->
+        if (error != null) {
+          result.error("Sahha Error", error, null)
+        } else {
+          result.success(sensorStatus.ordinal)
+        }
+      }
+
+    } catch (e: Exception) {
+      result.error("Sahha Error", e.message, e)
+    }
+
+  }
+
+  private fun openAppSettings() {
+    Sahha.openAppSettings(context);
   }
 
   private fun analyze(@NonNull result: Result) {
@@ -305,7 +353,4 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
   }
 
-  private fun openAppSettings() {
-    Sahha.openAppSettings(context);
-  }
 }

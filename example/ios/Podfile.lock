@@ -7,30 +7,35 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - webview_flutter_wkwebview (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - Sahha (from `../../../sahha-swift/`)
   - sahha_flutter (from `.symlinks/plugins/sahha_flutter/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
-
-SPEC REPOS:
-  trunk:
-    - Sahha
+  - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  Sahha:
+    :path: "../../../sahha-swift/"
   sahha_flutter:
     :path: ".symlinks/plugins/sahha_flutter/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  webview_flutter_wkwebview:
+    :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   Sahha: 0b57629e6f04cea02a14f40ab1b2d3c5c249875b
   sahha_flutter: 0221895256596c56d06744b8f03dcbf2e8d0d355
-  shared_preferences_foundation: 8da9db25511127fe6c63b88c6fe580e09061eb5b
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  webview_flutter_wkwebview: be0f0d33777f1bfd0c9fdcb594786704dbf65f36
 
-PODFILE CHECKSUM: 0cde445877ddd46eb6b7a9e792d054f59cc717eb
+PODFILE CHECKSUM: 55ab4ac67636578afda97f731bfe6eb9aae19e98
 
 COCOAPODS: 1.14.3
