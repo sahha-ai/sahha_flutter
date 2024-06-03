@@ -239,64 +239,46 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   private fun getSensorStatus(@NonNull call: MethodCall, @NonNull result: Result) {
     val sensors: List<String>? = call.argument<List<String>>("sensors")
+    var sensorsList: Set<SahhaSensor>? = null
 
-    if (sensors == null) {
-      Sahha.getSensorStatus(context, null) { error, sensorStatus ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(sensorStatus.ordinal)
-        }
+    if (sensors != null) {
+      try {
+        sensorsList = sensors.map { SahhaSensor.valueOf(it) }.toSet()
+      } catch (e: Exception) {
+        result.error("Sahha Error", e.message, e)
+        return
       }
-      return
     }
 
-    try {
-      val sensorsList = sensors.map { SahhaSensor.valueOf(it) }.toSet()
-
-      Sahha.getSensorStatus(context, sensorsList) { error, sensorStatus ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(sensorStatus.ordinal)
-        }
+    Sahha.getSensorStatus(context, sensorsList) { error, sensorStatus ->
+      if (error != null) {
+        result.error("Sahha Error", error, null)
+      } else {
+        result.success(sensorStatus.ordinal)
       }
-
-    } catch (e: Exception) {
-      result.error("Sahha Error", e.message, e)
     }
-
   }
 
   private fun enableSensors(@NonNull call: MethodCall, @NonNull result: Result) {
     val sensors: List<String>? = call.argument<List<String>>("sensors")
+    var sensorsList: Set<SahhaSensor>? = null
 
-    if (sensors == null) {
-      Sahha.enableSensors(context, null) { error, sensorStatus ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(sensorStatus.ordinal)
-        }
+    if (sensors != null) {
+      try {
+        sensorsList = sensors.map { SahhaSensor.valueOf(it) }.toSet()
+      } catch (e: Exception) {
+        result.error("Sahha Error", e.message, e)
+        return
       }
-      return
     }
 
-    try {
-      val sensorsList = sensors.map { SahhaSensor.valueOf(it) }.toSet()
-
-      Sahha.enableSensors(context, sensorsList) { error, sensorStatus ->
-        if (error != null) {
-          result.error("Sahha Error", error, null)
-        } else {
-          result.success(sensorStatus.ordinal)
-        }
+    Sahha.enableSensors(context, sensorsList) { error, sensorStatus ->
+      if (error != null) {
+        result.error("Sahha Error", error, null)
+      } else {
+        result.success(sensorStatus.ordinal)
       }
-
-    } catch (e: Exception) {
-      result.error("Sahha Error", e.message, e)
     }
-
   }
 
   private fun openAppSettings() {
