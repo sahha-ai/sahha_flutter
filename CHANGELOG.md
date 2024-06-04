@@ -1,3 +1,19 @@
+## 0.4.2 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- Moved sensor configuration from the `configure` method to `getSensorStatus` and `enableSensors` methods
+
+### Fixed
+
+- n/a
+
+---
+
 ## 0.4.1 alpha
 
 ### Added
