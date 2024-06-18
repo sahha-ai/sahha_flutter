@@ -1,3 +1,21 @@
+## 0.4.3 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (iOS) Fixed crash when configuring sensors
+- (iOS) Fixed loop when trying to refresh auth token
+- (iOS) Fixed deauthenticate method if credentials were missing
+
+---
+
 ## 0.4.2 alpha
 
 ### Added
