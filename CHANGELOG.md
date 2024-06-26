@@ -1,3 +1,22 @@
+## 0.4.4 alpha
+
+### Added
+
+- n/a
+
+### Changed
+
+- (iOS) Moved data handling and posting to a dedicated data manager
+- (Android) Improved data handling and posting
+
+### Fixed
+
+- (iOS) Fixed missing device information for logging
+- (iOS) Fixed warnings for missing credentials
+- (Android) Fixed deauthentication to properly halt background tasks and reset data
+
+---
+
 ## 0.4.3 alpha
 
 ### Added
