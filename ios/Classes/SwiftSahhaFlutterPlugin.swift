@@ -217,16 +217,13 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
 
     private func getSensorStatus(_ params: Any?, result: @escaping FlutterResult) {
         
-        if let values = params as? [String: Any?] {
+        if let values = params as? [String: Any?], let sensors = values["sensors"] as? [String] {
             
-            var configSensors: Set<SahhaSensor>? = nil
+            var configSensors: Set<SahhaSensor> = []
             
-            if let sensors = values["sensors"] as? [String] {
-                configSensors = []
-                for sensor in sensors {
-                    if let configSensor = SahhaSensor(rawValue: sensor) {
-                        configSensors?.insert(configSensor)
-                    }
+            for sensor in sensors {
+                if let configSensor = SahhaSensor(rawValue: sensor) {
+                    configSensors.insert(configSensor)
                 }
             }
             
@@ -247,16 +244,13 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     
     private func enableSensors(_ params: Any?, result: @escaping FlutterResult) {
         
-        if let values = params as? [String: Any?] {
+        if let values = params as? [String: Any?], let sensors = values["sensors"] as? [String] {
             
-            var configSensors: Set<SahhaSensor>? = nil
+            var configSensors: Set<SahhaSensor> = []
             
-            if let sensors = values["sensors"] as? [String] {
-                configSensors = []
-                for sensor in sensors {
-                    if let configSensor = SahhaSensor(rawValue: sensor) {
-                        configSensors?.insert(configSensor)
-                    }
+            for sensor in sensors {
+                if let configSensor = SahhaSensor(rawValue: sensor) {
+                    configSensors.insert(configSensor)
                 }
             }
             

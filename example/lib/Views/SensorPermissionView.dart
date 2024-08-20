@@ -14,26 +14,13 @@ class SensorPermissionState extends State<SensorPermissionView> {
   @override
   void initState() {
     super.initState();
-    onTapGetAll(context);
-  }
-
-  onTapGetAll(BuildContext context) {
-    SahhaFlutter.getSensorStatus().then((value) {
-      setState(() {
-        sensorStatus = value;
-      });
-      debugPrint('Get All Sensors ' + sensorStatus.name);
-    }).catchError((error) {
-      debugPrint(error.toString());
-    });
+    onTapGetSome(context);
   }
 
   onTapGetSome(BuildContext context) {
-    SahhaFlutter.getSensorStatus(sensors: [
-      SahhaSensor.sleep,
-      SahhaSensor.step_count,
-      SahhaSensor.heart_rate
-    ]).then((value) {
+    SahhaFlutter.getSensorStatus(
+            [SahhaSensor.sleep, SahhaSensor.step_count, SahhaSensor.heart_rate])
+        .then((value) {
       setState(() {
         sensorStatus = value;
       });
@@ -44,7 +31,7 @@ class SensorPermissionState extends State<SensorPermissionView> {
   }
 
   onTapGetEmpty(BuildContext context) {
-    SahhaFlutter.getSensorStatus(sensors: []).then((value) {
+    SahhaFlutter.getSensorStatus([]).then((value) {
       setState(() {
         sensorStatus = value;
       });
@@ -54,23 +41,10 @@ class SensorPermissionState extends State<SensorPermissionView> {
     });
   }
 
-  onTapEnableAll(BuildContext context) {
-    SahhaFlutter.enableSensors().then((value) {
-      setState(() {
-        sensorStatus = value;
-      });
-      debugPrint('Enable All Sensors ' + sensorStatus.name);
-    }).catchError((error) {
-      debugPrint(error.toString());
-    });
-  }
-
   onTapEnableSome(BuildContext context) {
-    SahhaFlutter.enableSensors(sensors: [
-      SahhaSensor.sleep,
-      SahhaSensor.step_count,
-      SahhaSensor.heart_rate
-    ]).then((value) {
+    SahhaFlutter.enableSensors(
+            [SahhaSensor.sleep, SahhaSensor.step_count, SahhaSensor.heart_rate])
+        .then((value) {
       setState(() {
         sensorStatus = value;
       });
@@ -81,7 +55,7 @@ class SensorPermissionState extends State<SensorPermissionView> {
   }
 
   onTapEnableEmpty(BuildContext context) {
-    SahhaFlutter.enableSensors(sensors: []).then((value) {
+    SahhaFlutter.enableSensors([]).then((value) {
       setState(() {
         sensorStatus = value;
       });
@@ -145,18 +119,6 @@ class SensorPermissionState extends State<SensorPermissionView> {
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {
-            onTapGetAll(context);
-          },
-          child: const Text('GET ALL'),
-        ),
-        const SizedBox(height: 20),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(40),
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-            textStyle: const TextStyle(fontSize: 16),
-          ),
-          onPressed: () {
             onTapEnableEmpty(context);
           },
           child: const Text('ENABLE EMPTY'),
@@ -172,18 +134,6 @@ class SensorPermissionState extends State<SensorPermissionView> {
             onTapEnableSome(context);
           },
           child: const Text('ENABLE SOME'),
-        ),
-        const SizedBox(height: 20),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(40),
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-            textStyle: const TextStyle(fontSize: 16),
-          ),
-          onPressed: () {
-            onTapEnableAll(context);
-          },
-          child: const Text('ENABLE ALL'),
         ),
         const SizedBox(height: 20),
         ElevatedButton(

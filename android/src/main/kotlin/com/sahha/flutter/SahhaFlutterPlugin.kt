@@ -248,6 +248,9 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         result.error("Sahha Error", e.message, e)
         return
       }
+    } else {
+      result.error("Sahha Error", "SahhaFlutter.getSensorStatus() sensors parameter must not be null", null)
+      return
     }
 
     Sahha.getSensorStatus(context, sensorsList) { error, sensorStatus ->
@@ -270,6 +273,9 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         result.error("Sahha Error", e.message, e)
         return
       }
+    } else {
+      result.error("Sahha Error", "SahhaFlutter.enableSensors() sensors parameter must not be null", null)
+      return
     }
 
     Sahha.enableSensors(context, sensorsList) { error, sensorStatus ->

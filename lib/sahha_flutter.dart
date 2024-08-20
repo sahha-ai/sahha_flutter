@@ -197,12 +197,10 @@ class SahhaFlutter {
   }
 
   static Future<SahhaSensorStatus> getSensorStatus(
-      {List<SahhaSensor>? sensors}) async {
+      List<SahhaSensor> sensors) async {
     try {
-      List<String>? sensorStrings;
-      if (sensors != null) {
-        sensorStrings = sensors.map((sensor) => sensor.name).toList();
-      }
+      List<String> sensorStrings =
+          sensors.map((sensor) => sensor.name).toList();
       int statusInt = await _channel
           .invokeMethod('getSensorStatus', {'sensors': sensorStrings});
       SahhaSensorStatus status = SahhaSensorStatus.values[statusInt];
@@ -215,12 +213,10 @@ class SahhaFlutter {
   }
 
   static Future<SahhaSensorStatus> enableSensors(
-      {List<SahhaSensor>? sensors}) async {
+      List<SahhaSensor> sensors) async {
     try {
-      List<String>? sensorStrings;
-      if (sensors != null) {
-        sensorStrings = sensors.map((sensor) => sensor.name).toList();
-      }
+      List<String> sensorStrings =
+          sensors.map((sensor) => sensor.name).toList();
       int statusInt = await _channel
           .invokeMethod('enableSensors', {'sensors': sensorStrings});
       SahhaSensorStatus status = SahhaSensorStatus.values[statusInt];
