@@ -1,3 +1,21 @@
+## 0.4.5 alpha
+
+### Added
+
+- (Android) Improved the quality of step data being sent to Sahha API
+
+### Changed
+
+-  Changed `getSensorStatus` and `enableSensors` method parameters to require an explicit list of sensors
+
+### Fixed
+
+- (iOS) Delete credentials if API response is unauthorized
+- (Android) Fixed a bug where the foreground service would attempt to periodically restart
+- (Android) Fixed a minor bug when batching data
+
+---
+
 ## 0.4.4 alpha
 
 ### Added
