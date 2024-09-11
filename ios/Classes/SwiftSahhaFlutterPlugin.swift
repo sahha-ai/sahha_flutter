@@ -316,18 +316,22 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                     scoreTypes.insert(scoreType)
                 }
             }
-        }
-        
-        Sahha.getScores(scoreTypes, dates: dates) { error, value in
-            if let error = error {
-                result(FlutterError(code: "Sahha Error", message: error, details: nil))
-            } else if let value = value {
-                result(value)
-            } else {
-                let message: String = "Requested Sahha Scores not available"
-                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScoresDateRange", body: params.debugDescription)
-                result(FlutterError(code: "Sahha Error", message: message, details: nil))
+            
+            Sahha.getScores(scoreTypes, dates: dates) { error, value in
+                if let error = error {
+                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                } else if let value = value {
+                    result(value)
+                } else {
+                    let message: String = "Requested Sahha Scores not available"
+                    Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScoresDateRange", body: params.debugDescription)
+                    result(FlutterError(code: "Sahha Error", message: message, details: nil))
+                }
             }
+        } else {
+            let message = "SahhaFlutter.getScoresDateRange() parameters are invalid"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScoresDateRange", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
 }
