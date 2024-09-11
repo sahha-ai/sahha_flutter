@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AnalyzationView extends StatefulWidget {
-  const AnalyzationView({Key? key}) : super(key: key);
+class ScoresView extends StatefulWidget {
+  const ScoresView({Key? key}) : super(key: key);
 
   @override
-  AnalyzationState createState() => AnalyzationState();
+  ScoresState createState() => ScoresState();
 }
 
-class AnalyzationState extends State<AnalyzationView> {
+class ScoresState extends State<ScoresView> {
   @override
   void initState() {
     super.initState();
@@ -27,14 +27,14 @@ class AnalyzationState extends State<AnalyzationView> {
     setState(() {});
   }
 
-  onTapAnalyze(BuildContext context, bool isDaily) {
+  onTapGetScores(BuildContext context, bool isDaily) {
     if (isDaily) {
-      SahhaFlutter.analyze()
+      SahhaFlutter.getScores(types: [SahhaScoreType.activity, SahhaScoreType.sleep, SahhaScoreType.wellbeing])
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
       var week = DateTime.now().subtract(const Duration(days: 7));
-      SahhaFlutter.analyzeDateRange(startDate: week, endDate: DateTime.now())
+      SahhaFlutter.getScoresDateRange(types: [SahhaScoreType.activity, SahhaScoreType.sleep, SahhaScoreType.wellbeing], startDate: week, endDate: DateTime.now())
           .then((value) => {showAlertDialog(context, value)})
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
@@ -42,7 +42,7 @@ class AnalyzationState extends State<AnalyzationView> {
 
   showAlertDialog(BuildContext context, String value) {
     AlertDialog alert = AlertDialog(
-      title: const Text('ANALYSIS'),
+      title: const Text('SCORES'),
       content: Text(value),
       actions: <Widget>[
         TextButton(
@@ -66,7 +66,7 @@ class AnalyzationState extends State<AnalyzationView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Analyzation'),
+          title: const Text('Scores'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(40),
@@ -80,7 +80,7 @@ class AnalyzationState extends State<AnalyzationView> {
                     size: 64,
                   ),
                   const SizedBox(height: 20),
-                  const Text('A new analysis will be available every 24 hours',
+                  const Text('A new score will be available every 6 hours',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 20),
@@ -93,9 +93,9 @@ class AnalyzationState extends State<AnalyzationView> {
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                     onPressed: () {
-                      onTapAnalyze(context, false);
+                      onTapGetScores(context, false);
                     },
-                    child: const Text('ANALYZE PREVIOUS WEEK'),
+                    child: const Text('GET SCORES PREVIOUS WEEK'),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
@@ -106,9 +106,9 @@ class AnalyzationState extends State<AnalyzationView> {
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                     onPressed: () {
-                      onTapAnalyze(context, true);
+                      onTapGetScores(context, true);
                     },
-                    child: const Text('ANALYZE PREVIOUS DAY'),
+                    child: const Text('GET SCORES PREVIOUS DAY'),
                   ),
                 ]),
           ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/services.dart';
 
 enum SahhaEnvironment { sandbox, production }
@@ -44,10 +45,19 @@ enum SahhaSensor {
   exercise
 }
 
+enum SahhaScoreType {
+  wellbeing,
+  activity,
+  sleep,
+  readiness,
+  mental_wellbeing,
+}
+
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
 
 class SahhaNotificationSettings {
   final String? icon, title, shortDescription;
+
   const SahhaNotificationSettings(
       {this.icon, this.title, this.shortDescription});
 }
@@ -232,9 +242,11 @@ class SahhaFlutter {
     _channel.invokeMethod('openAppSettings');
   }
 
-  static Future<String> analyze() async {
+  static Future<String> getScores({required List<SahhaScoreType> types}) async {
     try {
-      String value = await _channel.invokeMethod('analyze');
+      List<String> scoreTypeStrings = types.map((type) => type.name).toList();
+      String value =
+          await _channel.invokeMethod('getScores', {'types': scoreTypeStrings});
       return value;
     } on PlatformException catch (error) {
       return Future.error(error);
@@ -243,13 +255,16 @@ class SahhaFlutter {
     }
   }
 
-  static Future<String> analyzeDateRange(
-      {required DateTime startDate, required DateTime endDate}) async {
+  static Future<String> getScoresDateRange(
+      {required List<SahhaScoreType> types,
+      required DateTime startDate,
+      required DateTime endDate}) async {
     try {
+      List<String> scoreTypeStrings = types.map((type) => type.name).toList();
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String value = await _channel.invokeMethod('analyzeDateRange',
-          {'startDate': startDateInt, 'endDate': endDateInt});
+      String value = await _channel.invokeMethod('getScoresDateRange',
+          {'types': scoreTypeStrings, 'startDate': startDateInt, 'endDate': endDateInt});
       return value;
     } on PlatformException catch (error) {
       return Future.error(error);

@@ -19,8 +19,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case postDemographic
         case getSensorStatus
         case enableSensors
-        case analyze
-        case analyzeDateRange
+        case getScores
+        case getScoresDateRange
         case openAppSettings
     }
 
@@ -52,10 +52,10 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             getSensorStatus(call.arguments, result: result)
         case .enableSensors:
             enableSensors(call.arguments, result: result)
-        case .analyze:
-            analyze(result)
-        case .analyzeDateRange:
-            analyzeDateRange(call.arguments, result: result)
+        case .getScores:
+            getScores(call.arguments, result: result)
+        case .getScoresDateRange:
+            getScoresDateRange(call.arguments, result: result)
         case .openAppSettings:
             Sahha.openAppSettings()
         default:
@@ -269,38 +269,63 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func analyze(_ result: @escaping FlutterResult) {
-        Sahha.analyze { error, value in
-            if let error = error {
-                result(FlutterError(code: "Sahha Error", message: error, details: nil))
-            } else if let value = value {
-                result(value)
-            } else {
-                let message: String = "Requested Sahha Analyzation not available"
-                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "analyze", body: "")
-                result(FlutterError(code: "Sahha Error", message: message, details: nil))
+    private func getScores(_ params: Any?, result: @escaping FlutterResult) {
+        if let values = params as? [String: Any?], let types = values["types"] as? [String] {
+            
+            var scoreTypes: Set<SahhaScoreType> = []
+            
+            for type in types {
+                if let scoreType = SahhaScoreType(rawValue: type) {
+                    scoreTypes.insert(scoreType)
+                }
             }
+            
+            Sahha.getScores(scoreTypes) { error, value in
+                if let error = error {
+                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                } else if let value = value {
+                    result(value)
+                } else {
+                    let message: String = "Requested Sahha Scores not available"
+                    Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScores", body: "")
+                    result(FlutterError(code: "Sahha Error", message: message, details: nil))
+                }
+            }
+            
+        } else {
+            let message = "SahhaFlutter.getScores() parameters are invalid"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScores", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
 
-    private func analyzeDateRange(_ params: Any?, result: @escaping FlutterResult) {
-        Sahha.postError(framework: .flutter, message: "TEST", path: "SwiftSahhaFlutterPlugin", method: "analyzeDateRange", body: params.debugDescription)
+    private func getScoresDateRange(_ params: Any?, result: @escaping FlutterResult) {
+        Sahha.postError(framework: .flutter, message: "TEST", path: "SwiftSahhaFlutterPlugin", method: "getScoresDateRange", body: params.debugDescription)
+        
         var dates: (startDate: Date, endDate: Date)?
-        if let values = params as? [String: Any?] {
+        var scoreTypes: Set<SahhaScoreType> = []
+        if let values = params as? [String: Any?], let types = values["types"] as? [String] {
             if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
                 let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
                 let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
                 dates = (startDate, endDate)
             }
+            
+            for type in types {
+                if let scoreType = SahhaScoreType(rawValue: type) {
+                    scoreTypes.insert(scoreType)
+                }
+            }
         }
-        Sahha.analyze(dates: dates) { error, value in
+        
+        Sahha.getScores(scoreTypes, dates: dates) { error, value in
             if let error = error {
                 result(FlutterError(code: "Sahha Error", message: error, details: nil))
             } else if let value = value {
                 result(value)
             } else {
-                let message: String = "Requested Sahha Analyzation not available"
-                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "analyzeDateRange", body: params.debugDescription)
+                let message: String = "Requested Sahha Scores not available"
+                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScoresDateRange", body: params.debugDescription)
                 result(FlutterError(code: "Sahha Error", message: message, details: nil))
             }
         }

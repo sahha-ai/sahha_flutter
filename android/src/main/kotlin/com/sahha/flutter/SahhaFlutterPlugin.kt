@@ -36,8 +36,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     postDemographic,
     getSensorStatus,
     enableSensors,
-    analyze,
-    analyzeDateRange,
+    getScores,
+    getScoresDateRange,
     openAppSettings
   }
 
@@ -93,8 +93,8 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       SahhaMethod.postDemographic.name -> {postDemographic(call, result)}
       SahhaMethod.getSensorStatus.name -> {getSensorStatus(call, result)}
       SahhaMethod.enableSensors.name -> {enableSensors(call, result)}
-      SahhaMethod.analyze.name -> {analyze(result)}
-      SahhaMethod.analyzeDateRange.name -> {analyzeDateRange(call, result)}
+      SahhaMethod.getScores.name -> {getScores(call, result)}
+      SahhaMethod.getScoresDateRange.name -> {getScoresDateRange(call, result)}
       SahhaMethod.openAppSettings.name -> {openAppSettings()}
       else -> { result.notImplemented() }
     }
@@ -291,28 +291,44 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     Sahha.openAppSettings(context);
   }
 
-  private fun analyze(@NonNull result: Result) {
-    Sahha.analyze { error, value ->
+  private fun getScores(@NonNull call: MethodCall, @NonNull result: Result) {
+    val types = call.argument<List<String>>("types")
+    if (types == null) {
+      result.error("Sahha Error", "SahhaFlutter.getScores() types parameter must not be null", null)
+      return
+    }
+
+    val sahhaScoreTypes = types.map { SahhaScoreType.valueOf(it) }.toSet()
+
+    Sahha.getScores(sahhaScoreTypes) { error, value ->
       if (error != null) {
         result.error("Sahha Error", error, null)
       } else if (value != null) {
         result.success(value)
       } else {
-        Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.analyze() analyzation missing", "SahhaFlutterPlugin", "analyze")
-        result.error("Sahha Error", "Sahha Analyzation not available", null)
+        Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.getScores() scores missing", "SahhaFlutterPlugin", "getScores")
+        result.error("Sahha Error", "Sahha scores not available", null)
       }
     }
   }
 
-  private fun analyzeDateRange(@NonNull call: MethodCall, @NonNull result: Result) {
+  private fun getScoresDateRange(@NonNull call: MethodCall, @NonNull result: Result) {
     val codeBody = call.arguments?.toString()
-    Sahha.postError(SahhaFramework.flutter, "TEST", "SahhaFlutterPlugin", "analyzeDateRange", codeBody)
+    Sahha.postError(SahhaFramework.flutter, "TEST", "SahhaFlutterPlugin", "getScoresDateRange", codeBody)
+
+    val types = call.argument<List<String>>("types")
+    if (types != null) {
+      Log.d("Sahha", "types $types")
+    } else {
+      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.getScoresDateRange() score types missing", "SahhaFlutterPlugin", "getScoresDateRange", codeBody)
+      Log.d("Sahha", "types missing")
+    }
 
     val startDate: Long? = call.argument<Long>("startDate")
     if (startDate != null) {
       Log.d("Sahha", "startDate $startDate")
     } else {
-      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.analyzeDateRange() startDate missing", "SahhaFlutterPlugin", "analyzeDateRange", codeBody)
+      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.getScoresDateRange() startDate missing", "SahhaFlutterPlugin", "getScoresDateRange", codeBody)
       Log.d("Sahha", "startDate missing")
     }
 
@@ -320,24 +336,25 @@ class SahhaFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     if (endDate != null) {
       Log.d("Sahha", "endDate $endDate")
     } else {
-      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.analyzeDateRange() endDate missing", "SahhaFlutterPlugin", "analyzeDateRange", codeBody)
+      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.getScoresDateRange() endDate missing", "SahhaFlutterPlugin", "getScoresDateRange", codeBody)
       Log.d("Sahha", "endDate missing")
     }
 
-    if (startDate != null && endDate != null) {
-      Sahha.analyze(Pair(Date(startDate), Date(endDate)), ) { error, value ->
+    if (startDate != null && endDate != null && types != null) {
+      val sahhaScoreTypes = types.map { SahhaScoreType.valueOf(it) }.toSet()
+      Sahha.getScores(sahhaScoreTypes, Pair(Date(startDate), Date(endDate)), ) { error, value ->
         if (error != null) {
           result.error("Sahha Error", error, null)
         } else if (value != null) {
           result.success(value)
         } else {
-          Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.analyzeDateRange() analyzation missing", "SahhaFlutterPlugin", "analyzeDateRange", codeBody)
-          result.error("Sahha Error", "Sahha Analyzation not available", null)
+          Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.getScoresDateRange() scores missing", "SahhaFlutterPlugin", "getScoresDateRange", codeBody)
+          result.error("Sahha Error", "Sahha scores not available", null)
         }
       }
     } else {
-      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.analyzeDateRange() parameters invalid", "SahhaFlutterPlugin", "analyzeDateRange", codeBody)
-      result.error("Sahha Error", "SahhaFlutter.analyzeDateRange() parameters invalid", null)
+      Sahha.postError(SahhaFramework.flutter, "SahhaFlutter.getScoresDateRange() parameters invalid", "SahhaFlutterPlugin", "getScoresDateRange", codeBody)
+      result.error("Sahha Error", "SahhaFlutter.getScoresDateRange() parameters invalid", null)
     }
   }
 

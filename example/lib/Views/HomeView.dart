@@ -70,7 +70,7 @@ class HomeView extends StatelessWidget {
                       Icons.query_stats,
                       size: 32,
                     ),
-                    label: const Text('Analyzation'),
+                    label: const Text('Scores'),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
                       padding: const EdgeInsets.symmetric(
@@ -78,7 +78,7 @@ class HomeView extends StatelessWidget {
                       textStyle: const TextStyle(fontSize: 20),
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/analyzation');
+                      Navigator.pushNamed(context, '/scores');
                     },
                   ),
                   const SizedBox(height: 20),

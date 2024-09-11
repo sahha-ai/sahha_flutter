@@ -1,3 +1,21 @@
+## 1.0.0
+
+### Added
+
+- Added `getScores` method
+
+### Changed
+
+- Removed `analyze` method
+
+### Fixed
+
+- Fixed recording method strings
+- (Android) Fixed a bug where in specific scenarios, incorrect permission statuses were returned
+- (Android) Fixed a data filtering bug
+
+---
+
 ## 0.4.5 alpha
 
 ### Added
