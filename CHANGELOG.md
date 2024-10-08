@@ -1,3 +1,20 @@
+## 1.0.1
+
+### Added
+
+n/a
+
+### Changed
+
+n/a
+
+### Fixed
+
+- (Android) Resolved an issue where under certain circumstances, native step data would stop collecting (Health Connect step data unrelated)
+- (Android) Resolved an issue where certain permission states were incorrectly returning `unavailable` specifically for Android version 9 (API 28)
+
+---
+
 ## 1.0.0
 
 ### Added
