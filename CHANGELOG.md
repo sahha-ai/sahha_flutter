@@ -1,3 +1,20 @@
+## 1.0.2
+
+### Added
+
+- (Android) Added metadata to logs
+- (Android) Added `appVersion` to device information
+
+### Changed
+
+n/a
+
+### Fixed
+
+- (Android) Fixed an issue where the `endDateTime` timestamps were incorrect for historical step data
+
+---
+
 ## 1.0.1
 
 ### Added
