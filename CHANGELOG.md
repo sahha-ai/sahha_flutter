@@ -1,3 +1,19 @@
+## 1.0.3
+
+### Added
+
+n/a
+
+### Changed
+
+n/a
+
+### Fixed
+
+- (Android) Resolved an issue where applying metadata to native sleep data could cause crashing
+
+---
+
 ## 1.0.2
 
 ### Added
