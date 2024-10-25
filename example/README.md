@@ -14,4 +14,4 @@ Run `pod install` inside the `example/ios` project folder.
 
 ---
 
-Copyright © 2022 Sahha. All rights reserved.
+Copyright © 2022 - 2024 Sahha. All rights reserved.
