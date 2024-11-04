@@ -1,3 +1,19 @@
+## 1.0.4
+
+### Added
+
+n/a
+
+### Changed
+
+- Updated to Flutter version 7
+
+### Fixed
+
+n/a
+
+---
+
 ## 1.0.3
 
 ### Added
