@@ -10,7 +10,7 @@ n/a
 
 ### Fixed
 
-- (Android) Fixed an issue where null demographics was treated as an error—new profiles will always have null demographics, which is not an error.
+- (Android) Fixed an issue where null demographics was treated as an error — new profiles will always have null demographics, which is not an error.
 - (Android) Implemented a potential fix for occasional foreground service crashes.
 
 ---
