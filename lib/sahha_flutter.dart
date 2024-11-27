@@ -53,6 +53,73 @@ enum SahhaScoreType {
   mental_wellbeing,
 }
 
+enum SahhaBiomarkerType {
+  steps,
+  floors_climbed,
+  active_hours,
+  active_duration,
+  activity_low_intensity_duration,
+  activity_mid_intensity_duration,
+  activity_high_intensity_duration,
+  activity_sedentary_duration,
+  active_energy_burned,
+  total_energy_burned,
+  height,
+  weight,
+  body_mass_index,
+  body_fat,
+  fat_mass,
+  lean_mass,
+  waist_circumference,
+  resting_energy_burned,
+  age,
+  biological_sex,
+  date_of_birth,
+  menstrual_cycle_length,
+  menstrual_cycle_start_date,
+  menstrual_cycle_end_date,
+  menstrual_phase,
+  menstrual_phase_start_date,
+  menstrual_phase_end_date,
+  menstrual_phase_length,
+  sleep_start_time,
+  sleep_end_time,
+  sleep_duration,
+  sleep_debt,
+  sleep_interruptions,
+  sleep_in_bed_duration,
+  sleep_awake_duration,
+  sleep_light_duration,
+  sleep_rem_duration,
+  sleep_deep_duration,
+  sleep_regularity,
+  sleep_latency,
+  sleep_efficiency,
+  heart_rate_resting,
+  heart_rate_sleep,
+  heart_rate_variability_sdnn,
+  heart_rate_variability_rmssd,
+  respiratory_rate,
+  respiratory_rate_sleep,
+  oxygen_saturation,
+  oxygen_saturation_sleep,
+  vo2_max,
+  blood_glucose,
+  blood_pressure_systolic,
+  blood_pressure_diastolic,
+  body_temperature_basal,
+  skin_temperature_sleep,
+}
+
+enum SahhaBiomarkerCategory {
+  activity,
+  body,
+  characteristic,
+  reproductive,
+  sleep,
+  vitals
+}
+
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
 
 class SahhaNotificationSettings {
@@ -263,8 +330,53 @@ class SahhaFlutter {
       List<String> scoreTypeStrings = types.map((type) => type.name).toList();
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String value = await _channel.invokeMethod('getScoresDateRange',
-          {'types': scoreTypeStrings, 'startDate': startDateInt, 'endDate': endDateInt});
+      String value = await _channel.invokeMethod('getScoresDateRange', {
+        'types': scoreTypeStrings,
+        'startDate': startDateInt,
+        'endDate': endDateInt
+      });
+      return value;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<String> getBiomarkers(
+      {required List<SahhaBiomarkerCategory> categories,
+      required List<SahhaBiomarkerType> types}) async {
+    try {
+      List<String> biomarkerCategoryStrings =
+          categories.map((category) => category.name).toList();
+      List<String> biomarkerTypeStrings =
+          types.map((type) => type.name).toList();
+      String value = await _channel.invokeMethod('getBiomarkers', {
+        'categories': biomarkerCategoryStrings,
+        'types': biomarkerTypeStrings
+      });
+      return value;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<String> getBiomarkersDateRange(
+      {required List<SahhaBiomarkerCategory> categories,
+      required List<SahhaBiomarkerType> types,
+      required DateTime startDate,
+      required DateTime endDate}) async {
+    try {
+      List<String> scoreTypeStrings = types.map((type) => type.name).toList();
+      int startDateInt = startDate.millisecondsSinceEpoch;
+      int endDateInt = endDate.millisecondsSinceEpoch;
+      String value = await _channel.invokeMethod('getScoresDateRange', {
+        'types': scoreTypeStrings,
+        'startDate': startDateInt,
+        'endDate': endDateInt
+      });
       return value;
     } on PlatformException catch (error) {
       return Future.error(error);
