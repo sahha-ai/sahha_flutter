@@ -13,6 +13,8 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import sdk.sahha.android.source.Sahha
+import sdk.sahha.android.source.SahhaBiomarkerCategory
+import sdk.sahha.android.source.SahhaBiomarkerType
 import sdk.sahha.android.source.SahhaConverterUtility
 import sdk.sahha.android.source.SahhaDemographic
 import sdk.sahha.android.source.SahhaEnvironment
@@ -39,6 +41,8 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         enableSensors,
         getScores,
         getScoresDateRange,
+        getBiomarkers,
+        getBiomarkersDateRange,
         openAppSettings
     }
 
@@ -130,6 +134,14 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
             SahhaMethod.getScoresDateRange.name -> {
                 getScoresDateRange(call, result)
+            }
+
+            SahhaMethod.getBiomarkers.name -> {
+                getBiomarkers(call, result)
+            }
+
+            SahhaMethod.getBiomarkersDateRange.name -> {
+                getBiomarkersDateRange(call, result)
             }
 
             SahhaMethod.openAppSettings.name -> {
@@ -535,6 +547,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun getBiomarkersDateRange(@NonNull call: MethodCall, @NonNull result: Result) {
+        val codeBody = call.arguments?.toString()
         val categories = call.argument<List<String>>("categories")
         if (categories != null) {
             Log.d("Sahha", "categories $categories")

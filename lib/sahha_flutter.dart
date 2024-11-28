@@ -369,11 +369,13 @@ class SahhaFlutter {
       required DateTime startDate,
       required DateTime endDate}) async {
     try {
-      List<String> scoreTypeStrings = types.map((type) => type.name).toList();
+      List<String> biomarkerCategoryStrings = categories.map((category) => category.name).toList();
+      List<String> biomarkerTypeStrings = types.map((type) => type.name).toList();
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String value = await _channel.invokeMethod('getScoresDateRange', {
-        'types': scoreTypeStrings,
+      String value = await _channel.invokeMethod('getBiomarkersDateRange', {
+        'categories': biomarkerCategoryStrings,
+        'types': biomarkerTypeStrings,
         'startDate': startDateInt,
         'endDate': endDateInt
       });

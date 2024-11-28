@@ -48,7 +48,7 @@ class BiomarkersState extends State<BiomarkersView> {
 
   showAlertDialog(BuildContext context, String value) {
     AlertDialog alert = AlertDialog(
-      title: const Text('SCORES'),
+      title: const Text('BIOMARKERS'),
       content: Text(value),
       actions: <Widget>[
         TextButton(
@@ -72,7 +72,7 @@ class BiomarkersState extends State<BiomarkersView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Scores'),
+          title: const Text('Biomarkers'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(40),
@@ -101,7 +101,7 @@ class BiomarkersState extends State<BiomarkersView> {
                     onPressed: () {
                       onTapGetBiomarkers(context, false);
                     },
-                    child: const Text('GET SCORES PREVIOUS WEEK'),
+                    child: const Text('GET BIOMARKERS PREVIOUS WEEK'),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
@@ -114,7 +114,7 @@ class BiomarkersState extends State<BiomarkersView> {
                     onPressed: () {
                       onTapGetBiomarkers(context, true);
                     },
-                    child: const Text('GET SCORES PREVIOUS DAY'),
+                    child: const Text('GET BIOMARKERS PREVIOUS DAY'),
                   ),
                 ]),
           ),
