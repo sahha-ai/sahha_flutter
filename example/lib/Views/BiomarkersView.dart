@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +34,11 @@ class BiomarkersState extends State<BiomarkersView> {
       SahhaFlutter.getBiomarkers(
               categories: SahhaBiomarkerCategory.values,
               types: SahhaBiomarkerType.values)
-          .then((value) => {showAlertDialog(context, value)})
+          .then((value) {
+            List<dynamic> data = jsonDecode(value);
+            debugPrint(data.firstOrNull?.toString());
+            showAlertDialog(context, value);
+          })
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
       var week = DateTime.now().subtract(const Duration(days: 7));
@@ -49,7 +55,9 @@ class BiomarkersState extends State<BiomarkersView> {
   showAlertDialog(BuildContext context, String value) {
     AlertDialog alert = AlertDialog(
       title: const Text('BIOMARKERS'),
-      content: Text(value),
+      content: SingleChildScrollView(
+        child: Text(value),
+      ),
       actions: <Widget>[
         TextButton(
           child: const Text('OK'),

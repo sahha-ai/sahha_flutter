@@ -43,7 +43,9 @@ class ScoresState extends State<ScoresView> {
   showAlertDialog(BuildContext context, String value) {
     AlertDialog alert = AlertDialog(
       title: const Text('SCORES'),
-      content: Text(value),
+      content: SingleChildScrollView(
+          child: Text(value)
+      ),
       actions: <Widget>[
         TextButton(
           child: const Text('OK'),
