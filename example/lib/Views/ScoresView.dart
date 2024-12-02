@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,23 +31,34 @@ class ScoresState extends State<ScoresView> {
 
   onTapGetScores(BuildContext context, bool isDaily) {
     if (isDaily) {
-      SahhaFlutter.getScores(types: [SahhaScoreType.activity, SahhaScoreType.sleep, SahhaScoreType.wellbeing])
-          .then((value) => {showAlertDialog(context, value)})
-          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+      SahhaFlutter.getScores(types: [
+        SahhaScoreType.activity,
+        SahhaScoreType.sleep,
+        SahhaScoreType.wellbeing
+      ]).then((value) {
+        List<dynamic> data = jsonDecode(value);
+        debugPrint(data.firstOrNull?.toString());
+        showAlertDialog(context, value);
+      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
       var week = DateTime.now().subtract(const Duration(days: 7));
-      SahhaFlutter.getScoresDateRange(types: [SahhaScoreType.activity, SahhaScoreType.sleep, SahhaScoreType.wellbeing], startDate: week, endDate: DateTime.now())
-          .then((value) => {showAlertDialog(context, value)})
-          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+      SahhaFlutter.getScoresDateRange(types: [
+        SahhaScoreType.activity,
+        SahhaScoreType.sleep,
+        SahhaScoreType.wellbeing
+      ], startDate: week, endDate: DateTime.now())
+          .then((value) {
+        List<dynamic> data = jsonDecode(value);
+        debugPrint(data.firstOrNull?.toString());
+        showAlertDialog(context, value);
+      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
   }
 
   showAlertDialog(BuildContext context, String value) {
     AlertDialog alert = AlertDialog(
       title: const Text('SCORES'),
-      content: SingleChildScrollView(
-          child: Text(value)
-      ),
+      content: SingleChildScrollView(child: Text(value)),
       actions: <Widget>[
         TextButton(
           child: const Text('OK'),

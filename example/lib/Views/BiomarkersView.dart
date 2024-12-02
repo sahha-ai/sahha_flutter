@@ -32,22 +32,26 @@ class BiomarkersState extends State<BiomarkersView> {
   onTapGetBiomarkers(BuildContext context, bool isDaily) {
     if (isDaily) {
       SahhaFlutter.getBiomarkers(
-              categories: SahhaBiomarkerCategory.values,
-              types: SahhaBiomarkerType.values)
+          categories: SahhaBiomarkerCategory.values,
+          types: SahhaBiomarkerType.values)
           .then((value) {
-            List<dynamic> data = jsonDecode(value);
-            debugPrint(data.firstOrNull?.toString());
-            showAlertDialog(context, value);
-          })
+        List<dynamic> data = jsonDecode(value);
+        debugPrint(data.firstOrNull?.toString());
+        showAlertDialog(context, value);
+      })
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
       var week = DateTime.now().subtract(const Duration(days: 7));
       SahhaFlutter.getBiomarkersDateRange(
-              categories: SahhaBiomarkerCategory.values,
-              types: SahhaBiomarkerType.values,
-              startDate: week,
-              endDate: DateTime.now())
-          .then((value) => {showAlertDialog(context, value)})
+          categories: SahhaBiomarkerCategory.values,
+          types: SahhaBiomarkerType.values,
+          startDate: week,
+          endDate: DateTime.now())
+          .then((value) {
+        List<dynamic> data = jsonDecode(value);
+        debugPrint(data.firstOrNull?.toString());
+        showAlertDialog(context, value);
+      })
           .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
   }
