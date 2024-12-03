@@ -1,7 +1,8 @@
 package com.sahha.flutter
 
-import android.app.Activity
 import android.content.Context
+import androidx.activity.ComponentActivity
+import io.flutter.embedding.android.FlutterActivity
 import androidx.annotation.NonNull
 import com.google.gson.Gson
 import io.flutter.Log
@@ -24,6 +25,7 @@ import sdk.sahha.android.source.SahhaScoreType
 import sdk.sahha.android.source.SahhaSensor
 import sdk.sahha.android.source.SahhaSettings
 import java.util.Date
+
 
 /** SahhaFlutterPlugin */
 class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -52,7 +54,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
-    private var flutterActivity: Activity? = null
+    private var flutterActivity: ComponentActivity? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "sahha_flutter")
@@ -75,8 +77,11 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        val componentActivity = binding.activity as ComponentActivity
         Log.d("Sahha", "onAttachedToActivity")
-        flutterActivity = binding.activity
+        flutterActivity = if (componentActivity is ComponentActivity) {
+            componentActivity
+        } else null
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
@@ -191,7 +196,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             )
 
             // null checked above ^^^
-            Sahha.configure(flutterActivity!!.application, settings) { error, success ->
+            Sahha.configure(flutterActivity!!, settings) { error, success ->
                 if (!success) result.error("Sahha Error", error, null)
                 result.success(success)
             }
