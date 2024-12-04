@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ScoresView extends StatefulWidget {
-  const ScoresView({Key? key}) : super(key: key);
+class BiomarkersView extends StatefulWidget {
+  const BiomarkersView({Key? key}) : super(key: key);
 
   @override
-  ScoresState createState() => ScoresState();
+  BiomarkersState createState() => BiomarkersState();
 }
 
-class ScoresState extends State<ScoresView> {
+class BiomarkersState extends State<BiomarkersView> {
   @override
   void initState() {
     super.initState();
@@ -29,36 +29,39 @@ class ScoresState extends State<ScoresView> {
     setState(() {});
   }
 
-  onTapGetScores(BuildContext context, bool isDaily) {
+  onTapGetBiomarkers(BuildContext context, bool isDaily) {
     if (isDaily) {
-      SahhaFlutter.getScores(types: [
-        SahhaScoreType.activity,
-        SahhaScoreType.sleep,
-        SahhaScoreType.wellbeing
-      ]).then((value) {
-        List<dynamic> data = jsonDecode(value);
-        debugPrint(data.firstOrNull?.toString());
-        showAlertDialog(context, value);
-      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
-    } else {
-      var week = DateTime.now().subtract(const Duration(days: 7));
-      SahhaFlutter.getScoresDateRange(types: [
-        SahhaScoreType.activity,
-        SahhaScoreType.sleep,
-        SahhaScoreType.wellbeing
-      ], startDate: week, endDate: DateTime.now())
+      SahhaFlutter.getBiomarkers(
+          categories: SahhaBiomarkerCategory.values,
+          types: SahhaBiomarkerType.values)
           .then((value) {
         List<dynamic> data = jsonDecode(value);
         debugPrint(data.firstOrNull?.toString());
         showAlertDialog(context, value);
-      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
+      })
+          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+    } else {
+      var week = DateTime.now().subtract(const Duration(days: 7));
+      SahhaFlutter.getBiomarkersDateRange(
+          categories: SahhaBiomarkerCategory.values,
+          types: SahhaBiomarkerType.values,
+          startDate: week,
+          endDate: DateTime.now())
+          .then((value) {
+        List<dynamic> data = jsonDecode(value);
+        debugPrint(data.firstOrNull?.toString());
+        showAlertDialog(context, value);
+      })
+          .catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
   }
 
   showAlertDialog(BuildContext context, String value) {
     AlertDialog alert = AlertDialog(
-      title: const Text('SCORES'),
-      content: SingleChildScrollView(child: Text(value)),
+      title: const Text('BIOMARKERS'),
+      content: SingleChildScrollView(
+        child: Text(value),
+      ),
       actions: <Widget>[
         TextButton(
           child: const Text('OK'),
@@ -81,7 +84,7 @@ class ScoresState extends State<ScoresView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Scores'),
+          title: const Text('Biomarkers'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(40),
@@ -108,9 +111,9 @@ class ScoresState extends State<ScoresView> {
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                     onPressed: () {
-                      onTapGetScores(context, false);
+                      onTapGetBiomarkers(context, false);
                     },
-                    child: const Text('GET SCORES PREVIOUS WEEK'),
+                    child: const Text('GET BIOMARKERS PREVIOUS WEEK'),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
@@ -121,9 +124,9 @@ class ScoresState extends State<ScoresView> {
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                     onPressed: () {
-                      onTapGetScores(context, true);
+                      onTapGetBiomarkers(context, true);
                     },
-                    child: const Text('GET SCORES PREVIOUS DAY'),
+                    child: const Text('GET BIOMARKERS PREVIOUS DAY'),
                   ),
                 ]),
           ),
