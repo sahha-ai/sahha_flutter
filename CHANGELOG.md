@@ -1,3 +1,23 @@
+## 1.0.6
+
+### Added
+
+- Added `getBiomarkers` to retrieve biomarker data
+- Added app event logs for lifecycle changes
+
+### Changed
+
+- (Android) Changed `authenticate` to return an "in progress" error if an authentication is already in progress
+- (Android) Adjusted metadata for data logs
+
+### Fixed
+
+- (Android) Hotfixed an issue where device information sometimes would not send
+
+Note: The `MainActivity` within the project's `android` folder will need to be changed to use `FlutterFragmentActivity` instead.
+
+---
+
 ## 1.0.5
 
 ### Added

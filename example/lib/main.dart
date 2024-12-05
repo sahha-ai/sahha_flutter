@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
-import 'package:sahha_flutter_example/Views/ScoresView.dart';
 import 'package:sahha_flutter_example/Views/AuthenticationView.dart';
+import 'package:sahha_flutter_example/Views/BiomarkersView.dart';
 import 'package:sahha_flutter_example/Views/HomeView.dart';
 import 'package:sahha_flutter_example/Views/ProfileView.dart';
-import 'package:sahha_flutter_example/Views/WebView.dart';
+import 'package:sahha_flutter_example/Views/ScoresView.dart';
 import 'package:sahha_flutter_example/Views/SensorPermissionView.dart';
+import 'package:sahha_flutter_example/Views/WebView.dart';
 
 void main() {
   runApp(const App());
@@ -58,6 +59,7 @@ class AppState extends State<App> {
         '/profile': (BuildContext context) => const ProfileView(),
         '/permissions': (BuildContext context) => const SensorPermissionView(),
         '/scores': (BuildContext context) => const ScoresView(),
+        '/biomarkers': (BuildContext context) => const BiomarkersView(),
         '/web': (BuildContext context) => const WebView(),
       },
     );
