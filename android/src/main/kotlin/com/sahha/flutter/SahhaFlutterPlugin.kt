@@ -2,7 +2,6 @@ package com.sahha.flutter
 
 import android.content.Context
 import androidx.activity.ComponentActivity
-import io.flutter.embedding.android.FlutterActivity
 import androidx.annotation.NonNull
 import com.google.gson.Gson
 import io.flutter.Log
@@ -45,6 +44,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         getScoresDateRange,
         getBiomarkers,
         getBiomarkersDateRange,
+        getStats,
         openAppSettings
     }
 
@@ -147,6 +147,10 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
             SahhaMethod.getBiomarkersDateRange.name -> {
                 getBiomarkersDateRange(call, result)
+            }
+
+            SahhaMethod.getStats.name -> {
+                getStats(call, result)
             }
 
             SahhaMethod.openAppSettings.name -> {
@@ -643,6 +647,88 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             result.error(
                 "Sahha Error",
                 "SahhaFlutter.getBiomarkersDateRange() parameters invalid",
+                null
+            )
+        }
+    }
+
+    private fun getStats(@NonNull call: MethodCall, @NonNull result: Result) {
+        val codeBody = call.arguments?.toString()
+        val sensor: String? = call.argument<String>("sensor")
+        if (sensor != null) {
+            Log.d("Sahha", "sensor $sensor")
+        } else {
+            Sahha.postError(
+                SahhaFramework.flutter,
+                "SahhaFlutter.getStats() sensor missing",
+                "SahhaFlutterPlugin",
+                "getStats",
+                codeBody
+            )
+            Log.d("Sahha", "sensor missing")
+        }
+
+        val startDate: Long? = call.argument<Long>("startDate")
+        if (startDate != null) {
+            Log.d("Sahha", "startDate $startDate")
+        } else {
+            Sahha.postError(
+                SahhaFramework.flutter,
+                "SahhaFlutter.getStats() startDate missing",
+                "SahhaFlutterPlugin",
+                "getStats",
+                codeBody
+            )
+            Log.d("Sahha", "startDate missing")
+        }
+
+        val endDate: Long? = call.argument<Long>("endDate")
+        if (endDate != null) {
+            Log.d("Sahha", "endDate $endDate")
+        } else {
+            Sahha.postError(
+                SahhaFramework.flutter,
+                "SahhaFlutter.getStats() endDate missing",
+                "SahhaFlutterPlugin",
+                "getStats",
+                codeBody
+            )
+            Log.d("Sahha", "endDate missing")
+        }
+
+        if (sensor != null && startDate != null && endDate != null) {
+            Sahha.getStats(
+                SahhaSensor.valueOf(sensor),
+                Pair(Date(startDate), Date(endDate)),
+            ) { error, stats ->
+                if (error != null) {
+                    result.error("Sahha Error", error, null)
+                } else if (stats != null) {
+                    val gson = Gson()
+                    val statsHashMap = stats?.also { gson.toJson(it) } ?: ""
+                    result.success(statsHashMap);
+                } else {
+                    Sahha.postError(
+                        SahhaFramework.flutter,
+                        "SahhaFlutter.getStats() stats missing",
+                        "SahhaFlutterPlugin",
+                        "getStats",
+                        codeBody
+                    )
+                    result.error("Sahha Error", "Sahha stats not available", null)
+                }
+            }
+        } else {
+            Sahha.postError(
+                SahhaFramework.flutter,
+                "SahhaFlutter.getStats() parameters invalid",
+                "SahhaFlutterPlugin",
+                "getStats",
+                codeBody
+            )
+            result.error(
+                "Sahha Error",
+                "SahhaFlutter.getStats() parameters invalid",
                 null
             )
         }

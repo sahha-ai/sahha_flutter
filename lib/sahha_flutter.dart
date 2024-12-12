@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:sahha_flutter/model/SahhaStat.dart';
 
 enum SahhaEnvironment { sandbox, production }
 
@@ -329,8 +331,10 @@ class SahhaFlutter {
       required DateTime startDate,
       required DateTime endDate}) async {
     try {
-      List<String> biomarkerCategoryStrings = categories.map((category) => category.name).toList();
-      List<String> biomarkerTypeStrings = types.map((type) => type.name).toList();
+      List<String> biomarkerCategoryStrings =
+          categories.map((category) => category.name).toList();
+      List<String> biomarkerTypeStrings =
+          types.map((type) => type.name).toList();
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
       String value = await _channel.invokeMethod('getBiomarkersDateRange', {
@@ -340,6 +344,29 @@ class SahhaFlutter {
         'endDate': endDateInt
       });
       return value;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<List<SahhaStat>> getStats(
+      {required SahhaSensor sensor,
+      required DateTime startDate,
+      required DateTime endDate}) async {
+    try {
+      int startDateInt = startDate.millisecondsSinceEpoch;
+      int endDateInt = endDate.millisecondsSinceEpoch;
+      String stats = await _channel.invokeMethod('getStats', {
+        'sensor': sensor.name,
+        'startDate': startDateInt,
+        'endDate': endDateInt
+      });
+
+      //TODO: incomplete
+
+      return ;
     } on PlatformException catch (error) {
       return Future.error(error);
     } catch (error) {
