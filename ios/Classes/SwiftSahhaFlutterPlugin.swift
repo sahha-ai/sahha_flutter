@@ -23,6 +23,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case getScoresDateRange
         case getBiomarkers
         case getBiomarkersDateRange
+        case getStatsDateRange
         case openAppSettings
     }
 
@@ -62,6 +63,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             getBiomarkers(call.arguments, result: result)
         case .getBiomarkersDateRange:
             getBiomarkersDateRange(call.arguments, result: result)
+        case .getStatsDateRange:
+            getStatsDateRange(call.arguments, result: result)
         case .openAppSettings:
             Sahha.openAppSettings()
         default:
@@ -418,4 +421,33 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
+
+    private func getStatsDateRange(_ params: Any?, result: @escaping FlutterResult) {
+            var dates: (startDate: Date, endDate: Date)?
+            if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
+                if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+                    let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+                    let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
+                    dates = (startDate, endDate)
+                }
+                
+                let sahhaSensor = SahhaSensor(rawValue: sensor)
+
+                Sahha.getStats(sensor: sahhaSensor, start: dates.startDate, end: dates.endDate) { error, value in
+                    if let error = error {
+                        result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                    } else if let value = value {
+                        result(value)
+                    } else {
+                        let message: String = "Requested Sahha Stats not available"
+                        Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getStatsDateRange", body: params.debugDescription)
+                        result(FlutterError(code: "Sahha Error", message: message, details: nil))
+                    }
+                }
+            } else {
+                let message = "SahhaFlutter.getStatsDateRange() parameters are invalid"
+                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getStatsDateRange", body: params.debugDescription)
+                result(FlutterError(code: "Sahha Error", message: message, details: nil))
+            }
+        }
 }

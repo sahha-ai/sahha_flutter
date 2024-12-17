@@ -11,7 +11,7 @@ enum SahhaSensor {
   date_of_birth,
   sleep,
   steps,
-  floor_count,
+  floors,
   heart_rate,
   resting_heart_rate,
   walking_heart_rate_average,
@@ -351,7 +351,7 @@ class SahhaFlutter {
     }
   }
 
-  static Future<List<SahhaStat>> getStats(
+  static Future<String> getStats(
       {required SahhaSensor sensor,
       required DateTime startDate,
       required DateTime endDate}) async {
@@ -363,10 +363,7 @@ class SahhaFlutter {
         'startDate': startDateInt,
         'endDate': endDateInt
       });
-
-      //TODO: incomplete
-
-      return ;
+      return stats;
     } on PlatformException catch (error) {
       return Future.error(error);
     } catch (error) {

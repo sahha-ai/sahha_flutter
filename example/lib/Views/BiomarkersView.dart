@@ -94,7 +94,7 @@ class BiomarkersState extends State<BiomarkersView> {
                 children: <Widget>[
                   const Spacer(),
                   const Icon(
-                    Icons.query_stats,
+                    Icons.insert_chart,
                     size: 64,
                   ),
                   const SizedBox(height: 20),

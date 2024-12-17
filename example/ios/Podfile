@@ -31,7 +31,7 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
   
-#    pod 'Sahha', :path => '../../../sahha-swift/'
+   pod 'Sahha', :path => '../../../sahha-swift/'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end

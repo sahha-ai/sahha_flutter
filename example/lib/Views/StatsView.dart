@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:selectpicker/models/select_picker_item.dart';
@@ -24,7 +26,12 @@ class StatsState extends State<StatsView> {
         sensor:
             SahhaSensor.values.firstWhere((element) => element.name == sensor),
         startDate: DateTime.timestamp().subtract(const Duration(days: 7)),
-        endDate: DateTime.timestamp());
+        endDate: DateTime.timestamp())
+    .then((value) {
+      List<dynamic> data = jsonDecode(value);
+      debugPrint(data.firstOrNull?.toString());
+      showAlertDialog(context, "STATS", value);
+    });
   }
 
   showAlertDialog(BuildContext context, String title, String message) {
@@ -62,10 +69,9 @@ class StatsState extends State<StatsView> {
             children: <Widget>[
               const Spacer(),
               const Icon(
-                Icons.person,
+                Icons.pie_chart,
                 size: 64,
               ),
-              //TODO: Show results of get stats somewhere
               const SizedBox(height: 20),
               SelectPicker(
                 hint: sensor.isEmpty ? "SENSOR" : sensor,

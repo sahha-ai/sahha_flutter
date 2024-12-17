@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.annotation.NonNull
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializer
 import io.flutter.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -23,6 +26,7 @@ import sdk.sahha.android.source.SahhaNotificationConfiguration
 import sdk.sahha.android.source.SahhaScoreType
 import sdk.sahha.android.source.SahhaSensor
 import sdk.sahha.android.source.SahhaSettings
+import java.time.ZonedDateTime
 import java.util.Date
 
 
@@ -704,9 +708,16 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (error != null) {
                     result.error("Sahha Error", error, null)
                 } else if (stats != null) {
-                    val gson = Gson()
-                    val statsHashMap = stats?.also { gson.toJson(it) } ?: ""
-                    result.success(statsHashMap);
+                    val gson = GsonBuilder().apply {
+                        registerTypeAdapter(
+                            ZonedDateTime::class.java,
+                            JsonSerializer<ZonedDateTime> { src, _, _ ->
+                                JsonPrimitive(src.toString())
+                            }
+                        )
+                    }.create()
+                    val statsJson = gson.toJson(stats)
+                    result.success(statsJson);
                 } else {
                     Sahha.postError(
                         SahhaFramework.flutter,
