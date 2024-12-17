@@ -22,7 +22,7 @@ class StatsState extends State<StatsView> {
   }
 
   onTapGetStats(BuildContext context) {
-    SahhaFlutter.getStats(
+    SahhaFlutter.getStatsDateRange(
         sensor:
             SahhaSensor.values.firstWhere((element) => element.name == sensor),
         startDate: DateTime.timestamp().subtract(const Duration(days: 7)),

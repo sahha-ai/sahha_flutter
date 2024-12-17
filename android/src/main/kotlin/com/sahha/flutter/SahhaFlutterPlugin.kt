@@ -48,7 +48,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         getScoresDateRange,
         getBiomarkers,
         getBiomarkersDateRange,
-        getStats,
+        getStatsDateRange,
         openAppSettings
     }
 
@@ -153,8 +153,8 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 getBiomarkersDateRange(call, result)
             }
 
-            SahhaMethod.getStats.name -> {
-                getStats(call, result)
+            SahhaMethod.getStatsDateRange.name -> {
+                getStatsDateRange(call, result)
             }
 
             SahhaMethod.openAppSettings.name -> {
@@ -656,7 +656,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
     }
 
-    private fun getStats(@NonNull call: MethodCall, @NonNull result: Result) {
+    private fun getStatsDateRange(@NonNull call: MethodCall, @NonNull result: Result) {
         val codeBody = call.arguments?.toString()
         val sensor: String? = call.argument<String>("sensor")
         if (sensor != null) {

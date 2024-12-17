@@ -351,14 +351,14 @@ class SahhaFlutter {
     }
   }
 
-  static Future<String> getStats(
+  static Future<String> getStatsDateRange(
       {required SahhaSensor sensor,
       required DateTime startDate,
       required DateTime endDate}) async {
     try {
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String stats = await _channel.invokeMethod('getStats', {
+      String stats = await _channel.invokeMethod('getStatsDateRange', {
         'sensor': sensor.name,
         'startDate': startDateInt,
         'endDate': endDateInt
