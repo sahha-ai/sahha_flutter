@@ -11,7 +11,7 @@ enum SahhaSensor {
   date_of_birth,
   sleep,
   steps,
-  floors,
+  floors_climbed,
   heart_rate,
   resting_heart_rate,
   walking_heart_rate_average,
