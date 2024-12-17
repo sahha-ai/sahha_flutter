@@ -35,14 +35,15 @@ class ScoresState extends State<ScoresView> {
         SahhaScoreType.activity,
         SahhaScoreType.sleep,
         SahhaScoreType.wellbeing
-      ]).then((value) {
+      ], startDate: DateTime.now(), endDate: DateTime.now())
+          .then((value) {
         List<dynamic> data = jsonDecode(value);
         debugPrint(data.firstOrNull?.toString());
         showAlertDialog(context, value);
       }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
       var week = DateTime.now().subtract(const Duration(days: 7));
-      SahhaFlutter.getScoresDateRange(types: [
+      SahhaFlutter.getScores(types: [
         SahhaScoreType.activity,
         SahhaScoreType.sleep,
         SahhaScoreType.wellbeing
@@ -123,7 +124,7 @@ class ScoresState extends State<ScoresView> {
                     onPressed: () {
                       onTapGetScores(context, true);
                     },
-                    child: const Text('GET SCORES PREVIOUS DAY'),
+                    child: const Text('GET SCORES TODAY'),
                   ),
                 ]),
           ),

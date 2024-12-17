@@ -45,10 +45,8 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         getSensorStatus,
         enableSensors,
         getScores,
-        getScoresDateRange,
         getBiomarkers,
-        getBiomarkersDateRange,
-        getStatsDateRange,
+        getStats,
         openAppSettings
     }
 
@@ -141,20 +139,12 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 getScores(call, result)
             }
 
-            SahhaMethod.getScoresDateRange.name -> {
-                getScoresDateRange(call, result)
-            }
-
             SahhaMethod.getBiomarkers.name -> {
                 getBiomarkers(call, result)
             }
 
-            SahhaMethod.getBiomarkersDateRange.name -> {
-                getBiomarkersDateRange(call, result)
-            }
-
-            SahhaMethod.getStatsDateRange.name -> {
-                getStatsDateRange(call, result)
+            SahhaMethod.getStats.name -> {
+                getStats(call, result)
             }
 
             SahhaMethod.openAppSettings.name -> {
@@ -399,44 +389,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun getScores(@NonNull call: MethodCall, @NonNull result: Result) {
-        val types = call.argument<List<String>>("types")
-        if (types == null) {
-            result.error(
-                "Sahha Error",
-                "SahhaFlutter.getScores() types parameter must not be null",
-                null
-            )
-            return
-        }
-
-        val sahhaScoreTypes = types.map { SahhaScoreType.valueOf(it) }.toSet()
-
-        Sahha.getScores(sahhaScoreTypes) { error, value ->
-            if (error != null) {
-                result.error("Sahha Error", error, null)
-            } else if (value != null) {
-                result.success(value)
-            } else {
-                Sahha.postError(
-                    SahhaFramework.flutter,
-                    "SahhaFlutter.getScores() scores missing",
-                    "SahhaFlutterPlugin",
-                    "getScores"
-                )
-                result.error("Sahha Error", "Sahha scores not available", null)
-            }
-        }
-    }
-
-    private fun getScoresDateRange(@NonNull call: MethodCall, @NonNull result: Result) {
         val codeBody = call.arguments?.toString()
-        Sahha.postError(
-            SahhaFramework.flutter,
-            "TEST",
-            "SahhaFlutterPlugin",
-            "getScoresDateRange",
-            codeBody
-        )
 
         val types = call.argument<List<String>>("types")
         if (types != null) {
@@ -444,9 +397,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getScoresDateRange() score types missing",
+                "SahhaFlutter.getScores() score types missing",
                 "SahhaFlutterPlugin",
-                "getScoresDateRange",
+                "getScores",
                 codeBody
             )
             Log.d("Sahha", "types missing")
@@ -458,9 +411,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getScoresDateRange() startDate missing",
+                "SahhaFlutter.getScores() startDate missing",
                 "SahhaFlutterPlugin",
-                "getScoresDateRange",
+                "getScores",
                 codeBody
             )
             Log.d("Sahha", "startDate missing")
@@ -472,9 +425,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getScoresDateRange() endDate missing",
+                "SahhaFlutter.getScores() endDate missing",
                 "SahhaFlutterPlugin",
-                "getScoresDateRange",
+                "getScores",
                 codeBody
             )
             Log.d("Sahha", "endDate missing")
@@ -493,9 +446,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 } else {
                     Sahha.postError(
                         SahhaFramework.flutter,
-                        "SahhaFlutter.getScoresDateRange() scores missing",
+                        "SahhaFlutter.getScores() scores missing",
                         "SahhaFlutterPlugin",
-                        "getScoresDateRange",
+                        "getScores",
                         codeBody
                     )
                     result.error("Sahha Error", "Sahha scores not available", null)
@@ -504,62 +457,20 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getScoresDateRange() parameters invalid",
+                "SahhaFlutter.getScores() parameters invalid",
                 "SahhaFlutterPlugin",
-                "getScoresDateRange",
+                "getScores",
                 codeBody
             )
             result.error(
                 "Sahha Error",
-                "SahhaFlutter.getScoresDateRange() parameters invalid",
+                "SahhaFlutter.getScores() parameters invalid",
                 null
             )
         }
     }
 
     private fun getBiomarkers(@NonNull call: MethodCall, @NonNull result: Result) {
-        val categories = call.argument<List<String>>("categories")
-        val types = call.argument<List<String>>("types")
-
-        if (categories == null) {
-            result.error(
-                "Sahha Error",
-                "SahhaFlutter.getBiomarkers() categories parameter must not be null",
-                null
-            )
-            return
-        }
-
-        if (types == null) {
-            result.error(
-                "Sahha Error",
-                "SahhaFlutter.getBiomarkers() types parameter must not be null",
-                null
-            )
-            return
-        }
-
-        val biomarkerCategories = categories.map { SahhaBiomarkerCategory.valueOf(it) }.toSet()
-        val biomarkerTypes = types.map { SahhaBiomarkerType.valueOf(it) }.toSet()
-
-        Sahha.getBiomarkers(biomarkerCategories, biomarkerTypes) { error, value ->
-            if (error != null) {
-                result.error("Sahha Error", error, null)
-            } else if (value != null) {
-                result.success(value)
-            } else {
-                Sahha.postError(
-                    SahhaFramework.flutter,
-                    "SahhaFlutter.getBiomarkers() biomarkers missing",
-                    "SahhaFlutterPlugin",
-                    "getBiomarkers"
-                )
-                result.error("Sahha Error", "Sahha biomarkers not available", null)
-            }
-        }
-    }
-
-    private fun getBiomarkersDateRange(@NonNull call: MethodCall, @NonNull result: Result) {
         val codeBody = call.arguments?.toString()
         val categories = call.argument<List<String>>("categories")
         if (categories != null) {
@@ -567,9 +478,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getBiomarkersDateRange() biomarker categories missing",
+                "SahhaFlutter.getBiomarkers() biomarker categories missing",
                 "SahhaFlutterPlugin",
-                "getBiomarkersDateRange",
+                "getBiomarkers",
                 codeBody
             )
             Log.d("Sahha", "categories missing")
@@ -581,9 +492,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getBiomarkersDateRange() biomarker types missing",
+                "SahhaFlutter.getBiomarkers() biomarker types missing",
                 "SahhaFlutterPlugin",
-                "getBiomarkersDateRange",
+                "getBiomarkers",
                 codeBody
             )
             Log.d("Sahha", "types missing")
@@ -595,9 +506,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getBiomarkersDateRange() startDate missing",
+                "SahhaFlutter.getBiomarkers() startDate missing",
                 "SahhaFlutterPlugin",
-                "getBiomarkersDateRange",
+                "getBiomarkers",
                 codeBody
             )
             Log.d("Sahha", "startDate missing")
@@ -609,9 +520,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getBiomarkersDateRange() endDate missing",
+                "SahhaFlutter.getBiomarkers() endDate missing",
                 "SahhaFlutterPlugin",
-                "getBiomarkersDateRange",
+                "getBiomarkers",
                 codeBody
             )
             Log.d("Sahha", "endDate missing")
@@ -632,9 +543,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 } else {
                     Sahha.postError(
                         SahhaFramework.flutter,
-                        "SahhaFlutter.getBiomarkersDateRange() scores missing",
+                        "SahhaFlutter.getBiomarkers() scores missing",
                         "SahhaFlutterPlugin",
-                        "getBiomarkersDateRange",
+                        "getBiomarkers",
                         codeBody
                     )
                     result.error("Sahha Error", "Sahha biomarkers not available", null)
@@ -643,20 +554,20 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getBiomarkersDateRange() parameters invalid",
+                "SahhaFlutter.getBiomarkers() parameters invalid",
                 "SahhaFlutterPlugin",
-                "getBiomarkersDateRange",
+                "getBiomarkers",
                 codeBody
             )
             result.error(
                 "Sahha Error",
-                "SahhaFlutter.getBiomarkersDateRange() parameters invalid",
+                "SahhaFlutter.getBiomarkers() parameters invalid",
                 null
             )
         }
     }
 
-    private fun getStatsDateRange(@NonNull call: MethodCall, @NonNull result: Result) {
+    private fun getStats(@NonNull call: MethodCall, @NonNull result: Result) {
         val codeBody = call.arguments?.toString()
         val sensor: String? = call.argument<String>("sensor")
         if (sensor != null) {

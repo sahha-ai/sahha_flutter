@@ -22,12 +22,11 @@ class StatsState extends State<StatsView> {
   }
 
   onTapGetStats(BuildContext context) {
-    SahhaFlutter.getStatsDateRange(
-        sensor:
-            SahhaSensor.values.firstWhere((element) => element.name == sensor),
-        startDate: DateTime.timestamp().subtract(const Duration(days: 7)),
-        endDate: DateTime.timestamp())
-    .then((value) {
+    SahhaFlutter.getStats(
+            sensor: SahhaSensor.sleep,
+            startDate: DateTime.timestamp().subtract(const Duration(days: 7)),
+            endDate: DateTime.timestamp())
+        .then((value) {
       List<dynamic> data = jsonDecode(value);
       debugPrint(data.firstOrNull?.toString());
       showAlertDialog(context, "STATS", value);

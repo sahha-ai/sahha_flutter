@@ -271,20 +271,7 @@ class SahhaFlutter {
     _channel.invokeMethod('openAppSettings');
   }
 
-  static Future<String> getScores({required List<SahhaScoreType> types}) async {
-    try {
-      List<String> scoreTypeStrings = types.map((type) => type.name).toList();
-      String value =
-          await _channel.invokeMethod('getScores', {'types': scoreTypeStrings});
-      return value;
-    } on PlatformException catch (error) {
-      return Future.error(error);
-    } catch (error) {
-      return Future.error(error);
-    }
-  }
-
-  static Future<String> getScoresDateRange(
+  static Future<String> getScores(
       {required List<SahhaScoreType> types,
       required DateTime startDate,
       required DateTime endDate}) async {
@@ -292,7 +279,7 @@ class SahhaFlutter {
       List<String> scoreTypeStrings = types.map((type) => type.name).toList();
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String value = await _channel.invokeMethod('getScoresDateRange', {
+      String value = await _channel.invokeMethod('getScores', {
         'types': scoreTypeStrings,
         'startDate': startDateInt,
         'endDate': endDateInt
@@ -307,26 +294,6 @@ class SahhaFlutter {
 
   static Future<String> getBiomarkers(
       {required List<SahhaBiomarkerCategory> categories,
-      required List<SahhaBiomarkerType> types}) async {
-    try {
-      List<String> biomarkerCategoryStrings =
-          categories.map((category) => category.name).toList();
-      List<String> biomarkerTypeStrings =
-          types.map((type) => type.name).toList();
-      String value = await _channel.invokeMethod('getBiomarkers', {
-        'categories': biomarkerCategoryStrings,
-        'types': biomarkerTypeStrings
-      });
-      return value;
-    } on PlatformException catch (error) {
-      return Future.error(error);
-    } catch (error) {
-      return Future.error(error);
-    }
-  }
-
-  static Future<String> getBiomarkersDateRange(
-      {required List<SahhaBiomarkerCategory> categories,
       required List<SahhaBiomarkerType> types,
       required DateTime startDate,
       required DateTime endDate}) async {
@@ -337,7 +304,7 @@ class SahhaFlutter {
           types.map((type) => type.name).toList();
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String value = await _channel.invokeMethod('getBiomarkersDateRange', {
+      String value = await _channel.invokeMethod('getBiomarkers', {
         'categories': biomarkerCategoryStrings,
         'types': biomarkerTypeStrings,
         'startDate': startDateInt,
@@ -351,14 +318,14 @@ class SahhaFlutter {
     }
   }
 
-  static Future<String> getStatsDateRange(
+  static Future<String> getStats(
       {required SahhaSensor sensor,
       required DateTime startDate,
       required DateTime endDate}) async {
     try {
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String stats = await _channel.invokeMethod('getStatsDateRange', {
+      String stats = await _channel.invokeMethod('getStats', {
         'sensor': sensor.name,
         'startDate': startDateInt,
         'endDate': endDateInt
