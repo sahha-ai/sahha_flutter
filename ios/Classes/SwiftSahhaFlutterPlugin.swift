@@ -428,7 +428,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                     let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
                     let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
                     if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-                        Sahha.getStats(sensor: sahhaSensor, start: startDate, end: endDate) { error, value in
+                        Sahha.getStats(sensor: sahhaSensor, startDate: startDate, endDate: endDate) { error, value in
                             if let error = error {
                                 result(FlutterError(code: "Sahha Error", message: error, details: nil))
                             } else {
