@@ -23,7 +23,7 @@ class StatsState extends State<StatsView> {
 
   onTapGetStats(BuildContext context) {
     SahhaFlutter.getStats(
-            sensor: SahhaSensor.sleep,
+            sensor: SahhaSensor.values.firstWhere((element) => element.name == sensor),
             startDate: DateTime.timestamp().subtract(const Duration(days: 7)),
             endDate: DateTime.timestamp())
         .then((value) {
@@ -82,7 +82,7 @@ class StatsState extends State<StatsView> {
                 showId: false,
                 onSelect: (value) {
                   setState(() {
-                    sensor = value.title.toString();
+                    sensor = value.title;
                     debugPrint(sensor);
                   });
                 },
