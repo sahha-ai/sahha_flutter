@@ -20,9 +20,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case getSensorStatus
         case enableSensors
         case getScores
-        case getScoresDateRange
         case getBiomarkers
-        case getBiomarkersDateRange
+        case getStats
         case openAppSettings
     }
 
@@ -56,12 +55,10 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             enableSensors(call.arguments, result: result)
         case .getScores:
             getScores(call.arguments, result: result)
-        case .getScoresDateRange:
-            getScoresDateRange(call.arguments, result: result)
         case .getBiomarkers:
             getBiomarkers(call.arguments, result: result)
-        case .getBiomarkersDateRange:
-            getBiomarkersDateRange(call.arguments, result: result)
+        case .getStats:
+            getStats(call.arguments, result: result)
         case .openAppSettings:
             Sahha.openAppSettings()
         default:
@@ -274,11 +271,15 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
-    
+
     private func getScores(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let types = values["types"] as? [String] {
+        Sahha.postError(framework: .flutter, message: "TEST", path: "SwiftSahhaFlutterPlugin", method: "getScores", body: params.debugDescription)
+        
+        var scoreTypes: Set<SahhaScoreType> = []
+        if let values = params as? [String: Any?], let types = values["types"] as? [String], let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
             
-            var scoreTypes: Set<SahhaScoreType> = []
+            let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+            let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
             
             for type in types {
                 if let scoreType = SahhaScoreType(rawValue: type) {
@@ -286,18 +287,17 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 }
             }
             
-            Sahha.getScores(scoreTypes) { error, value in
+            Sahha.getScores(types: scoreTypes, startDate: startDate, endDate: endDate) { error, value in
                 if let error = error {
                     result(FlutterError(code: "Sahha Error", message: error, details: nil))
                 } else if let value = value {
                     result(value)
                 } else {
                     let message: String = "Requested Sahha Scores not available"
-                    Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScores", body: "")
+                    Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScores", body: params.debugDescription)
                     result(FlutterError(code: "Sahha Error", message: message, details: nil))
                 }
             }
-            
         } else {
             let message = "SahhaFlutter.getScores() parameters are invalid"
             Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScores", body: params.debugDescription)
@@ -305,48 +305,14 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func getScoresDateRange(_ params: Any?, result: @escaping FlutterResult) {
-        Sahha.postError(framework: .flutter, message: "TEST", path: "SwiftSahhaFlutterPlugin", method: "getScoresDateRange", body: params.debugDescription)
-        
-        var dates: (startDate: Date, endDate: Date)?
-        var scoreTypes: Set<SahhaScoreType> = []
-        if let values = params as? [String: Any?], let types = values["types"] as? [String] {
-            if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
-                let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
-                let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
-                dates = (startDate, endDate)
-            }
-            
-            for type in types {
-                if let scoreType = SahhaScoreType(rawValue: type) {
-                    scoreTypes.insert(scoreType)
-                }
-            }
-            
-            Sahha.getScores(scoreTypes, dates: dates) { error, value in
-                if let error = error {
-                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
-                } else if let value = value {
-                    result(value)
-                } else {
-                    let message: String = "Requested Sahha Scores not available"
-                    Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScoresDateRange", body: params.debugDescription)
-                    result(FlutterError(code: "Sahha Error", message: message, details: nil))
-                }
-            }
-        } else {
-            let message = "SahhaFlutter.getScoresDateRange() parameters are invalid"
-            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getScoresDateRange", body: params.debugDescription)
-            result(FlutterError(code: "Sahha Error", message: message, details: nil))
-        }
-    }
-    
     private func getBiomarkers(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let categories = values["categories"] as? [String], let types = values["types"] as? [String] {
-
-            var biomarkerCategories: Set<SahhaBiomarkerCategory> = []
-            var biomarkerTypes: Set<SahhaBiomarkerType> = []
-
+        var biomarkerCategories: Set<SahhaBiomarkerCategory> = []
+        var biomarkerTypes: Set<SahhaBiomarkerType> = []
+        if let values = params as? [String: Any?], let categories = values["categories"] as? [String], let types = values["types"] as? [String], let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+            
+            let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+            let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
+            
             for category in categories {
                 if let biomarkerCategory = SahhaBiomarkerCategory(rawValue: category) {
                     biomarkerCategories.insert(biomarkerCategory)
@@ -359,18 +325,17 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 }
             }
             
-            Sahha.getBiomarkers(categories: biomarkerCategories, types: biomarkerTypes) { error, value in
+            Sahha.getBiomarkers(categories: biomarkerCategories, types: biomarkerTypes, startDate: startDate, endDate: endDate) { error, value in
                 if let error = error {
                     result(FlutterError(code: "Sahha Error", message: error, details: nil))
                 } else if let value = value {
                     result(value)
                 } else {
                     let message: String = "Requested Sahha Biomarkers not available"
-                    Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getBiomarkers", body: "")
+                    Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getBiomarkers", body: params.debugDescription)
                     result(FlutterError(code: "Sahha Error", message: message, details: nil))
                 }
             }
-            
         } else {
             let message = "SahhaFlutter.getBiomarkers() parameters are invalid"
             Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getBiomarkers", body: params.debugDescription)
@@ -378,44 +343,41 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func getBiomarkersDateRange(_ params: Any?, result: @escaping FlutterResult) {
-        var dates: (startDate: Date, endDate: Date)?
-        var biomarkerCategories: Set<SahhaBiomarkerCategory> = []
-        var biomarkerTypes: Set<SahhaBiomarkerType> = []
-        if let values = params as? [String: Any?], let categories = values["categories"] as? [String], let types = values["types"] as? [String] {
-            if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
-                let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
-                let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
-                dates = (startDate, endDate)
-            }
-
-            for category in categories {
-                if let biomarkerCategory = SahhaBiomarkerCategory(rawValue: category) {
-                    biomarkerCategories.insert(biomarkerCategory)
+    private func getStats(_ params: Any?, result: @escaping FlutterResult) {
+            if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
+                if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+                    let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+                    let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
+                    if let sahhaSensor = SahhaSensor(rawValue: sensor) {
+                        Sahha.getStats(sensor: sahhaSensor, startDate: startDate, endDate: endDate) { error, value in
+                            if let error = error {
+                                result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                            } else {
+                                var string: String?
+                                  do {
+                                    let jsonEncoder = JSONEncoder()
+                                    jsonEncoder.outputFormatting = .prettyPrinted
+                                    let jsonData = try jsonEncoder.encode(value)
+                                    string = String(data: jsonData, encoding: .utf8)
+                                  } catch let encodingError {
+                                    print(encodingError)
+                                    Sahha.postError(
+                                      framework: .react_native,
+                                      message: encodingError.localizedDescription,
+                                      path: "SahhaFlutter", method: "getStats",
+                                      body: "jsonEncoder")
+                                      result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
+                                    return
+                                  }
+                                result(string)
+                            }
+                        }
+                    }
                 }
+            } else {
+                let message = "SahhaFlutter.getStats() parameters are invalid"
+                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getStatsDateRange", body: params.debugDescription)
+                result(FlutterError(code: "Sahha Error", message: message, details: nil))
             }
-            
-            for type in types {
-                if let biomarkerType = SahhaBiomarkerType(rawValue: type) {
-                    biomarkerTypes.insert(biomarkerType)
-                }
-            }
-            
-            Sahha.getBiomarkers(categories: biomarkerCategories, types: biomarkerTypes, dates: dates) { error, value in
-                if let error = error {
-                    result(FlutterError(code: "Sahha Error", message: error, details: nil))
-                } else if let value = value {
-                    result(value)
-                } else {
-                    let message: String = "Requested Sahha Biomarkers not available"
-                    Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getBiomarkersDateRange", body: params.debugDescription)
-                    result(FlutterError(code: "Sahha Error", message: message, details: nil))
-                }
-            }
-        } else {
-            let message = "SahhaFlutter.getBiomarkersDateRange() parameters are invalid"
-            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getBiomarkersDateRange", body: params.debugDescription)
-            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
-    }
 }

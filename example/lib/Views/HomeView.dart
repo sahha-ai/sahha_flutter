@@ -100,6 +100,23 @@ class HomeView extends StatelessWidget {
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     icon: const Icon(
+                      Icons.pie_chart,
+                      size: 32,
+                    ),
+                    label: const Text('Stats'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 20),
+                      textStyle: const TextStyle(fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/stats');
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: const Icon(
                       Icons.psychology,
                       size: 32,
                     ),

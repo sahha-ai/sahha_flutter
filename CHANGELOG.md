@@ -1,3 +1,21 @@
+## 1.0.8
+
+### Added
+
+- Added `getStats` method
+
+### Changed
+
+- Renamed getScores and getBiomarkers method parameters
+- Renamed the `step_count` sensor to `steps`
+- Renamed the `floor_count` sensor to `floors_climbed`
+
+### Fixed
+
+n/a
+
+---
+
 ## 1.0.6
 
 ### Added
