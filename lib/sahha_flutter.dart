@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:sahha_flutter/model/SahhaStat.dart';
 
 enum SahhaEnvironment { sandbox, production }
 
@@ -8,8 +10,8 @@ enum SahhaSensor {
   gender,
   date_of_birth,
   sleep,
-  step_count,
-  floor_count,
+  steps,
+  floors_climbed,
   heart_rate,
   resting_heart_rate,
   walking_heart_rate_average,
@@ -131,46 +133,6 @@ class SahhaNotificationSettings {
 
 class SahhaFlutter {
   static const MethodChannel _channel = MethodChannel('sahha_flutter');
-  static const List<SahhaSensor> sensorList = [
-    SahhaSensor.gender,
-    SahhaSensor.date_of_birth,
-    SahhaSensor.sleep,
-    SahhaSensor.step_count,
-    SahhaSensor.floor_count,
-    SahhaSensor.heart_rate,
-    SahhaSensor.resting_heart_rate,
-    SahhaSensor.walking_heart_rate_average,
-    SahhaSensor.heart_rate_variability_sdnn,
-    SahhaSensor.heart_rate_variability_rmssd,
-    SahhaSensor.blood_pressure_systolic,
-    SahhaSensor.blood_pressure_diastolic,
-    SahhaSensor.blood_glucose,
-    SahhaSensor.vo2_max,
-    SahhaSensor.oxygen_saturation,
-    SahhaSensor.respiratory_rate,
-    SahhaSensor.active_energy_burned,
-    SahhaSensor.basal_energy_burned,
-    SahhaSensor.total_energy_burned,
-    SahhaSensor.basal_metabolic_rate,
-    SahhaSensor.time_in_daylight,
-    SahhaSensor.body_temperature,
-    SahhaSensor.basal_body_temperature,
-    SahhaSensor.sleeping_wrist_temperature,
-    SahhaSensor.height,
-    SahhaSensor.weight,
-    SahhaSensor.lean_body_mass,
-    SahhaSensor.body_mass_index,
-    SahhaSensor.body_fat,
-    SahhaSensor.body_water_mass,
-    SahhaSensor.bone_mass,
-    SahhaSensor.waist_circumference,
-    SahhaSensor.stand_time,
-    SahhaSensor.move_time,
-    SahhaSensor.exercise_time,
-    SahhaSensor.activity_summary,
-    SahhaSensor.device_lock,
-    SahhaSensor.exercise
-  ];
 
   static Future<bool> configure(
       {required SahhaEnvironment environment,
@@ -309,20 +271,7 @@ class SahhaFlutter {
     _channel.invokeMethod('openAppSettings');
   }
 
-  static Future<String> getScores({required List<SahhaScoreType> types}) async {
-    try {
-      List<String> scoreTypeStrings = types.map((type) => type.name).toList();
-      String value =
-          await _channel.invokeMethod('getScores', {'types': scoreTypeStrings});
-      return value;
-    } on PlatformException catch (error) {
-      return Future.error(error);
-    } catch (error) {
-      return Future.error(error);
-    }
-  }
-
-  static Future<String> getScoresDateRange(
+  static Future<String> getScores(
       {required List<SahhaScoreType> types,
       required DateTime startDate,
       required DateTime endDate}) async {
@@ -330,7 +279,7 @@ class SahhaFlutter {
       List<String> scoreTypeStrings = types.map((type) => type.name).toList();
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String value = await _channel.invokeMethod('getScoresDateRange', {
+      String value = await _channel.invokeMethod('getScores', {
         'types': scoreTypeStrings,
         'startDate': startDateInt,
         'endDate': endDateInt
@@ -345,15 +294,21 @@ class SahhaFlutter {
 
   static Future<String> getBiomarkers(
       {required List<SahhaBiomarkerCategory> categories,
-      required List<SahhaBiomarkerType> types}) async {
+      required List<SahhaBiomarkerType> types,
+      required DateTime startDate,
+      required DateTime endDate}) async {
     try {
       List<String> biomarkerCategoryStrings =
           categories.map((category) => category.name).toList();
       List<String> biomarkerTypeStrings =
           types.map((type) => type.name).toList();
+      int startDateInt = startDate.millisecondsSinceEpoch;
+      int endDateInt = endDate.millisecondsSinceEpoch;
       String value = await _channel.invokeMethod('getBiomarkers', {
         'categories': biomarkerCategoryStrings,
-        'types': biomarkerTypeStrings
+        'types': biomarkerTypeStrings,
+        'startDate': startDateInt,
+        'endDate': endDateInt
       });
       return value;
     } on PlatformException catch (error) {
@@ -363,23 +318,19 @@ class SahhaFlutter {
     }
   }
 
-  static Future<String> getBiomarkersDateRange(
-      {required List<SahhaBiomarkerCategory> categories,
-      required List<SahhaBiomarkerType> types,
+  static Future<String> getStats(
+      {required SahhaSensor sensor,
       required DateTime startDate,
       required DateTime endDate}) async {
     try {
-      List<String> biomarkerCategoryStrings = categories.map((category) => category.name).toList();
-      List<String> biomarkerTypeStrings = types.map((type) => type.name).toList();
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
-      String value = await _channel.invokeMethod('getBiomarkersDateRange', {
-        'categories': biomarkerCategoryStrings,
-        'types': biomarkerTypeStrings,
+      String stats = await _channel.invokeMethod('getStats', {
+        'sensor': sensor.name,
         'startDate': startDateInt,
         'endDate': endDateInt
       });
-      return value;
+      return stats;
     } on PlatformException catch (error) {
       return Future.error(error);
     } catch (error) {

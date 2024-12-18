@@ -32,27 +32,27 @@ class BiomarkersState extends State<BiomarkersView> {
   onTapGetBiomarkers(BuildContext context, bool isDaily) {
     if (isDaily) {
       SahhaFlutter.getBiomarkers(
-          categories: SahhaBiomarkerCategory.values,
-          types: SahhaBiomarkerType.values)
+              categories: SahhaBiomarkerCategory.values,
+              types: SahhaBiomarkerType.values,
+              startDate: DateTime.now(),
+              endDate: DateTime.now())
           .then((value) {
         List<dynamic> data = jsonDecode(value);
         debugPrint(data.firstOrNull?.toString());
         showAlertDialog(context, value);
-      })
-          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
       var week = DateTime.now().subtract(const Duration(days: 7));
-      SahhaFlutter.getBiomarkersDateRange(
-          categories: SahhaBiomarkerCategory.values,
-          types: SahhaBiomarkerType.values,
-          startDate: week,
-          endDate: DateTime.now())
+      SahhaFlutter.getBiomarkers(
+              categories: SahhaBiomarkerCategory.values,
+              types: SahhaBiomarkerType.values,
+              startDate: week,
+              endDate: DateTime.now())
           .then((value) {
         List<dynamic> data = jsonDecode(value);
         debugPrint(data.firstOrNull?.toString());
         showAlertDialog(context, value);
-      })
-          .catchError((error, stackTrace) => {debugPrint(error.toString())});
+      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
   }
 
@@ -94,7 +94,7 @@ class BiomarkersState extends State<BiomarkersView> {
                 children: <Widget>[
                   const Spacer(),
                   const Icon(
-                    Icons.query_stats,
+                    Icons.insert_chart,
                     size: 64,
                   ),
                   const SizedBox(height: 20),
@@ -126,7 +126,7 @@ class BiomarkersState extends State<BiomarkersView> {
                     onPressed: () {
                       onTapGetBiomarkers(context, true);
                     },
-                    child: const Text('GET BIOMARKERS PREVIOUS DAY'),
+                    child: const Text('GET BIOMARKERS TODAY'),
                   ),
                 ]),
           ),
