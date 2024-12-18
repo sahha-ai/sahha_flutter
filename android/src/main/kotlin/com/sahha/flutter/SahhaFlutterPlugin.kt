@@ -702,13 +702,13 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         if (sensor != null && startDate != null && endDate != null) {
-            Sahha.getStats(
+            Sahha.getSamples(
                 SahhaSensor.valueOf(sensor),
                 Pair(Date(startDate), Date(endDate)),
-            ) { error, stats ->
+            ) { error, samples ->
                 if (error != null) {
                     result.error("Sahha Error", error, null)
-                } else if (stats != null) {
+                } else if (samples != null) {
                     val gson = GsonBuilder().apply {
                         registerTypeAdapter(
                             ZonedDateTime::class.java,
@@ -717,8 +717,8 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                             }
                         )
                     }.create()
-                    val statsJson = gson.toJson(stats)
-                    result.success(statsJson);
+                    val samplesJson = gson.toJson(samples)
+                    result.success(samplesJson);
                 } else {
                     Sahha.postError(
                         SahhaFramework.flutter,
