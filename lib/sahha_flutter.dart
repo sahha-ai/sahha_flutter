@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:sahha_flutter/model/SahhaStat.dart';
 
 enum SahhaEnvironment { sandbox, production }
 
@@ -326,6 +325,26 @@ class SahhaFlutter {
       int startDateInt = startDate.millisecondsSinceEpoch;
       int endDateInt = endDate.millisecondsSinceEpoch;
       String stats = await _channel.invokeMethod('getStats', {
+        'sensor': sensor.name,
+        'startDate': startDateInt,
+        'endDate': endDateInt
+      });
+      return stats;
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  static Future<String> getSamples(
+      {required SahhaSensor sensor,
+      required DateTime startDate,
+      required DateTime endDate}) async {
+    try {
+      int startDateInt = startDate.millisecondsSinceEpoch;
+      int endDateInt = endDate.millisecondsSinceEpoch;
+      String stats = await _channel.invokeMethod('getSamples', {
         'sensor': sensor.name,
         'startDate': startDateInt,
         'endDate': endDateInt

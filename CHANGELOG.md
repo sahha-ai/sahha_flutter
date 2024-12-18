@@ -1,4 +1,18 @@
-## 1.0.8
+## 1.0.9
+
+### Added
+
+- Added `getSamples` method
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (iOS) Fixed sleep time dates for `getStats`
+
+---
 
 ### Added
 

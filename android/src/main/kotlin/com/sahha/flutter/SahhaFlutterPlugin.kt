@@ -47,6 +47,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         getScores,
         getBiomarkers,
         getStats,
+        getSamples,
         openAppSettings
     }
 
@@ -655,4 +656,94 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             )
         }
     }
+
+    private fun getSamples(@NonNull call: MethodCall, @NonNull result: Result) {
+        val codeBody = call.arguments?.toString()
+        val sensor: String? = call.argument<String>("sensor")
+        if (sensor != null) {
+            Log.d("Sahha", "sensor $sensor")
+        } else {
+            Sahha.postError(
+                SahhaFramework.flutter,
+                "SahhaFlutter.getSamples() sensor missing",
+                "SahhaFlutterPlugin",
+                "getSamples",
+                codeBody
+            )
+            Log.d("Sahha", "sensor missing")
+        }
+
+        val startDate: Long? = call.argument<Long>("startDate")
+        if (startDate != null) {
+            Log.d("Sahha", "startDate $startDate")
+        } else {
+            Sahha.postError(
+                SahhaFramework.flutter,
+                "SahhaFlutter.getSamples() startDate missing",
+                "SahhaFlutterPlugin",
+                "getStats",
+                codeBody
+            )
+            Log.d("Sahha", "startDate missing")
+        }
+
+        val endDate: Long? = call.argument<Long>("endDate")
+        if (endDate != null) {
+            Log.d("Sahha", "endDate $endDate")
+        } else {
+            Sahha.postError(
+                SahhaFramework.flutter,
+                "SahhaFlutter.getStats() endDate missing",
+                "SahhaFlutterPlugin",
+                "getSamples",
+                codeBody
+            )
+            Log.d("Sahha", "endDate missing")
+        }
+
+        if (sensor != null && startDate != null && endDate != null) {
+            Sahha.getStats(
+                SahhaSensor.valueOf(sensor),
+                Pair(Date(startDate), Date(endDate)),
+            ) { error, stats ->
+                if (error != null) {
+                    result.error("Sahha Error", error, null)
+                } else if (stats != null) {
+                    val gson = GsonBuilder().apply {
+                        registerTypeAdapter(
+                            ZonedDateTime::class.java,
+                            JsonSerializer<ZonedDateTime> { src, _, _ ->
+                                JsonPrimitive(src.toString())
+                            }
+                        )
+                    }.create()
+                    val statsJson = gson.toJson(stats)
+                    result.success(statsJson);
+                } else {
+                    Sahha.postError(
+                        SahhaFramework.flutter,
+                        "SahhaFlutter.getSamples() stats missing",
+                        "SahhaFlutterPlugin",
+                        "getSamples",
+                        codeBody
+                    )
+                    result.error("Sahha Error", "Sahha samples not available", null)
+                }
+            }
+        } else {
+            Sahha.postError(
+                SahhaFramework.flutter,
+                "SahhaFlutter.getSamples() parameters invalid",
+                "SahhaFlutterPlugin",
+                "getSamples",
+                codeBody
+            )
+            result.error(
+                "Sahha Error",
+                "SahhaFlutter.getSamples() parameters invalid",
+                null
+            )
+        }
+    }
+
 }
