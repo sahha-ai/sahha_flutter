@@ -31,14 +31,16 @@ class SamplesState extends State<SamplesView> {
         .then((value) {
       List<dynamic> data = jsonDecode(value);
       debugPrint(data.firstOrNull?.toString());
-      showAlertDialog(context, "SAMPLES", value);
+      const encoder = JsonEncoder.withIndent('      ');
+      final prettyJson = encoder.convert(data);
+      showAlertDialog(context, "SAMPLES", prettyJson);
     });
   }
 
   showAlertDialog(BuildContext context, String title, String message) {
     AlertDialog alert = AlertDialog(
       title: Text(title),
-      content: Text(message),
+      content: SingleChildScrollView(child: Text(message)),
       actions: <Widget>[
         TextButton(
           child: const Text('OK'),

@@ -31,14 +31,16 @@ class StatsState extends State<StatsView> {
         .then((value) {
       List<dynamic> data = jsonDecode(value);
       debugPrint(data.firstOrNull?.toString());
-      showAlertDialog(context, "STATS", value);
+      const encoder = JsonEncoder.withIndent('      ');
+      final prettyJson = encoder.convert(data);
+      showAlertDialog(context, "STATS", prettyJson);
     });
   }
 
   showAlertDialog(BuildContext context, String title, String message) {
     AlertDialog alert = AlertDialog(
       title: Text(title),
-      content: Text(message),
+      content: SingleChildScrollView(child: Text(message)),
       actions: <Widget>[
         TextButton(
           child: const Text('OK'),

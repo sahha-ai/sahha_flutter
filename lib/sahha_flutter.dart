@@ -344,12 +344,12 @@ class SahhaFlutter {
     try {
       int startDateInt = startDateTime.millisecondsSinceEpoch;
       int endDateInt = endDateTime.millisecondsSinceEpoch;
-      String stats = await _channel.invokeMethod('getSamples', {
+      String samples = await _channel.invokeMethod('getSamples', {
         'sensor': sensor.name,
         'startDateTime': startDateInt,
         'endDateTime': endDateInt
       });
-      return stats;
+      return samples;
     } on PlatformException catch (error) {
       return Future.error(error);
     } catch (error) {

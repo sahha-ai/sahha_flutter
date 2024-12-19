@@ -148,6 +148,10 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 getStats(call, result)
             }
 
+            SahhaMethod.getSamples.name -> {
+                getSamples(call, result)
+            }
+
             SahhaMethod.openAppSettings.name -> {
                 openAppSettings()
             }
