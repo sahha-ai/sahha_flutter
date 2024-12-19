@@ -406,39 +406,39 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "types missing")
         }
 
-        val startDate: Long? = call.argument<Long>("startDate")
-        if (startDate != null) {
-            Log.d("Sahha", "startDate $startDate")
+        val startDateTime: Long? = call.argument<Long>("startDateTime")
+        if (startDateTime != null) {
+            Log.d("Sahha", "startDateTime $startDateTime")
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getScores() startDate missing",
+                "SahhaFlutter.getScores() startDateTime missing",
                 "SahhaFlutterPlugin",
                 "getScores",
                 codeBody
             )
-            Log.d("Sahha", "startDate missing")
+            Log.d("Sahha", "startDateTime missing")
         }
 
-        val endDate: Long? = call.argument<Long>("endDate")
-        if (endDate != null) {
-            Log.d("Sahha", "endDate $endDate")
+        val endDateTime: Long? = call.argument<Long>("endDateTime")
+        if (endDateTime != null) {
+            Log.d("Sahha", "endDateTime $endDateTime")
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getScores() endDate missing",
+                "SahhaFlutter.getScores() endDateTime missing",
                 "SahhaFlutterPlugin",
                 "getScores",
                 codeBody
             )
-            Log.d("Sahha", "endDate missing")
+            Log.d("Sahha", "endDateTime missing")
         }
 
-        if (startDate != null && endDate != null && types != null) {
+        if (startDateTime != null && endDateTime != null && types != null) {
             val sahhaScoreTypes = types.map { SahhaScoreType.valueOf(it) }.toSet()
             Sahha.getScores(
                 sahhaScoreTypes,
-                Pair(Date(startDate), Date(endDate)),
+                Pair(Date(startDateTime), Date(endDateTime)),
             ) { error, value ->
                 if (error != null) {
                     result.error("Sahha Error", error, null)
@@ -501,41 +501,41 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "types missing")
         }
 
-        val startDate: Long? = call.argument<Long>("startDate")
-        if (startDate != null) {
-            Log.d("Sahha", "startDate $startDate")
+        val startDateTime: Long? = call.argument<Long>("startDateTime")
+        if (startDateTime != null) {
+            Log.d("Sahha", "startDateTime $startDateTime")
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getBiomarkers() startDate missing",
+                "SahhaFlutter.getBiomarkers() startDateTime missing",
                 "SahhaFlutterPlugin",
                 "getBiomarkers",
                 codeBody
             )
-            Log.d("Sahha", "startDate missing")
+            Log.d("Sahha", "startDateTime missing")
         }
 
-        val endDate: Long? = call.argument<Long>("endDate")
-        if (endDate != null) {
-            Log.d("Sahha", "endDate $endDate")
+        val endDateTime: Long? = call.argument<Long>("endDateTime")
+        if (endDateTime != null) {
+            Log.d("Sahha", "endDateTime $endDateTime")
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getBiomarkers() endDate missing",
+                "SahhaFlutter.getBiomarkers() endDateTime missing",
                 "SahhaFlutterPlugin",
                 "getBiomarkers",
                 codeBody
             )
-            Log.d("Sahha", "endDate missing")
+            Log.d("Sahha", "endDateTime missing")
         }
 
-        if (startDate != null && endDate != null && categories != null && types != null) {
+        if (startDateTime != null && endDateTime != null && categories != null && types != null) {
             val biomarkerCategories = categories.map { SahhaBiomarkerCategory.valueOf(it) }.toSet()
             val biomarkerTypes = types.map { SahhaBiomarkerType.valueOf(it) }.toSet()
             Sahha.getBiomarkers(
                 biomarkerCategories,
                 biomarkerTypes,
-                Pair(Date(startDate), Date(endDate)),
+                Pair(Date(startDateTime), Date(endDateTime)),
             ) { error, value ->
                 if (error != null) {
                     result.error("Sahha Error", error, null)
@@ -584,38 +584,38 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "sensor missing")
         }
 
-        val startDate: Long? = call.argument<Long>("startDate")
-        if (startDate != null) {
-            Log.d("Sahha", "startDate $startDate")
+        val startDateTime: Long? = call.argument<Long>("startDateTime")
+        if (startDateTime != null) {
+            Log.d("Sahha", "startDateTime $startDateTime")
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getStats() startDate missing",
+                "SahhaFlutter.getStats() startDateTime missing",
                 "SahhaFlutterPlugin",
                 "getStats",
                 codeBody
             )
-            Log.d("Sahha", "startDate missing")
+            Log.d("Sahha", "startDateTime missing")
         }
 
-        val endDate: Long? = call.argument<Long>("endDate")
-        if (endDate != null) {
-            Log.d("Sahha", "endDate $endDate")
+        val endDateTime: Long? = call.argument<Long>("endDateTime")
+        if (endDateTime != null) {
+            Log.d("Sahha", "endDatTime $endDateTime")
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getStats() endDate missing",
+                "SahhaFlutter.getStats() endDateTime missing",
                 "SahhaFlutterPlugin",
                 "getStats",
                 codeBody
             )
-            Log.d("Sahha", "endDate missing")
+            Log.d("Sahha", "endDateTime missing")
         }
 
-        if (sensor != null && startDate != null && endDate != null) {
+        if (sensor != null && startDateTime != null && endDateTime != null) {
             Sahha.getStats(
                 SahhaSensor.valueOf(sensor),
-                Pair(Date(startDate), Date(endDate)),
+                Pair(Date(startDateTime), Date(endDateTime)),
             ) { error, stats ->
                 if (error != null) {
                     result.error("Sahha Error", error, null)
@@ -673,38 +673,38 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "sensor missing")
         }
 
-        val startDate: Long? = call.argument<Long>("startDate")
-        if (startDate != null) {
-            Log.d("Sahha", "startDate $startDate")
+        val startDateTime: Long? = call.argument<Long>("startDateTime")
+        if (startDateTime != null) {
+            Log.d("Sahha", "startDate $startDateTime")
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getSamples() startDate missing",
+                "SahhaFlutter.getSamples() startDateTime missing",
                 "SahhaFlutterPlugin",
                 "getStats",
                 codeBody
             )
-            Log.d("Sahha", "startDate missing")
+            Log.d("Sahha", "startDateTime missing")
         }
 
-        val endDate: Long? = call.argument<Long>("endDate")
-        if (endDate != null) {
-            Log.d("Sahha", "endDate $endDate")
+        val endDateTime: Long? = call.argument<Long>("endDateTime")
+        if (endDateTime != null) {
+            Log.d("Sahha", "endDateTime $endDateTime")
         } else {
             Sahha.postError(
                 SahhaFramework.flutter,
-                "SahhaFlutter.getStats() endDate missing",
+                "SahhaFlutter.getSamples() endDateTime missing",
                 "SahhaFlutterPlugin",
                 "getSamples",
                 codeBody
             )
-            Log.d("Sahha", "endDate missing")
+            Log.d("Sahha", "endDateTime missing")
         }
 
-        if (sensor != null && startDate != null && endDate != null) {
+        if (sensor != null && startDateTime != null && endDateTime != null) {
             Sahha.getSamples(
                 SahhaSensor.valueOf(sensor),
-                Pair(Date(startDate), Date(endDate)),
+                Pair(Date(startDateTime), Date(endDateTime)),
             ) { error, samples ->
                 if (error != null) {
                     result.error("Sahha Error", error, null)

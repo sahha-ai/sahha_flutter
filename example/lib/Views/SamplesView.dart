@@ -25,8 +25,9 @@ class SamplesState extends State<SamplesView> {
     SahhaFlutter.getSamples(
             sensor: SahhaSensor.values
                 .firstWhere((element) => element.name == sensor),
-            startDate: DateTime.timestamp().subtract(const Duration(days: 1)),
-            endDate: DateTime.timestamp())
+            startDateTime:
+                DateTime.timestamp().subtract(const Duration(days: 1)),
+            endDateTime: DateTime.timestamp())
         .then((value) {
       List<dynamic> data = jsonDecode(value);
       debugPrint(data.firstOrNull?.toString());

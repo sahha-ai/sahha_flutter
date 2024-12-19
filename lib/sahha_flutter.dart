@@ -272,16 +272,16 @@ class SahhaFlutter {
 
   static Future<String> getScores(
       {required List<SahhaScoreType> types,
-      required DateTime startDate,
-      required DateTime endDate}) async {
+      required DateTime startDateTime,
+      required DateTime endDateTime}) async {
     try {
       List<String> scoreTypeStrings = types.map((type) => type.name).toList();
-      int startDateInt = startDate.millisecondsSinceEpoch;
-      int endDateInt = endDate.millisecondsSinceEpoch;
+      int startDateInt = startDateTime.millisecondsSinceEpoch;
+      int endDateInt = endDateTime.millisecondsSinceEpoch;
       String value = await _channel.invokeMethod('getScores', {
         'types': scoreTypeStrings,
-        'startDate': startDateInt,
-        'endDate': endDateInt
+        'startDateTime': startDateInt,
+        'endDateTime': endDateInt
       });
       return value;
     } on PlatformException catch (error) {
@@ -294,20 +294,20 @@ class SahhaFlutter {
   static Future<String> getBiomarkers(
       {required List<SahhaBiomarkerCategory> categories,
       required List<SahhaBiomarkerType> types,
-      required DateTime startDate,
-      required DateTime endDate}) async {
+      required DateTime startDateTime,
+      required DateTime endDateTime}) async {
     try {
       List<String> biomarkerCategoryStrings =
           categories.map((category) => category.name).toList();
       List<String> biomarkerTypeStrings =
           types.map((type) => type.name).toList();
-      int startDateInt = startDate.millisecondsSinceEpoch;
-      int endDateInt = endDate.millisecondsSinceEpoch;
+      int startDateInt = startDateTime.millisecondsSinceEpoch;
+      int endDateInt = endDateTime.millisecondsSinceEpoch;
       String value = await _channel.invokeMethod('getBiomarkers', {
         'categories': biomarkerCategoryStrings,
         'types': biomarkerTypeStrings,
-        'startDate': startDateInt,
-        'endDate': endDateInt
+        'startDateTime': startDateInt,
+        'endDateTime': endDateInt
       });
       return value;
     } on PlatformException catch (error) {
@@ -319,15 +319,15 @@ class SahhaFlutter {
 
   static Future<String> getStats(
       {required SahhaSensor sensor,
-      required DateTime startDate,
-      required DateTime endDate}) async {
+      required DateTime startDateTime,
+      required DateTime endDateTime}) async {
     try {
-      int startDateInt = startDate.millisecondsSinceEpoch;
-      int endDateInt = endDate.millisecondsSinceEpoch;
+      int startDateInt = startDateTime.millisecondsSinceEpoch;
+      int endDateInt = endDateTime.millisecondsSinceEpoch;
       String stats = await _channel.invokeMethod('getStats', {
         'sensor': sensor.name,
-        'startDate': startDateInt,
-        'endDate': endDateInt
+        'startDateTime': startDateInt,
+        'endDateTime': endDateInt
       });
       return stats;
     } on PlatformException catch (error) {
@@ -339,15 +339,15 @@ class SahhaFlutter {
 
   static Future<String> getSamples(
       {required SahhaSensor sensor,
-      required DateTime startDate,
-      required DateTime endDate}) async {
+      required DateTime startDateTime,
+      required DateTime endDateTime}) async {
     try {
-      int startDateInt = startDate.millisecondsSinceEpoch;
-      int endDateInt = endDate.millisecondsSinceEpoch;
+      int startDateInt = startDateTime.millisecondsSinceEpoch;
+      int endDateInt = endDateTime.millisecondsSinceEpoch;
       String stats = await _channel.invokeMethod('getSamples', {
         'sensor': sensor.name,
-        'startDate': startDateInt,
-        'endDate': endDateInt
+        'startDateTime': startDateInt,
+        'endDateTime': endDateInt
       });
       return stats;
     } on PlatformException catch (error) {

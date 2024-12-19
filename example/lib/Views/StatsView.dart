@@ -23,9 +23,11 @@ class StatsState extends State<StatsView> {
 
   onTapGetStats(BuildContext context) {
     SahhaFlutter.getStats(
-            sensor: SahhaSensor.values.firstWhere((element) => element.name == sensor),
-            startDate: DateTime.timestamp().subtract(const Duration(days: 7)),
-            endDate: DateTime.timestamp())
+            sensor: SahhaSensor.values
+                .firstWhere((element) => element.name == sensor),
+            startDateTime:
+                DateTime.timestamp().subtract(const Duration(days: 7)),
+            endDateTime: DateTime.timestamp())
         .then((value) {
       List<dynamic> data = jsonDecode(value);
       debugPrint(data.firstOrNull?.toString());

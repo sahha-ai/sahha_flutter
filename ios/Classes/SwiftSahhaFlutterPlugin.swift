@@ -279,7 +279,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         Sahha.postError(framework: .flutter, message: "TEST", path: "SwiftSahhaFlutterPlugin", method: "getScores", body: params.debugDescription)
         
         var scoreTypes: Set<SahhaScoreType> = []
-        if let values = params as? [String: Any?], let types = values["types"] as? [String], let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+        if let values = params as? [String: Any?], let types = values["types"] as? [String], let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
             
             let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
             let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
@@ -290,7 +290,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 }
             }
             
-            Sahha.getScores(types: scoreTypes, startDate: startDate, endDate: endDate) { error, value in
+            Sahha.getScores(types: scoreTypes, startDateTime: startDate, endDateTime: endDate) { error, value in
                 if let error = error {
                     result(FlutterError(code: "Sahha Error", message: error, details: nil))
                 } else if let value = value {
@@ -311,7 +311,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     private func getBiomarkers(_ params: Any?, result: @escaping FlutterResult) {
         var biomarkerCategories: Set<SahhaBiomarkerCategory> = []
         var biomarkerTypes: Set<SahhaBiomarkerType> = []
-        if let values = params as? [String: Any?], let categories = values["categories"] as? [String], let types = values["types"] as? [String], let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+        if let values = params as? [String: Any?], let categories = values["categories"] as? [String], let types = values["types"] as? [String], let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
             
             let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
             let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
@@ -328,7 +328,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 }
             }
             
-            Sahha.getBiomarkers(categories: biomarkerCategories, types: biomarkerTypes, startDate: startDate, endDate: endDate) { error, value in
+            Sahha.getBiomarkers(categories: biomarkerCategories, types: biomarkerTypes, startDateTime: startDate, endDateTime: endDate) { error, value in
                 if let error = error {
                     result(FlutterError(code: "Sahha Error", message: error, details: nil))
                 } else if let value = value {
@@ -348,11 +348,11 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     
     private func getStats(_ params: Any?, result: @escaping FlutterResult) {
         if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
-            if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+            if let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
                 let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
                 let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
                 if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-                    Sahha.getStats(sensor: sahhaSensor, startDate: startDate, endDate: endDate) { error, value in
+                    Sahha.getStats(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, value in
                         if let error = error {
                             result(FlutterError(code: "Sahha Error", message: error, details: nil))
                         } else {
@@ -386,11 +386,11 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     
     private func getSamples(_ params: Any?, result: @escaping FlutterResult) {
         if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
-            if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+            if let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
                 let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
                 let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
                 if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-                    Sahha.getSamples(sensor: sahhaSensor, startDate: startDate, endDate: endDate) { error, value in
+                    Sahha.getSamples(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, value in
                         if let error = error {
                             result(FlutterError(code: "Sahha Error", message: error, details: nil))
                         } else {
