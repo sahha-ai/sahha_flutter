@@ -14,6 +14,8 @@
 
 ---
 
+## 1.0.8
+
 ### Added
 
 - Added `getStats` method
