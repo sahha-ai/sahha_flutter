@@ -6,11 +6,11 @@
 
 ### Changed
 
-- n/a
+- Renamed instances of `startDate` / `endDate` to `startDateTime` / `endDateTime`
 
 ### Fixed
 
-- (iOS) Fixed sleep time dates for `getStats`
+- (iOS) Fixed incorrect `startDateTime` / `endDateTime` for `getStats` sleep stats
 
 ---
 
