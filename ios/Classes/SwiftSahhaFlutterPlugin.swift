@@ -7,7 +7,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case motion
         case health
     }
-
+    
     enum SahhaMethod: String {
         case configure
         case isAuthenticated
@@ -22,18 +22,19 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case getScores
         case getBiomarkers
         case getStats
+        case getSamples
         case openAppSettings
     }
-
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "sahha_flutter", binaryMessenger: registrar.messenger())
         let instance = SwiftSahhaFlutterPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
-
+    
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let method = SahhaMethod(rawValue: call.method)
-
+        
         switch method {
         case .configure:
             configure(call.arguments, result: result)
@@ -59,16 +60,18 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             getBiomarkers(call.arguments, result: result)
         case .getStats:
             getStats(call.arguments, result: result)
+        case .getSamples:
+            getSamples(call.arguments, result: result)
         case .openAppSettings:
             Sahha.openAppSettings()
         default:
             result(FlutterMethodNotImplemented)
         }
     }
-
+    
     private func configure(_ params: Any?, result: @escaping FlutterResult) {
         if let values = params as? [String: Any?], let environment = values["environment"] as? String, let configEnvironment = SahhaEnvironment(rawValue: environment) {
-
+            
             var settings = SahhaSettings(environment: configEnvironment)
             settings.framework = .flutter
             
@@ -76,7 +79,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 print("Sahha | Flutter configured")
                 result(true)
             }
-
+            
         } else {
             let message = "SahhaFlutter.configure() parameters are invalid"
             Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "configure", body: params.debugDescription)
@@ -120,7 +123,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
-
+    
     private func deauthenticate(_ result: @escaping FlutterResult) {
         Sahha.deauthenticate { error, success in
             if let error = error {
@@ -159,7 +162,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             }
         }
     }
-
+    
     private func postDemographic(_ params: Any?, result: @escaping FlutterResult) {
         if let values = params as? [String: Any?] {
             var demographic = SahhaDemographic()
@@ -217,7 +220,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
-
+    
     private func getSensorStatus(_ params: Any?, result: @escaping FlutterResult) {
         
         if let values = params as? [String: Any?], let sensors = values["sensors"] as? [String] {
@@ -237,7 +240,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                     result(sensorStatus.rawValue)
                 }
             }
-
+            
         } else {
             let message = "SahhaFlutter.getSensorStatus() parameters are invalid"
             Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getSensorStatus", body: params.debugDescription)
@@ -264,19 +267,19 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                     result(sensorStatus.rawValue)
                 }
             }
-
+            
         } else {
             let message = "SahhaFlutter.enableSensors() parameters are invalid"
             Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "enableSensors", body: params.debugDescription)
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
-
+    
     private func getScores(_ params: Any?, result: @escaping FlutterResult) {
         Sahha.postError(framework: .flutter, message: "TEST", path: "SwiftSahhaFlutterPlugin", method: "getScores", body: params.debugDescription)
         
         var scoreTypes: Set<SahhaScoreType> = []
-        if let values = params as? [String: Any?], let types = values["types"] as? [String], let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+        if let values = params as? [String: Any?], let types = values["types"] as? [String], let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
             
             let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
             let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
@@ -287,7 +290,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 }
             }
             
-            Sahha.getScores(types: scoreTypes, startDate: startDate, endDate: endDate) { error, value in
+            Sahha.getScores(types: scoreTypes, startDateTime: startDate, endDateTime: endDate) { error, value in
                 if let error = error {
                     result(FlutterError(code: "Sahha Error", message: error, details: nil))
                 } else if let value = value {
@@ -304,11 +307,11 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
-
+    
     private func getBiomarkers(_ params: Any?, result: @escaping FlutterResult) {
         var biomarkerCategories: Set<SahhaBiomarkerCategory> = []
         var biomarkerTypes: Set<SahhaBiomarkerType> = []
-        if let values = params as? [String: Any?], let categories = values["categories"] as? [String], let types = values["types"] as? [String], let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
+        if let values = params as? [String: Any?], let categories = values["categories"] as? [String], let types = values["types"] as? [String], let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
             
             let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
             let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
@@ -325,7 +328,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
                 }
             }
             
-            Sahha.getBiomarkers(categories: biomarkerCategories, types: biomarkerTypes, startDate: startDate, endDate: endDate) { error, value in
+            Sahha.getBiomarkers(categories: biomarkerCategories, types: biomarkerTypes, startDateTime: startDate, endDateTime: endDate) { error, value in
                 if let error = error {
                     result(FlutterError(code: "Sahha Error", message: error, details: nil))
                 } else if let value = value {
@@ -342,42 +345,81 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
     }
-
+    
     private func getStats(_ params: Any?, result: @escaping FlutterResult) {
-            if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
-                if let startDateNumber = values["startDate"] as? NSNumber, let endDateNumber = values["endDate"] as? NSNumber {
-                    let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
-                    let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
-                    if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-                        Sahha.getStats(sensor: sahhaSensor, startDate: startDate, endDate: endDate) { error, value in
-                            if let error = error {
-                                result(FlutterError(code: "Sahha Error", message: error, details: nil))
-                            } else {
-                                var string: String?
-                                  do {
-                                    let jsonEncoder = JSONEncoder()
-                                    jsonEncoder.outputFormatting = .prettyPrinted
-                                    let jsonData = try jsonEncoder.encode(value)
-                                    string = String(data: jsonData, encoding: .utf8)
-                                  } catch let encodingError {
-                                    print(encodingError)
-                                    Sahha.postError(
-                                      framework: .react_native,
-                                      message: encodingError.localizedDescription,
-                                      path: "SahhaFlutter", method: "getStats",
-                                      body: "jsonEncoder")
-                                      result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
-                                    return
-                                  }
-                                result(string)
+        if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
+            if let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
+                let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+                let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
+                if let sahhaSensor = SahhaSensor(rawValue: sensor) {
+                    Sahha.getStats(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, value in
+                        if let error = error {
+                            result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                        } else {
+                            var string: String?
+                            do {
+                                let jsonEncoder = JSONEncoder()
+                                jsonEncoder.outputFormatting = .prettyPrinted
+                                let jsonData = try jsonEncoder.encode(value)
+                                string = String(data: jsonData, encoding: .utf8)
+                            } catch let encodingError {
+                                print(encodingError)
+                                Sahha.postError(
+                                    framework: .flutter,
+                                    message: encodingError.localizedDescription,
+                                    path: "SahhaFlutter", method: "getStats",
+                                    body: "jsonEncoder")
+                                result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
+                                return
                             }
+                            result(string)
                         }
                     }
                 }
-            } else {
-                let message = "SahhaFlutter.getStats() parameters are invalid"
-                Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getStatsDateRange", body: params.debugDescription)
-                result(FlutterError(code: "Sahha Error", message: message, details: nil))
             }
+        } else {
+            let message = "SahhaFlutter.getStats() parameters are invalid"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getStats", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
         }
+    }
+    
+    private func getSamples(_ params: Any?, result: @escaping FlutterResult) {
+        if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
+            if let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
+                let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+                let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
+                if let sahhaSensor = SahhaSensor(rawValue: sensor) {
+                    Sahha.getSamples(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, value in
+                        if let error = error {
+                            result(FlutterError(code: "Sahha Error", message: error, details: nil))
+                        } else {
+                            var string: String?
+                            do {
+                                let jsonEncoder = JSONEncoder()
+                                jsonEncoder.outputFormatting = .prettyPrinted
+                                let jsonData = try jsonEncoder.encode(value)
+                                string = String(data: jsonData, encoding: .utf8)
+                            } catch let encodingError {
+                                print(encodingError)
+                                Sahha.postError(
+                                    framework: .flutter,
+                                    message: encodingError.localizedDescription,
+                                    path: "SahhaFlutter", method: "getStats",
+                                    body: "jsonEncoder")
+                                result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
+                                return
+                            }
+                            result(string)
+                        }
+                    }
+                }
+            }
+        } else {
+            let message = "SahhaFlutter.getSamples() parameters are invalid"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getSamples", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
+        }
+    }
+    
 }
