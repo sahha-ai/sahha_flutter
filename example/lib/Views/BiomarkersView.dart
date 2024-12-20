@@ -34,8 +34,8 @@ class BiomarkersState extends State<BiomarkersView> {
       SahhaFlutter.getBiomarkers(
               categories: SahhaBiomarkerCategory.values,
               types: SahhaBiomarkerType.values,
-              startDate: DateTime.now(),
-              endDate: DateTime.now())
+              startDateTime: DateTime.now(),
+              endDateTime: DateTime.now())
           .then((value) {
         List<dynamic> data = jsonDecode(value);
         debugPrint(data.firstOrNull?.toString());
@@ -46,8 +46,8 @@ class BiomarkersState extends State<BiomarkersView> {
       SahhaFlutter.getBiomarkers(
               categories: SahhaBiomarkerCategory.values,
               types: SahhaBiomarkerType.values,
-              startDate: week,
-              endDate: DateTime.now())
+              startDateTime: week,
+              endDateTime: DateTime.now())
           .then((value) {
         List<dynamic> data = jsonDecode(value);
         debugPrint(data.firstOrNull?.toString());

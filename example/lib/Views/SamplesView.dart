@@ -6,14 +6,14 @@ import 'package:selectpicker/models/select_picker_item.dart';
 import 'package:selectpicker/selectpicker.dart';
 import 'package:selectpicker/styles/input_style.dart';
 
-class StatsView extends StatefulWidget {
-  const StatsView({Key? key}) : super(key: key);
+class SamplesView extends StatefulWidget {
+  const SamplesView({Key? key}) : super(key: key);
 
   @override
-  StatsState createState() => StatsState();
+  SamplesState createState() => SamplesState();
 }
 
-class StatsState extends State<StatsView> {
+class SamplesState extends State<SamplesView> {
   String sensor = '';
 
   @override
@@ -21,19 +21,19 @@ class StatsState extends State<StatsView> {
     super.initState();
   }
 
-  onTapGetStats(BuildContext context) {
-    SahhaFlutter.getStats(
+  onTapGetSamples(BuildContext context) {
+    SahhaFlutter.getSamples(
             sensor: SahhaSensor.values
                 .firstWhere((element) => element.name == sensor),
             startDateTime:
-                DateTime.timestamp().subtract(const Duration(days: 7)),
+                DateTime.timestamp().subtract(const Duration(days: 1)),
             endDateTime: DateTime.timestamp())
         .then((value) {
       List<dynamic> data = jsonDecode(value);
       debugPrint(data.firstOrNull?.toString());
       const encoder = JsonEncoder.withIndent('      ');
       final prettyJson = encoder.convert(data);
-      showAlertDialog(context, "STATS", prettyJson);
+      showAlertDialog(context, "SAMPLES", prettyJson);
     });
   }
 
@@ -72,7 +72,7 @@ class StatsState extends State<StatsView> {
             children: <Widget>[
               const Spacer(),
               const Icon(
-                Icons.pie_chart,
+                Icons.timer_outlined,
                 size: 64,
               ),
               const SizedBox(height: 20),
@@ -102,9 +102,9 @@ class StatsState extends State<StatsView> {
                   textStyle: const TextStyle(fontSize: 16),
                 ),
                 onPressed: () {
-                  onTapGetStats(context);
+                  onTapGetSamples(context);
                 },
-                child: const Text('GET STATS'),
+                child: const Text('GET SAMPLES'),
               ),
               const SizedBox(height: 40),
             ],
