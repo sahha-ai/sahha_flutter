@@ -1,3 +1,19 @@
+## 1.0.9
+
+### Added
+
+- Added `getSamples` method
+
+### Changed
+
+- Renamed instances of `startDate` / `endDate` to `startDateTime` / `endDateTime`
+
+### Fixed
+
+- (iOS) Fixed incorrect `startDateTime` / `endDateTime` for `getStats` sleep stats
+
+---
+
 ## 1.0.8
 
 ### Added

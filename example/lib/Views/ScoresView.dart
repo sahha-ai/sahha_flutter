@@ -35,7 +35,7 @@ class ScoresState extends State<ScoresView> {
         SahhaScoreType.activity,
         SahhaScoreType.sleep,
         SahhaScoreType.wellbeing
-      ], startDate: DateTime.now(), endDate: DateTime.now())
+      ], startDateTime: DateTime.now(), endDateTime: DateTime.now())
           .then((value) {
         List<dynamic> data = jsonDecode(value);
         debugPrint(data.firstOrNull?.toString());
@@ -47,7 +47,7 @@ class ScoresState extends State<ScoresView> {
         SahhaScoreType.activity,
         SahhaScoreType.sleep,
         SahhaScoreType.wellbeing
-      ], startDate: week, endDate: DateTime.now())
+      ], startDateTime: week, endDateTime: DateTime.now())
           .then((value) {
         List<dynamic> data = jsonDecode(value);
         debugPrint(data.firstOrNull?.toString());
