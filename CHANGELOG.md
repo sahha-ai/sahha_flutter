@@ -1,3 +1,20 @@
+## 1.1.0
+
+### Added
+
+- Added `recordingMethod` parameter to `getSamples` method
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (iOS) Fixed async errors for app lifecycle events
+- (Android) Fixed an issue where `getSensorStatus` may sometimes not return a status
+
+---
+
 ## 1.0.9
 
 ### Added
