@@ -1,3 +1,21 @@
+## 1.1.1
+
+### Added
+
+- (Android) Added rules for consumer-rules.pro for developers using pro guard obfuscation
+
+### Changed
+
+- Adjusted sleep data window to 6pm - 6pm for `getStats`
+- Added a `deviceId` to device information
+- (iOS) Split Stats by source
+
+### Fixed
+
+- (Android) Fixed an issue when posting data was not being cancelled when de-authenticating
+
+---
+
 ## 1.1.0
 
 ### Added
