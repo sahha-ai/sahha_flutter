@@ -1,3 +1,20 @@
+## 1.1.3
+
+### Added
+
+- Added `category` to `SahhaSample` and `SahhaStat`
+- Added `deviceId` to the data logs
+
+### Changed
+
+- (Android) Made changes to how native sleep collection is handled
+
+### Fixed
+
+- (Android) Fixed an issue for Android version 13 and below regarding behaviour between installing HealthConnect during the permission flow
+
+---
+
 ## 1.1.1
 
 ### Added
