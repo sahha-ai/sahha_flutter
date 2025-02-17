@@ -2,12 +2,15 @@
 
 ### Added
 
-- Added `category` to `SahhaSample` and `SahhaStat`
+- Added `category` to samples and stats
 - Added `deviceId` to the data logs
+- Added optional stats list on samples
+- Added exercise stats
 
 ### Changed
 
 - (Android) Made changes to how native sleep collection is handled
+- (Android) Improved how the SDK handles large amounts of data logs at once
 
 ### Fixed
 
