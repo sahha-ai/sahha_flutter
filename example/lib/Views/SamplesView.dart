@@ -63,7 +63,7 @@ class SamplesState extends State<SamplesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stats'),
+        title: const Text('Samples'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(40),

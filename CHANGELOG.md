@@ -1,3 +1,23 @@
+## 1.1.4
+
+### Added
+
+- Added `category` to samples and stats
+- Added `deviceId` to the data logs
+- Added exercise stats
+- (iOS) Added optional stats list on samples
+
+### Changed
+
+- (Android) Made changes to how native sleep collection is handled
+- (Android) Improved how the SDK handles large amounts of data logs at once
+
+### Fixed
+
+- (Android) Fixed an issue for Android version 13 and below regarding behaviour between installing HealthConnect during the permission flow
+
+---
+
 ## 1.1.1
 
 ### Added
