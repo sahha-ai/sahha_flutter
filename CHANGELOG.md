@@ -1,11 +1,11 @@
-## 1.1.3
+## 1.1.4
 
 ### Added
 
 - Added `category` to samples and stats
 - Added `deviceId` to the data logs
-- Added optional stats list on samples
 - Added exercise stats
+- (iOS) Added optional stats list on samples
 
 ### Changed
 
