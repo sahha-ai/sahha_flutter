@@ -24,6 +24,8 @@ dependencies:
 
   webview_flutter: ^4.8.0
 
+  flutter_local_notifications: ^18.0.1
+
   sahha_flutter:
     # When depending on this package from a real application you should use:
     #   sahha_flutter: ^x.y.z
