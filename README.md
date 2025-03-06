@@ -149,11 +149,11 @@ SahhaFlutter.isAuthenticated().then((authenticated) => {
         appId: APP_ID,
         appSecret: APP_SECRET,
         externalId: EXTERNAL_ID) // Some unique identifier for the user
-    .then((success) => {
-        if (success)
-          {
-            // E.g. continue onboarding flow
-          }
+        .then((success) =>
+    {
+      if (success) {
+        // E.g. continue onboarding flow
+      }
     }).catchError((error, stackTrace) => {debugPrint(error.toString())});
 ```
 
