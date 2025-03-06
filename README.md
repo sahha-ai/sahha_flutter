@@ -54,6 +54,8 @@ dependencies:
   sahha_flutter: ^1.1.4
 ```
 
+### Android
+
 In the `AndroidManifest.xml` file, which can be found in `android` > `app` > `src` > `main`, declare Google Health Connect data types if required, e.g. sleep and step count.
 
 More data types are available such as heart rate, workout / exercise, please refer to the links below for more information.
@@ -74,6 +76,49 @@ To declare other sensor permissions, please refer to [this](https://docs.sahha.a
 Only include the sensor permissions required by your project, what is declared here will be reviewed by the Play Store.
 
 You must be able to justify reasons behind requiring the sensor permissions, [these](https://docs.sahha.ai/docs/data-flow/sdk/app-store-submission/google-play-store#data-type-justifications) justifications may be used to clearly articulate the reasoning behind your required sensor permissions.
+
+### Apple iOS
+
+#### Enabling Health Kit
+
+Before you can connect to Apple Health, you must enable the HealthKit capabilities for your app using the Signing & Capabilities pane of the project editor:
+
+- Add `HealthKit` entitlement to your Xcode project
+- Select your App Target in the Project panel
+- Select Signing & Capabilities
+- Tap the + button
+- Select HealthKit from the list
+- Double-click the capability to add it to your project
+
+In the Project navigator of the main window, select the project — the root group with the same name as your app — and in the project editor that appears, select the appropriate target and then click the Signing & Capabilities tab.
+
+In the toolbar, click the Library button (+) to open the Capabilities library. Alternatively, click + Capability to the left of the build configurations, or choose Editor > Add Capability. The Capabilities library displays only the capabilities available to the target platform and your program membership. Select a capability in the list to view its description on the right.
+
+Select HealthKit from the list of capabilities.
+
+After you add the HealthKit capability, Xcode links the HealthKit framework to your target and updates the target’s entitlements file to include the HealthKit Entitlement. If Xcode automatically manages the signing of your app, it also enables HealthKit for your app’s App ID.
+
+#### Background Delivery
+
+In order for the Sahha SDK to passively collect health data, your app will need to enable background delivery for HealthKit:
+
+- Select your project in Xcode’s Project navigator.
+- Select the app’s target from the Targets list.
+- Click the Signing & Capabilities tab in the project editor.
+- Find the HealthKit capability.
+- Enable the nested Background Delivery capability.
+
+#### Add Usage Descriptions
+
+Follow these steps to add the usage description for reading health data to your app’s target:
+
+- Select your App Target in the Project panel
+- Select Info
+- Tap the + button to add a new key
+- Choose Privacy - Health Share Usage Description.
+- Write a clear description for the key value such as This app needs your health info to deliver mood predictions.
+
+
 
 ---
 
