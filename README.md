@@ -92,7 +92,7 @@ Before you can connect to Apple Health, you must enable the HealthKit capabiliti
 
 In the Project navigator of the main window, select the project — the root group with the same name as your app — and in the project editor that appears, select the appropriate target and then click the Signing & Capabilities tab.
 
-In the toolbar, click the Library button (+) to open the Capabilities library. Alternatively, click + Capability to the left of the build configurations, or choose Editor > Add Capability. The Capabilities library displays only the capabilities available to the target platform and your program membership. Select a capability in the list to view its description on the right.
+In the toolbar, click the Library button (+) to open the Capabilities library. Alternatively, click + Capability to the left of the build configurations, or choose `Editor` > `Add Capability`. The Capabilities library displays only the capabilities available to the target platform and your program membership. Select a capability in the list to view its description on the right.
 
 Select HealthKit from the list of capabilities.
 
@@ -118,7 +118,7 @@ Follow these steps to add the usage description for reading health data to your 
 - Choose Privacy - Health Share Usage Description.
 - Write a clear description for the key value such as This app needs your health info to deliver mood predictions.
 
-
+For more information enabling Health Kit, please refer to this [page](https://docs.sahha.ai/docs/data-flow/sdk/setup#minimum-requirements)
 
 ---
 
