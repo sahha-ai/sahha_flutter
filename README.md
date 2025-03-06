@@ -137,7 +137,7 @@ For more information enabling Health Kit, please refer to this [page](https://do
 #### Add Usage Descriptions
 - Select your **App Target** and navigate to the **Info** tab.
 - Click the **+** button to add a new key and choose **Privacy - Health Share Usage Description**.
-- Provide a clear description, such as: "This app needs your health info to deliver mood predictions."
+- Provide a clear description, such as: "*This app needs your health info to deliver mood predictions*."
 
 For more detailed instructions, refer to our [setup guide](https://docs.sahha.ai/docs/data-flow/sdk/setup#minimum-requirements).
 
