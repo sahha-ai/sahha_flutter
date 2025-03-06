@@ -129,10 +129,6 @@ For more information enabling Health Kit, please refer to this [page](https://do
 - Click the **+** button (or choose **Editor > Add Capability**) to open the Capabilities library.
 - Locate and select **HealthKit**; double-click it to add it to your project.
 
-**Verify the Setup**:
-- Xcode links the HealthKit framework and updates your entitlements file.
-- If Xcode manages signing automatically, HealthKit is enabled for your App ID.
-
 #### Background Delivery
 - Select your project in the Project navigator and choose your app’s target.
 - In the **Signing & Capabilities** tab, find the HealthKit capability.
