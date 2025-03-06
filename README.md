@@ -83,8 +83,9 @@ You must be able to justify reasons behind requiring the sensor permissions, [th
 * [`configure(...)`](#configure)
 * [`isAuthenticated`](#isauthenticated)
 * [`authenticate()`](#authenticate)
+* [`authenticateToken()`](#authenticatetoken)
 * [`deauthenticate()`](#deauthenticate)
-* [`profileToken`](#profiletoken)
+* [`getProfileToken()`](#getprofiletoken)
 * [`getDemographic()`](#getdemographic)
 * [`postDemographic(...)`](#postdemographic)
 * [`getSensorStatus(...)`](#getsensorstatus)
@@ -94,7 +95,6 @@ You must be able to justify reasons behind requiring the sensor permissions, [th
 * [`getStats(...)`](#getstats)
 * [`getSamples(...)`](#getsamples)
 * [`openAppSettings()`](#openappsettings)
-* [Interfaces](#interfaces)
 * [Enums](#enums)
 
 </docgen-index>
@@ -169,14 +169,14 @@ static Future<bool> authenticateToken(
 
 **Example usage**:
 ```dart
-SahhaFlutter.authenticateToken(
+    SahhaFlutter.authenticateToken(
         profileToken: PROFILE_TOKEN,
         refreshToken: REFRESH_TOKEN)
-    .then((success) => {
-        if (success)
-          {
-            // E.g. continue onboarding flow
-          }
+        .then((success) =>
+    {
+      if (success) {
+        // E.g. continue onboarding flow
+      }
     }).catchError((error, stackTrace) => {debugPrint(error.toString())});
 ```
 
@@ -190,12 +190,12 @@ static Future<bool> deauthenticate() async
 
 **Example usage**:
 ```dart
-SahhaFlutter.deauthenticate()
-    .then((success) => {
-        if (success)
-        {
-          // E.g. continue logic for successful deauthentication
-        }
+    SahhaFlutter.deauthenticate()
+        .then((success) =>
+    {
+      if (success) {
+        // E.g. continue logic for successful deauthentication
+      }
     }).catchError((error, stackTrace) => {debugPrint(error.toString())});
 ```
 
@@ -209,11 +209,12 @@ static Future<String?> getProfileToken() async
 
 **Example usage**:
 ```dart
-SahhaFlutter.getProfileToken()
-        .then((token) => {
-              // Do something with the token
-            })
-        .catchError((error, stackTrace) => {debugPrint(error.toString())});
+    SahhaFlutter.getProfileToken()
+        .then((token) =>
+    {
+      // Do something with the token
+    }).catchError((error, stackTrace) => {debugPrint(error.toString())});
+
 ```
 
 ---
@@ -241,7 +242,7 @@ static Future<bool> postDemographic(Map demographic) async
 
 **Example usage**:
 ```dart
-var demographic = {'age': 123, 'gender': 'Male'};
+const demographic = {'age': 123, 'gender': 'Male'};
 
 SahhaFlutter.postDemographic(demographic)
     .then((success) => {debugPrint(success.toString())})
@@ -259,7 +260,7 @@ static Future<SahhaSensorStatus> getSensorStatus(
 
 **Example usage**
 ```dart
-var sensors = [SahhaSensor.sleep, SahhaSensor.steps, SahhaSensor.heart_rate];
+const sensors = [SahhaSensor.sleep, SahhaSensor.steps, SahhaSensor.heart_rate];
 
 SahhaFlutter.getSensorStatus(sensors)
     .then((status) => {debugPrint(status.toString())})
@@ -277,7 +278,7 @@ static Future<SahhaSensorStatus> enableSensors(
 
 **Example usage**:
 ```dart
-var sensors = [SahhaSensor.sleep, SahhaSensor.steps, SahhaSensor.heart_rate];
+const sensors = [SahhaSensor.sleep, SahhaSensor.steps, SahhaSensor.heart_rate];
 
 SahhaFlutter.enableSensors(sensors)
     .then((status) => {debugPrint(status.toString())})
@@ -344,7 +345,7 @@ static Future<String> getBiomarkers(
         startDateTime: DateTime.now(),
         endDateTime: DateTime.now())
         .then((value) {
-      debugPrint(value.toString());
+      debugPrint(value.toString()); // value is in the form of a JSON array
     }).catchError((error, stackTrace) => {debugPrint(error.toString())});
 ```
 
