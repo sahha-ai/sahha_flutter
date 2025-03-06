@@ -129,7 +129,7 @@ For more information enabling Health Kit, please refer to this [page](https://do
 - Click the **+** button (or choose **Editor > Add Capability**) to open the Capabilities library.
 - Locate and select **HealthKit**; double-click it to add it to your project.
 
-#### Verify the Setup:
+**Verify the Setup**:
 - Xcode links the HealthKit framework and updates your entitlements file.
 - If Xcode manages signing automatically, HealthKit is enabled for your App ID.
 
@@ -138,7 +138,7 @@ For more information enabling Health Kit, please refer to this [page](https://do
 - In the **Signing & Capabilities** tab, find the HealthKit capability.
 - Enable the nested **Background Delivery** option to allow passive health data collection.
 
-## Add Usage Descriptions
+#### Add Usage Descriptions
 - Select your **App Target** and navigate to the **Info** tab.
 - Click the **+** button to add a new key and choose **Privacy - Health Share Usage Description**.
 - Provide a clear description, such as: "This app needs your health info to deliver mood predictions."
