@@ -81,19 +81,19 @@ You must be able to justify reasons behind requiring the sensor permissions, [th
 
 #### Enable HealthKit
 
-- Open your project in Xcode and select your **App Target** in the Project panel.
-- Navigate to the **Signing & Capabilities** tab.
-- Click the **+** button (or choose **Editor > Add Capability**) to open the Capabilities library.
-- Locate and select **HealthKit**; double-click it to add it to your project.
+- Open your project in Xcode and select your `App Target` in the Project panel.
+- Navigate to the `Signing & Capabilities` tab.
+- Click the `+` button (or choose `Editor > Add Capability`) to open the Capabilities library.
+- Locate and select `HealthKit`; double-click it to add it to your project.
 
 #### Background Delivery
 - Select your project in the Project navigator and choose your app’s target.
-- In the **Signing & Capabilities** tab, find the HealthKit capability.
-- Enable the nested **Background Delivery** option to allow passive health data collection.
+- In the `Signing & Capabilities` tab, find the HealthKit capability.
+- Enable the nested `Background Delivery` option to allow passive health data collection.
 
 #### Add Usage Descriptions
-- Select your **App Target** and navigate to the **Info** tab.
-- Click the **+** button to add a new key and choose **Privacy - Health Share Usage Description**.
+- Select your `App Target` and navigate to the `Info` tab.
+- Click the `+` button to add a new key and choose `Privacy - Health Share Usage Description`.
 - Provide a clear description, such as: "*This app needs your health info to deliver mood predictions*."
 
 For more detailed instructions, refer to our [setup guide](https://docs.sahha.ai/docs/data-flow/sdk/setup#minimum-requirements).
