@@ -3,7 +3,7 @@
 ### Added
 
 - Added aggregates to data logs
-- (iOS) Added new activity sensors
+- Added new activity sensors
 
 ### Changed
 
