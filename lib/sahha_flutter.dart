@@ -43,7 +43,20 @@ enum SahhaSensor {
   exercise_time,
   activity_summary,
   device_lock,
-  exercise
+  exercise,
+  running_speed,
+  running_power,
+  running_ground_contact_time,
+  running_stride_length,
+  running_vertical_oscillation,
+  six_minute_walk_test_distance,
+  stair_ascent_speed,
+  stair_descent_speed,
+  walking_speed,
+  walking_steadiness,
+  walking_asymmetry_percentage,
+  walking_double_support_percentage,
+  walking_step_length,
 }
 
 enum SahhaScoreType {

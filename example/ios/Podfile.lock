@@ -1,9 +1,9 @@
 PODS:
   - Flutter (1.0.0)
-  - Sahha (1.1.3)
-  - sahha_flutter (1.1.4):
+  - Sahha (1.1.5)
+  - sahha_flutter (1.1.5):
     - Flutter
-    - Sahha (= 1.1.3)
+    - Sahha (= 1.1.5)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -32,11 +32,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  Sahha: c7c704e4894d4c82879decba18f2cca8db86fbcf
-  sahha_flutter: 875392110f1e285e281044d72cff7b761c6abe4f
+  Sahha: 7259b3905c6d49eb45baa7e6c7ddbb51e1eb06c7
+  sahha_flutter: 270bd5bf6e4e92e00fd5ff1ce2bc966778719da1
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   webview_flutter_wkwebview: be0f0d33777f1bfd0c9fdcb594786704dbf65f36
 
-PODFILE CHECKSUM: b8db6cf341a56e3c39c545e017e6986a518c1549
+PODFILE CHECKSUM: 6d277d5c5c5121af9fdf7bff45a86ac1cf37de2e
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
