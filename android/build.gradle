@@ -27,6 +27,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace 'com.sahha.flutter'
     compileSdkVersion 34
 
     compileOptions {
