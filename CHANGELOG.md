@@ -13,6 +13,7 @@
 
 - (Android) Fixed an issue that could cause unnecessary battery drain
 - (Android) Fixed an issue where the foreground service would launch intermittently
+- (Android) Added namespace declaration to `build.gradle`
 
 ---
 
