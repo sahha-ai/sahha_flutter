@@ -1,3 +1,22 @@
+## 1.1.5
+
+### Added
+
+- Added aggregates to data logs
+- Added new activity sensors
+
+### Changed
+
+- Changed how app session logs are formatted
+
+### Fixed
+
+- (Android) Fixed an issue that could cause unnecessary battery drain
+- (Android) Fixed an issue where the foreground service would launch intermittently
+- (Android) Added namespace declaration to `build.gradle`
+
+---
+
 ## 1.1.4
 
 ### Added
