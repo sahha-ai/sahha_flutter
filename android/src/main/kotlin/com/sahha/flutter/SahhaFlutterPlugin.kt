@@ -29,6 +29,7 @@ import sdk.sahha.android.source.SahhaSettings
 import java.time.ZonedDateTime
 import java.util.Date
 
+private const val TAG = "SahhaFlutterPlugin"
 
 /** SahhaFlutterPlugin */
 class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -48,7 +49,8 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         getBiomarkers,
         getStats,
         getSamples,
-        openAppSettings
+        openAppSettings,
+        postSensorData,
     }
 
     /// The MethodChannel that will the communication between Flutter and native Android
@@ -150,6 +152,10 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
             SahhaMethod.getSamples.name -> {
                 getSamples(call, result)
+            }
+
+            SahhaMethod.postSensorData.name -> {
+                postSensorData()
             }
 
             SahhaMethod.openAppSettings.name -> {
@@ -387,6 +393,14 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 result.success(sensorStatus.ordinal)
             }
         }
+    }
+
+    @Deprecated(
+        message = "postSensorData is only supported on iOS",
+        level = DeprecationLevel.WARNING
+    )
+    private fun postSensorData() {
+        Log.w(TAG, "postSensorData is only supported on iOS")
     }
 
     private fun openAppSettings() {
