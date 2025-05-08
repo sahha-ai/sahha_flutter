@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sahha_flutter/sahha_flutter.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -143,6 +144,23 @@ class HomeView extends StatelessWidget {
               ),
               onPressed: () {
                 Navigator.pushNamed(context, '/web');
+              },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: const Icon(
+                Icons.task_outlined,
+                size: 32,
+              ),
+              label: const Text('Test Post Sensor Data'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                textStyle: const TextStyle(fontSize: 20),
+              ),
+              onPressed: () {
+                SahhaFlutter.postSensorData();
               },
             ),
           ]),

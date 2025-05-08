@@ -1,3 +1,19 @@
+## 1.1.7
+
+### Added
+
+- (iOS) Added `postSensorData` method
+
+### Changed
+
+- (Android) Updated `com.google.android.gms:play-services-location` dependency to the latest version
+
+### Fixed
+
+- n/a
+
+---
+
 ## 1.1.5
 
 ### Added

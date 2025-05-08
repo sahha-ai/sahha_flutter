@@ -279,6 +279,10 @@ class SahhaFlutter {
     }
   }
 
+  static void postSensorData() {
+    _channel.invokeMethod('postSensorData');
+  }
+
   static void openAppSettings() {
     _channel.invokeMethod('openAppSettings');
   }
