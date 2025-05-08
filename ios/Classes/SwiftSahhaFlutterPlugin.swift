@@ -23,6 +23,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case getBiomarkers
         case getStats
         case getSamples
+        case postSensorData
         case openAppSettings
     }
     
@@ -62,6 +63,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
             getStats(call.arguments, result: result)
         case .getSamples:
             getSamples(call.arguments, result: result)
+        case .postSensorData:
+            Sahha.postSensorData()
         case .openAppSettings:
             Sahha.openAppSettings()
         default:
