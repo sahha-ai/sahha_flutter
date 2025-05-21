@@ -1,3 +1,19 @@
+## 1.1.8
+
+### Added
+
+- n/a
+
+### Changed
+
+- (iOS) Changed how data in ingested from HealthKit
+
+### Fixed
+
+- (iOS) Fixed issue with data ingestion causing extreme memory usage
+
+---
+
 ## 1.1.7
 
 ### Added
