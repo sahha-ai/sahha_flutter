@@ -1,3 +1,19 @@
+## 1.1.9
+
+### Added
+
+- n/a
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (iOS) Reverted back to stable iOS version
+
+---
+
 ## 1.1.8
 
 ### Added
@@ -6,7 +22,7 @@
 
 ### Changed
 
-- (iOS) Changed how data in ingested from HealthKit
+- (iOS) Changed how data is ingested from HealthKit
 
 ### Fixed
 
