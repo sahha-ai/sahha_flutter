@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 ## 1.2.0
 
 ### Added
@@ -33,7 +31,6 @@
 
 ---
 
->>>>>>> Stashed changes
 ## 1.1.8
 
 ### Added
