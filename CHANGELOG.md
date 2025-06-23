@@ -1,3 +1,20 @@
+## 1.2.0
+
+### Added
+
+- Added nutrition data.
+- Added compatibility for androidx.lifecycle:lifecycle-runtime-ktx  2.8.7
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 1.1.9
 
 ### Added
