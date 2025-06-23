@@ -1,3 +1,39 @@
+<<<<<<< Updated upstream
+=======
+## 1.2.0
+
+### Added
+
+- Added nutrition data.
+- Added compatibility for androidx.lifecycle:lifecycle-runtime-ktx  2.8.7
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
+## 1.1.9
+
+### Added
+
+- n/a
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- (iOS) Reverted back to stable iOS version
+
+---
+
+>>>>>>> Stashed changes
 ## 1.1.8
 
 ### Added
