@@ -57,6 +57,7 @@ enum SahhaSensor {
   walking_asymmetry_percentage,
   walking_double_support_percentage,
   walking_step_length,
+  energy_consumed
 }
 
 enum SahhaScoreType {
@@ -131,7 +132,8 @@ enum SahhaBiomarkerCategory {
   characteristic,
   reproductive,
   sleep,
-  vitals
+  vitals,
+  nutrition
 }
 
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
