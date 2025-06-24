@@ -1,3 +1,19 @@
+## 1.2.1
+
+### Added
+
+- Adding energy_consumed data point.
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 1.2.0
 
 ### Added
