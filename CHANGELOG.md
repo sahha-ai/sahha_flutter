@@ -1,3 +1,20 @@
+## 1.2.5
+
+### Added
+
+- Synchronised version with other SDK's 
+- Fixed bug with IOS26 blood pressure requiring both Systolic and Diastolic permission.
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 1.2.1
 
 ### Added
