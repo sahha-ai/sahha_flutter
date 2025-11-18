@@ -1,8 +1,24 @@
-## 1.2.6
+## 1.2.7
 
 ### Added
 
 - Hot patch to resolve issue with android foreground service not starting in time. Under some conditions this would cause a crash.
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
+## 1.2.6
+
+### Added
+
+- n/a
 
 ### Changed
 
