@@ -1,3 +1,19 @@
+## 1.3.1
+
+### Added
+
+- Implemented new Sahha IOS SDK.
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- n/a
+
+---
+
 ## 1.2.7
 
 ### Added

@@ -299,32 +299,11 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun postDemographic(@NonNull call: MethodCall, @NonNull result: Result) {
-        val age: Int? = call.argument<Int>("age")
+     
         val gender: String? = call.argument<String>("gender")
-        val country: String? = call.argument<String>("country")
-        val birthCountry: String? = call.argument<String>("birthCountry")
-        val ethnicity: String? = call.argument<String>("ethnicity")
-        val occupation: String? = call.argument<String>("occupation")
-        val industry: String? = call.argument<String>("industry")
-        val incomeRange: String? = call.argument<String>("incomeRange")
-        val education: String? = call.argument<String>("education")
-        val relationship: String? = call.argument<String>("relationship")
-        val locale: String? = call.argument<String>("locale")
-        val livingArrangement: String? = call.argument<String>("livingArrangement")
         val birthDate: String? = call.argument<String>("birthDate")
         var sahhaDemographic = SahhaDemographic(
-            age,
             gender,
-            country,
-            birthCountry,
-            ethnicity,
-            occupation,
-            industry,
-            incomeRange,
-            education,
-            relationship,
-            locale,
-            livingArrangement,
             birthDate
         )
 
