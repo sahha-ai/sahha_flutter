@@ -68,7 +68,11 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         case .openAppSettings:
             Sahha.openAppSettings()
         default:
-            result(FlutterMethodNotImplemented)
+            result(FlutterError(
+                code: "method_not_implemented",
+                message: "Method \(call.method) is not implemented on iOS",
+                details: nil
+            ))
         }
     }
     
@@ -169,42 +173,8 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     private func postDemographic(_ params: Any?, result: @escaping FlutterResult) {
         if let values = params as? [String: Any?] {
             var demographic = SahhaDemographic()
-            if let ageNumber = values["age"] as? NSNumber {
-                let age = ageNumber.intValue
-                demographic.age = age
-            }
             if let gender = values["gender"] as? String {
                 demographic.gender = gender
-            }
-            if let country = values["country"] as? String {
-                demographic.country = country
-            }
-            if let birthCountry = values["birthCountry"] as? String {
-                demographic.birthCountry = birthCountry
-            }
-            if let ethnicity = values["ethnicity"] as? String {
-                demographic.ethnicity = ethnicity
-            }
-            if let occupation = values["occupation"] as? String {
-                demographic.occupation = occupation
-            }
-            if let industry = values["industry"] as? String {
-                demographic.industry = industry
-            }
-            if let incomeRange = values["incomeRange"] as? String {
-                demographic.incomeRange = incomeRange
-            }
-            if let education = values["education"] as? String {
-                demographic.education = education
-            }
-            if let relationship = values["relationship"] as? String {
-                demographic.relationship = relationship
-            }
-            if let locale = values["locale"] as? String {
-                demographic.locale = locale
-            }
-            if let livingArrangement = values["livingArrangement"] as? String {
-                demographic.livingArrangement = livingArrangement
             }
             if let birthDate = values["birthDate"] as? String {
                 demographic.birthDate = birthDate

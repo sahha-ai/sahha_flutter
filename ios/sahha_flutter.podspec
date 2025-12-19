@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'sahha_flutter'
-  s.version          = '1.2.7'
+  s.version          = '1.3.1'
   s.summary          = 'Sahha Flutter SDK'
   s.description      = 'The Sahha SDK provides a convenient way for Flutter apps to connect to the Sahha API.'
   s.homepage         = 'https://sahha.ai'
@@ -13,10 +13,10 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'Sahha', '1.2.5'
-  s.platform = :ios, '14.0'
+  s.dependency 'Sahha', '1.3.1'
+  s.platform = :ios, '15.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-  s.swift_version = '5.0'
+  s.swift_version = '6.0'
 end

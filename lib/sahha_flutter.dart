@@ -248,37 +248,53 @@ class SahhaFlutter {
     }
   }
 
-  static Future<SahhaSensorStatus> getSensorStatus(
-      List<SahhaSensor> sensors) async {
-    try {
-      List<String> sensorStrings =
-          sensors.map((sensor) => sensor.name).toList();
-      int statusInt = await _channel
-          .invokeMethod('getSensorStatus', {'sensors': sensorStrings});
-      SahhaSensorStatus status = SahhaSensorStatus.values[statusInt];
-      return status;
-    } on PlatformException catch (error) {
-      return Future.error(error);
-    } catch (error) {
-      return Future.error(error);
-    }
+static Future<SahhaSensorStatus> getSensorStatus(List<SahhaSensor> sensors) async {
+  try {
+    final sensorStrings = sensors.map((s) => s.name).toList();
+    final raw = await _channel.invokeMethod('getSensorStatus', {'sensors': sensorStrings});
+    return _statusFromNative(raw);
+  } on PlatformException catch (error) {
+    return Future.error(error);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+
+static SahhaSensorStatus _statusFromNative(dynamic raw) {
+  if (raw is int) {
+    return SahhaSensorStatus.values[raw];
   }
 
-  static Future<SahhaSensorStatus> enableSensors(
-      List<SahhaSensor> sensors) async {
-    try {
-      List<String> sensorStrings =
-          sensors.map((sensor) => sensor.name).toList();
-      int statusInt = await _channel
-          .invokeMethod('enableSensors', {'sensors': sensorStrings});
-      SahhaSensorStatus status = SahhaSensorStatus.values[statusInt];
-      return status;
-    } on PlatformException catch (error) {
-      return Future.error(error);
-    } catch (error) {
-      return Future.error(error);
-    }
+  if (raw is String) {
+    final s = raw.trim().toLowerCase();
+
+    // If native ever returns "0", "1", etc.
+    final asInt = int.tryParse(s);
+    if (asInt != null) return SahhaSensorStatus.values[asInt];
+
+    // If native returns enum names like "enabled"
+    return SahhaSensorStatus.values.firstWhere(
+      (e) => e.name.toLowerCase() == s,
+      orElse: () => throw StateError('Unknown SahhaSensorStatus: "$raw"'),
+    );
   }
+
+  throw StateError('Unexpected status type: ${raw.runtimeType} ($raw)');
+}
+
+static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async {
+  try {
+    final sensorStrings = sensors.map((s) => s.name).toList();
+    final raw = await _channel.invokeMethod('enableSensors', {'sensors': sensorStrings});
+    return _statusFromNative(raw);
+  } on PlatformException catch (error) {
+    return Future.error(error);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
 
   static void postSensorData() {
     _channel.invokeMethod('postSensorData');
