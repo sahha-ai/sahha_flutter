@@ -19,6 +19,12 @@ class ProfileState extends State<ProfileView> {
   String gender = '';
 
   @override
+  void dispose() {
+    ageController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
 
@@ -47,15 +53,20 @@ class ProfileState extends State<ProfileView> {
   }
 
   onTapSave(BuildContext context) {
-    if (ageString.isEmpty) {
+    final ageText = ageController.text.trim(); // <-- always current
+    final parsedAge = int.tryParse(ageText);
+
+    if (ageText.isEmpty) {
       showAlertDialog(context, 'MISSING INFO', "You need to input an AGE");
-    } else if (int.tryParse(ageString) == null) {
+    } else if (parsedAge == null) {
       showAlertDialog(context, 'MISSING INFO', "AGE must be a number");
     } else if (gender.isEmpty) {
       showAlertDialog(context, 'MISSING INFO', "You need to input a GENDER");
     } else {
+      ageString = ageText; // keep your state consistent (optional)
       setPrefs();
-      var demographic = {'age': int.tryParse(ageString), 'gender': gender};
+
+      var demographic = {'age': parsedAge, 'gender': gender};
       SahhaFlutter.postDemographic(demographic).then((success) {
         debugPrint(success.toString());
         showAlertDialog(context, "SAVE", success.toString());
