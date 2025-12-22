@@ -299,12 +299,12 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun postDemographic(@NonNull call: MethodCall, @NonNull result: Result) {
-     
         val gender: String? = call.argument<String>("gender")
         val birthDate: String? = call.argument<String>("birthDate")
-        var sahhaDemographic = SahhaDemographic(
-            gender,
-            birthDate
+
+        val sahhaDemographic = SahhaDemographic(
+            gender = gender,
+            birthDate = birthDate
         )
 
         Sahha.postDemographic(sahhaDemographic) { error, success ->
@@ -315,6 +315,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         }
     }
+
 
     private fun getSensorStatus(@NonNull call: MethodCall, @NonNull result: Result) {
         val sensors: List<String>? = call.argument<List<String>>("sensors")
