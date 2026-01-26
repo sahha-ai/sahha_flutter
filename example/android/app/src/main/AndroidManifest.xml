@@ -48,7 +48,8 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Sahha Demo">
+        android:label="Sahha Demo"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".MainActivity"

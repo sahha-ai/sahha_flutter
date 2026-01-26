@@ -15,17 +15,17 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import sdk.sahha.android.source.Sahha
-import sdk.sahha.android.source.SahhaBiomarkerCategory
-import sdk.sahha.android.source.SahhaBiomarkerType
-import sdk.sahha.android.source.SahhaConverterUtility
-import sdk.sahha.android.source.SahhaDemographic
-import sdk.sahha.android.source.SahhaEnvironment
-import sdk.sahha.android.source.SahhaFramework
-import sdk.sahha.android.source.SahhaNotificationConfiguration
-import sdk.sahha.android.source.SahhaScoreType
-import sdk.sahha.android.source.SahhaSensor
-import sdk.sahha.android.source.SahhaSettings
+import ai.sahha.api.Sahha
+import ai.sahha.api.biomarkers.SahhaBiomarkerCategory
+import ai.sahha.api.biomarkers.SahhaBiomarkerType
+//import sdk.sahha.android.source.SahhaConverterUtility
+import ai.sahha.api.demographic.SahhaDemographic
+import ai.sahha.api.settings.SahhaEnvironment
+import ai.sahha.api.notifications.SahhaNotificationConfiguration
+import ai.sahha.api.settings.SahhaFramework
+import ai.sahha.api.score.SahhaScoreType
+import ai.sahha.api.sensors.SahhaSensor
+import ai.sahha.api.settings.SahhaSettings
 import java.time.ZonedDateTime
 import java.util.Date
 
@@ -175,7 +175,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         if (environment == null || notificationSettings == null) {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.configure() parameters invalid",
                 "SahhaFlutterPlugin",
                 "configure"
@@ -191,16 +191,16 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         try {
             val settings = SahhaSettings(
-                framework = SahhaFramework.flutter,
-                environment = SahhaEnvironment.valueOf(environment),
+                framework = SahhaFramework.FLUTTER,
+                environment = SahhaEnvironment.valueOf(environment.uppercase()),
                 notificationSettings = SahhaNotificationConfiguration(
-                    icon = SahhaConverterUtility
-                        .stringToDrawableResource(
+                    iconResourceId =
+                        stringToDrawableResource(
                             context,
-                            notificationSettings["icon"]
-                        ),
-                    title = notificationSettings["title"],
-                    shortDescription = notificationSettings["shortDescription"]
+                            notificationSettings["icon"] ?:"notification"
+                        ) ?: 0,
+                    title = notificationSettings["title"] ?: "Title",
+                    shortDescription = notificationSettings["shortDescription"] ?: "Short description"
                 )
             )
 
@@ -219,7 +219,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun authenticate(@NonNull call: MethodCall, @NonNull result: Result) {
-        Sahha.postError(SahhaFramework.flutter, "TEST", "SahhaFlutterPlugin", "authenticate")
+        Sahha.postError(SahhaFramework.FLUTTER, "TEST", "SahhaFlutterPlugin", "authenticate")
 
         val appId: String? = call.argument<String>("appId")
         val appSecret: String? = call.argument<String>("appSecret")
@@ -236,7 +236,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.authenticate() parameters invalid",
                 "SahhaFlutterPlugin",
                 "authenticate",
@@ -259,7 +259,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.authenticateToken() parameters invalid",
                 "SahhaFlutterPlugin",
                 "authenticateToken",
@@ -323,7 +323,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         if (sensors != null) {
             try {
-                sensorsList = sensors.map { SahhaSensor.valueOf(it) }.toSet()
+                sensorsList = sensors.map { SahhaSensor.valueOf(it.uppercase()) }.toSet()
             } catch (e: Exception) {
                 result.error("Sahha Error", e.message, e)
                 return
@@ -337,10 +337,11 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
 
-        Sahha.getSensorStatus(context, sensorsList) { error, sensorStatus ->
+        Sahha.getSensorStatus( sensorsList) { error, sensorStatus ->
             if (error != null) {
                 result.error("Sahha Error", error, null)
             } else {
+                Log.d("getSensorStatus Result", sensorStatus.name);
                 result.success(sensorStatus.ordinal)
             }
         }
@@ -352,7 +353,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         if (sensors != null) {
             try {
-                sensorsList = sensors.map { SahhaSensor.valueOf(it) }.toSet()
+                sensorsList = sensors.map { SahhaSensor.valueOf(it.uppercase()) }.toSet()
             } catch (e: Exception) {
                 result.error("Sahha Error", e.message, e)
                 return
@@ -366,11 +367,12 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
 
-        Sahha.enableSensors(context, sensorsList) { error, sensorStatus ->
+        Sahha.enableSensors(sensorsList) { error, sensorStatus ->
+            Log.d("Sahha", "enableSensors result: error=$error | sensor status=$sensorStatus")
             if (error != null) {
                 result.error("Sahha Error", error, null)
             } else {
-                result.success(sensorStatus.ordinal)
+                result.success(sensorStatus)
             }
         }
     }
@@ -384,7 +386,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun openAppSettings() {
-        Sahha.openAppSettings(context);
+        Sahha.openAppSettings();
     }
 
     private fun getScores(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -395,7 +397,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "types $types")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getScores() score types missing",
                 "SahhaFlutterPlugin",
                 "getScores",
@@ -409,7 +411,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "startDateTime $startDateTime")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getScores() startDateTime missing",
                 "SahhaFlutterPlugin",
                 "getScores",
@@ -423,7 +425,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "endDateTime $endDateTime")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getScores() endDateTime missing",
                 "SahhaFlutterPlugin",
                 "getScores",
@@ -431,9 +433,9 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             )
             Log.d("Sahha", "endDateTime missing")
         }
-
+        Log.d("Sahha","getScores is going call now ");
         if (startDateTime != null && endDateTime != null && types != null) {
-            val sahhaScoreTypes = types.map { SahhaScoreType.valueOf(it) }.toSet()
+            val sahhaScoreTypes = types.map { SahhaScoreType.valueOf(it.uppercase()) }.toSet()
             Sahha.getScores(
                 sahhaScoreTypes,
                 Pair(Date(startDateTime), Date(endDateTime)),
@@ -441,10 +443,11 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (error != null) {
                     result.error("Sahha Error", error, null)
                 } else if (value != null) {
+                    Log.d("Sahha","getScores Result "+value);
                     result.success(value)
                 } else {
                     Sahha.postError(
-                        SahhaFramework.flutter,
+                        SahhaFramework.FLUTTER,
                         "SahhaFlutter.getScores() scores missing",
                         "SahhaFlutterPlugin",
                         "getScores",
@@ -455,7 +458,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getScores() parameters invalid",
                 "SahhaFlutterPlugin",
                 "getScores",
@@ -476,7 +479,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "categories $categories")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getBiomarkers() biomarker categories missing",
                 "SahhaFlutterPlugin",
                 "getBiomarkers",
@@ -490,7 +493,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "types $types")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getBiomarkers() biomarker types missing",
                 "SahhaFlutterPlugin",
                 "getBiomarkers",
@@ -504,7 +507,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "startDateTime $startDateTime")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getBiomarkers() startDateTime missing",
                 "SahhaFlutterPlugin",
                 "getBiomarkers",
@@ -518,7 +521,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "endDateTime $endDateTime")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getBiomarkers() endDateTime missing",
                 "SahhaFlutterPlugin",
                 "getBiomarkers",
@@ -528,8 +531,8 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         if (startDateTime != null && endDateTime != null && categories != null && types != null) {
-            val biomarkerCategories = categories.map { SahhaBiomarkerCategory.valueOf(it) }.toSet()
-            val biomarkerTypes = types.map { SahhaBiomarkerType.valueOf(it) }.toSet()
+            val biomarkerCategories = categories.map { SahhaBiomarkerCategory.valueOf(it.uppercase()) }.toSet()
+            val biomarkerTypes = types.map { SahhaBiomarkerType.valueOf(it.uppercase()) }.toSet()
             Sahha.getBiomarkers(
                 biomarkerCategories,
                 biomarkerTypes,
@@ -541,7 +544,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.success(value)
                 } else {
                     Sahha.postError(
-                        SahhaFramework.flutter,
+                        SahhaFramework.FLUTTER,
                         "SahhaFlutter.getBiomarkers() scores missing",
                         "SahhaFlutterPlugin",
                         "getBiomarkers",
@@ -552,7 +555,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getBiomarkers() parameters invalid",
                 "SahhaFlutterPlugin",
                 "getBiomarkers",
@@ -573,7 +576,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "sensor $sensor")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getStats() sensor missing",
                 "SahhaFlutterPlugin",
                 "getStats",
@@ -587,7 +590,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "startDateTime $startDateTime")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getStats() startDateTime missing",
                 "SahhaFlutterPlugin",
                 "getStats",
@@ -601,7 +604,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "endDatTime $endDateTime")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getStats() endDateTime missing",
                 "SahhaFlutterPlugin",
                 "getStats",
@@ -612,7 +615,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         if (sensor != null && startDateTime != null && endDateTime != null) {
             Sahha.getStats(
-                SahhaSensor.valueOf(sensor),
+                SahhaSensor.valueOf(sensor.uppercase()),
                 Pair(Date(startDateTime), Date(endDateTime)),
             ) { error, stats ->
                 if (error != null) {
@@ -630,7 +633,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.success(statsJson);
                 } else {
                     Sahha.postError(
-                        SahhaFramework.flutter,
+                        SahhaFramework.FLUTTER,
                         "SahhaFlutter.getStats() stats missing",
                         "SahhaFlutterPlugin",
                         "getStats",
@@ -641,7 +644,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getStats() parameters invalid",
                 "SahhaFlutterPlugin",
                 "getStats",
@@ -662,7 +665,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "sensor $sensor")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getSamples() sensor missing",
                 "SahhaFlutterPlugin",
                 "getSamples",
@@ -676,7 +679,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "startDate $startDateTime")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getSamples() startDateTime missing",
                 "SahhaFlutterPlugin",
                 "getStats",
@@ -690,7 +693,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("Sahha", "endDateTime $endDateTime")
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getSamples() endDateTime missing",
                 "SahhaFlutterPlugin",
                 "getSamples",
@@ -701,7 +704,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         if (sensor != null && startDateTime != null && endDateTime != null) {
             Sahha.getSamples(
-                SahhaSensor.valueOf(sensor),
+                SahhaSensor.valueOf(sensor.uppercase()),
                 Pair(Date(startDateTime), Date(endDateTime)),
             ) { error, samples ->
                 if (error != null) {
@@ -719,7 +722,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.success(samplesJson);
                 } else {
                     Sahha.postError(
-                        SahhaFramework.flutter,
+                        SahhaFramework.FLUTTER,
                         "SahhaFlutter.getSamples() stats missing",
                         "SahhaFlutterPlugin",
                         "getSamples",
@@ -730,7 +733,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         } else {
             Sahha.postError(
-                SahhaFramework.flutter,
+                SahhaFramework.FLUTTER,
                 "SahhaFlutter.getSamples() parameters invalid",
                 "SahhaFlutterPlugin",
                 "getSamples",
@@ -741,6 +744,14 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 "SahhaFlutter.getSamples() parameters invalid",
                 null
             )
+        }
+    }
+
+    fun stringToDrawableResource(context: Context, iconString: String?): Int? {
+        return try {
+            context.resources.getIdentifier(iconString, "drawable", context.packageName)
+        } catch (e: Exception) {
+            null
         }
     }
 

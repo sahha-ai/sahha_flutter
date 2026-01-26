@@ -34,6 +34,9 @@ class SamplesState extends State<SamplesView> {
       const encoder = JsonEncoder.withIndent('      ');
       final prettyJson = encoder.convert(data);
       showAlertDialog(context, "SAMPLES", prettyJson);
+    }).catchError((error, stackTrace) {
+      showAlertDialog(context, "Error", error.toString());
+      return null;
     });
   }
 

@@ -27,6 +27,7 @@ class SensorPermissionState extends State<SensorPermissionView> {
       debugPrint('Get Some Sensors ' + sensorStatus.name);
     }).catchError((error) {
       debugPrint(error.toString());
+      showAlertDialog(context,"Error",error.toString());
     });
   }
 
@@ -38,6 +39,7 @@ class SensorPermissionState extends State<SensorPermissionView> {
       debugPrint('Get Empty Sensors ' + sensorStatus.name);
     }).catchError((error) {
       debugPrint(error.toString());
+      showAlertDialog(context,"Error",error.toString());
     });
   }
 
@@ -51,6 +53,7 @@ class SensorPermissionState extends State<SensorPermissionView> {
       debugPrint('Enable Some Sensors ' + sensorStatus.name);
     }).catchError((error) {
       debugPrint(error.toString());
+      showAlertDialog(context,"Error",error.toString());
     });
   }
 
@@ -62,6 +65,7 @@ class SensorPermissionState extends State<SensorPermissionView> {
       debugPrint('Enable Empty Sensors ' + sensorStatus.name);
     }).catchError((error) {
       debugPrint(error.toString());
+      showAlertDialog(context,"Error",error.toString());
     });
   }
 
@@ -69,7 +73,27 @@ class SensorPermissionState extends State<SensorPermissionView> {
     debugPrint('Open App Settings');
     SahhaFlutter.openAppSettings();
   }
+  showAlertDialog(BuildContext context, String title, String message) {
+    AlertDialog alert = AlertDialog(
+      title: Text(title),
+      content: SingleChildScrollView(child: Text(message)),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('OK'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
 
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

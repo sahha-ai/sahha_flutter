@@ -28,9 +28,9 @@ class AppState extends State<App> {
 
     // Use default values
     SahhaFlutter.configure(
-      environment: SahhaEnvironment.sandbox,
+      environment: SahhaEnvironment.development,
     )
-        .then((success) => {debugPrint(success.toString())})
+        .then((success) => {debugPrint("Configure Success Result: $success")})
         .catchError((error, stackTrace) => {debugPrint(error.toString())});
 
 /*

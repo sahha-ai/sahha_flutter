@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-enum SahhaEnvironment { sandbox, production }
+enum SahhaEnvironment { development,sandbox, production}
 
 enum SahhaSensor {
   gender,
@@ -278,6 +278,13 @@ static SahhaSensorStatus _statusFromNative(dynamic raw) {
       (e) => e.name.toLowerCase() == s,
       orElse: () => throw StateError('Unknown SahhaSensorStatus: "$raw"'),
     );
+  }
+  if (raw is bool){
+    if(raw) {
+      return SahhaSensorStatus.enabled;
+    } else {
+      return SahhaSensorStatus.pending;
+    }
   }
 
   throw StateError('Unexpected status type: ${raw.runtimeType} ($raw)');

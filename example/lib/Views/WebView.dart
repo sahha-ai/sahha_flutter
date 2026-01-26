@@ -100,12 +100,12 @@ Page resource error:
       debugPrint(value);
       if (value != null) {
         controller.loadRequest(
-          Uri.parse("https://sandbox.webview.sahha.ai/app"),
+          Uri.parse("https://development.webview.sahha.ai/app"),
           headers: {"Authorization": value},
         );
       } else {
         controller.loadRequest(
-          Uri.parse("https://sandbox.webview.sahha.ai/app"),
+          Uri.parse("https://development.webview.sahha.ai/app"),
         );
       }
     }).catchError((error, stackTrace) {
