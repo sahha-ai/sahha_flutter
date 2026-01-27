@@ -95,6 +95,15 @@ You must be able to justify reasons behind requiring the sensor permissions, [th
 - Select your `App Target` and navigate to the `Info` tab.
 - Click the `+` button to add a new key and choose `Privacy - Health Share Usage Description`.
 - Provide a clear description, such as: "*This app needs your health info to deliver mood predictions*."
+- Also add `Privacy - Motion Usage Description` (`NSMotionUsageDescription`) key.
+- Provide a description, such as: "*This app needs motion data to track your activity and provide health insights*."
+
+  Or add the **Motion Usage Description** directly in your `Info.plist` file:
+
+  ```xml
+  <key>NSMotionUsageDescription</key>
+  <string>This app needs motion data to track your activity and provide health insights</string>
+  ```
 
 For more detailed instructions, refer to our [setup guide](https://docs.sahha.ai/docs/data-flow/sdk/setup#minimum-requirements).
 
