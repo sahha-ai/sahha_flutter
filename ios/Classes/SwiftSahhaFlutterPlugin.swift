@@ -248,9 +248,7 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func getScores(_ params: Any?, result: @escaping FlutterResult) {
-        Sahha.postError(framework: .flutter, message: "TEST", path: "SwiftSahhaFlutterPlugin", method: "getScores", body: params.debugDescription)
-        
+    private func getScores(_ params: Any?, result: @escaping FlutterResult) {        
         var scoreTypes: Set<SahhaScoreType> = []
         if let values = params as? [String: Any?], let types = values["types"] as? [String], let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
             

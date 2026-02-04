@@ -219,8 +219,6 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun authenticate(@NonNull call: MethodCall, @NonNull result: Result) {
-        Sahha.postError(SahhaFramework.FLUTTER, "TEST", "SahhaFlutterPlugin", "authenticate")
-
         val appId: String? = call.argument<String>("appId")
         val appSecret: String? = call.argument<String>("appSecret")
         val externalId: String? = call.argument<String>("externalId")
