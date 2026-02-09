@@ -37,8 +37,8 @@ class BiomarkersState extends State<BiomarkersView> {
               startDateTime: DateTime.now(),
               endDateTime: DateTime.now())
           .then((value) {
-        List<dynamic> data = jsonDecode(value);
-        debugPrint(data.firstOrNull?.toString());
+        final data = jsonDecode(value);
+        debugPrint(data.toString());
         showAlertDialog(context, value);
       }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
@@ -49,8 +49,8 @@ class BiomarkersState extends State<BiomarkersView> {
               startDateTime: week,
               endDateTime: DateTime.now())
           .then((value) {
-        List<dynamic> data = jsonDecode(value);
-        debugPrint(data.firstOrNull?.toString());
+        final data = jsonDecode(value);
+        debugPrint(data.toString());
         showAlertDialog(context, value);
       }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     }
