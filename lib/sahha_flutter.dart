@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-enum SahhaEnvironment { sandbox, production }
+enum SahhaEnvironment { development,sandbox, production}
 
 enum SahhaSensor {
   gender,
@@ -147,14 +147,16 @@ class SahhaNotificationSettings {
 class SahhaFlutter {
   static const MethodChannel _channel = MethodChannel('sahha_flutter');
 
-  static Future<bool> configure(
-      {required SahhaEnvironment environment,
-      Map<String, String> notificationSettings =
-          const <String, String>{}}) async {
+  static Future<bool> configure({
+    required SahhaEnvironment environment,
+    Map<String, String> notificationSettings = const <String, String>{},
+    bool enableMotionTrigger = false, 
+  }) async {
     try {
-      bool success = await _channel.invokeMethod('configure', {
+      final bool success = await _channel.invokeMethod('configure', {
         'environment': environment.name,
-        'notificationSettings': notificationSettings
+        'notificationSettings': notificationSettings,
+        'enableMotionTrigger': enableMotionTrigger,
       });
       return success;
     } on PlatformException catch (error) {
@@ -163,6 +165,7 @@ class SahhaFlutter {
       return Future.error(error);
     }
   }
+
 
   static Future<bool> isAuthenticated() async {
     try {
@@ -278,6 +281,13 @@ static SahhaSensorStatus _statusFromNative(dynamic raw) {
       (e) => e.name.toLowerCase() == s,
       orElse: () => throw StateError('Unknown SahhaSensorStatus: "$raw"'),
     );
+  }
+  if (raw is bool){
+    if(raw) {
+      return SahhaSensorStatus.enabled;
+    } else {
+      return SahhaSensorStatus.pending;
+    }
   }
 
   throw StateError('Unexpected status type: ${raw.runtimeType} ($raw)');

@@ -37,8 +37,8 @@ class ScoresState extends State<ScoresView> {
         SahhaScoreType.wellbeing
       ], startDateTime: DateTime.now(), endDateTime: DateTime.now())
           .then((value) {
-        List<dynamic> data = jsonDecode(value);
-        debugPrint(data.firstOrNull?.toString());
+        final data = jsonDecode(value);
+        debugPrint(data.toString());
         showAlertDialog(context, value);
       }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     } else {
@@ -49,8 +49,8 @@ class ScoresState extends State<ScoresView> {
         SahhaScoreType.wellbeing
       ], startDateTime: week, endDateTime: DateTime.now())
           .then((value) {
-        List<dynamic> data = jsonDecode(value);
-        debugPrint(data.firstOrNull?.toString());
+        final data = jsonDecode(value);
+        debugPrint(data.toString());
         showAlertDialog(context, value);
       }).catchError((error, stackTrace) => {debugPrint(error.toString())});
     }

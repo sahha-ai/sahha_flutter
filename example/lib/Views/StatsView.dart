@@ -34,6 +34,9 @@ class StatsState extends State<StatsView> {
       const encoder = JsonEncoder.withIndent('      ');
       final prettyJson = encoder.convert(data);
       showAlertDialog(context, "STATS", prettyJson);
+    }).catchError((error, stackTrace) {
+      showAlertDialog(context, "Error", error.toString());
+      return null;
     });
   }
 
