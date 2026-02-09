@@ -45,7 +45,7 @@ class SensorPermissionState extends State<SensorPermissionView> {
 
   onTapEnableSome(BuildContext context) {
     SahhaFlutter.enableSensors(
-            [SahhaSensor.sleep, SahhaSensor.steps, SahhaSensor.heart_rate, SahhaSensor.blood_pressure_diastolic])
+            [SahhaSensor.steps, SahhaSensor.exercise, SahhaSensor.device_lock, SahhaSensor.sleep, SahhaSensor.floors_climbed, SahhaSensor.heart_rate, SahhaSensor.heart_rate_variability_rmssd, SahhaSensor.heart_rate_variability_sdnn])
         .then((value) {
       setState(() {
         sensorStatus = value;

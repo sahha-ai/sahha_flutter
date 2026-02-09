@@ -180,7 +180,7 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 "SahhaFlutterPlugin",
                 "configure"
             )
-            result.error("Sahha Error", "SahhaFlutter.configure() parameters invalid", null)
+            result.error("Sahha Error", "SahhaFlutter.configure() parameters invalid - Ensure an environment and notification settings are provided.", null)
             return
         }
 

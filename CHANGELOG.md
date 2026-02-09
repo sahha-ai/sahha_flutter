@@ -1,3 +1,28 @@
+## 1.3.5
+
+### Added
+
+- New Android SDK integrated, this is a full refactor of the Sahha Android SDK. 
+- Improved Native Step and Sleep tracking - Requires Android Manifest to include Write permissions for Steps and Sleep.
+- New Synchronisation and batching logic for Android.
+
+### Changed
+
+- Upgraded to the latest stable Flutter version 3.38.7.
+- Updated to the latest supported Dart version 3.10.7.
+- Upgraded to the latest AGP version 9.0.
+- Upgraded Kotlin to the latest stable version 2.3.0.
+- Motion Permission is now optional, this can be configured on or off by passing enableMotionTrigger: true to the configure function.
+- Background task protection and Upload loop reliability improved.
+
+### Fixed
+
+- Fixed a bug where the network monitor couldn't restart after being stopped.
+- Fixed discrepancy between Android and IOS Score / Biomarker response objects.
+- Fixed issue where IOS was returning Score Factors without ID or Unit.
+
+---
+
 ## 1.3.3
 
 ### Added

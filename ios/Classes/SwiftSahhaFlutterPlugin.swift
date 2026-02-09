@@ -77,20 +77,43 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     private func configure(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let environment = values["environment"] as? String, let configEnvironment = SahhaEnvironment(rawValue: environment) {
-            
-            var settings = SahhaSettings(environment: configEnvironment)
-            settings.framework = .flutter
-            
-            Sahha.configure(settings) {
-                print("Sahha | Flutter configured")
-                result(true)
-            }
-            
-        } else {
+        guard
+            let values = params as? [String: Any?],
+            let environment = values["environment"] as? String,
+            let configEnvironment = SahhaEnvironment(rawValue: environment)
+        else {
             let message = "SahhaFlutter.configure() parameters are invalid"
-            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "configure", body: params.debugDescription)
+            Sahha.postError(
+                framework: .flutter,
+                message: message,
+                path: "SwiftSahhaFlutterPlugin",
+                method: "configure",
+                body: params.debugDescription
+            )
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
+            return
+        }
+
+        // Optional: enableMotionTrigger (default false)
+        let enableMotionTrigger: Bool = {
+            if let boolVal = values["enableMotionTrigger"] as? Bool {
+                return boolVal
+            }
+            if let numVal = values["enableMotionTrigger"] as? NSNumber {
+                return numVal.boolValue
+            }
+            return false
+        }()
+
+        var settings = SahhaSettings(
+            environment: configEnvironment,
+            enableMotionTrigger: enableMotionTrigger
+        )
+        settings.framework = .flutter
+
+        Sahha.configure(settings) {
+            print("Sahha | Flutter configured")
+            result(true)
         }
     }
     
