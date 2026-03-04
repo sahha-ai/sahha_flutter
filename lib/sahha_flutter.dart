@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-enum SahhaEnvironment { development,sandbox, production}
+enum SahhaEnvironment { sandbox, production}
 
 enum SahhaSensor {
   gender,

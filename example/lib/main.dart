@@ -28,8 +28,7 @@ class AppState extends State<App> {
 
     // Use default values
     SahhaFlutter.configure(
-      environment: SahhaEnvironment.development,
-      enableMotionTrigger: true
+      environment: SahhaEnvironment.sandbox
     )
         .then((success) => {debugPrint("Configure Success Result: $success")})
         .catchError((error, stackTrace) => {debugPrint(error.toString())});
