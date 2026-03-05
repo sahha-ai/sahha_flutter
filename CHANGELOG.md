@@ -1,3 +1,19 @@
+## 1.3.8
+
+### Added
+
+- 
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- Fixed issue on Android where GetSensorStatus reporting IOS sensors
+
+---
+
 ## 1.3.7
 
 ### Added
