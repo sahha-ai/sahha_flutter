@@ -1,3 +1,35 @@
+## 1.3.8
+
+### Added
+
+- 
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- Fixed issue on Android where GetSensorStatus reporting IOS sensors
+
+---
+
+## 1.3.7
+
+### Added
+
+- 
+
+### Changed
+
+- n/a
+
+### Fixed
+
+- Fixed issue on Android and IOS where GetSensorStatus was not reporting if background services were running.
+
+---
+
 ## 1.3.5
 
 ### Added
