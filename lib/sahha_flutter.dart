@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-enum SahhaEnvironment { sandbox, production}
+enum SahhaEnvironment { development, sandbox, production}
 
 enum SahhaSensor {
   gender,
@@ -56,7 +56,10 @@ enum SahhaSensor {
   walking_asymmetry_percentage,
   walking_double_support_percentage,
   walking_step_length,
-  energy_consumed
+  energy_consumed,
+  reproductive,
+  symptom,
+  nutrition
 }
 
 enum SahhaScoreType {
@@ -122,7 +125,7 @@ enum SahhaBiomarkerType {
   blood_pressure_systolic,
   blood_pressure_diastolic,
   body_temperature_basal,
-  skin_temperature_sleep,
+  skin_temperature_sleep
 }
 
 enum SahhaBiomarkerCategory {
@@ -130,6 +133,7 @@ enum SahhaBiomarkerCategory {
   body,
   characteristic,
   reproductive,
+  symptom,
   sleep,
   vitals,
   nutrition
@@ -400,4 +404,5 @@ static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async 
       return Future.error(error);
     }
   }
+
 }

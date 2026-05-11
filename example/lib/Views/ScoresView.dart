@@ -29,30 +29,24 @@ class ScoresState extends State<ScoresView> {
     setState(() {});
   }
 
-  onTapGetScores(BuildContext context, bool isDaily) {
-    if (isDaily) {
-      SahhaFlutter.getScores(types: [
-        SahhaScoreType.activity,
-        SahhaScoreType.sleep,
-        SahhaScoreType.wellbeing
-      ], startDateTime: DateTime.now(), endDateTime: DateTime.now())
-          .then((value) {
-        final data = jsonDecode(value);
-        debugPrint(data.toString());
-        showAlertDialog(context, value);
-      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
-    } else {
-      var week = DateTime.now().subtract(const Duration(days: 7));
-      SahhaFlutter.getScores(types: [
-        SahhaScoreType.activity,
-        SahhaScoreType.sleep,
-        SahhaScoreType.wellbeing
-      ], startDateTime: week, endDateTime: DateTime.now())
-          .then((value) {
-        final data = jsonDecode(value);
-        debugPrint(data.toString());
-        showAlertDialog(context, value);
-      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
+  onTapGetScores(BuildContext context, bool isDaily) async {
+    try {
+      final startDateTime = isDaily
+          ? DateTime.now()
+          : DateTime.now().subtract(const Duration(days: 7));
+      final value = await SahhaFlutter.getScores(
+          types: [
+            SahhaScoreType.activity,
+            SahhaScoreType.sleep,
+            SahhaScoreType.wellbeing
+          ],
+          startDateTime: startDateTime,
+          endDateTime: DateTime.now());
+      final data = jsonDecode(value);
+      debugPrint(data.toString());
+      showAlertDialog(context, value);
+    } catch (error) {
+      debugPrint(error.toString());
     }
   }
 

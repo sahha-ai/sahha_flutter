@@ -29,30 +29,21 @@ class BiomarkersState extends State<BiomarkersView> {
     setState(() {});
   }
 
-  onTapGetBiomarkers(BuildContext context, bool isDaily) {
-    if (isDaily) {
-      SahhaFlutter.getBiomarkers(
-              categories: SahhaBiomarkerCategory.values,
-              types: SahhaBiomarkerType.values,
-              startDateTime: DateTime.now(),
-              endDateTime: DateTime.now())
-          .then((value) {
-        final data = jsonDecode(value);
-        debugPrint(data.toString());
-        showAlertDialog(context, value);
-      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
-    } else {
-      var week = DateTime.now().subtract(const Duration(days: 7));
-      SahhaFlutter.getBiomarkers(
-              categories: SahhaBiomarkerCategory.values,
-              types: SahhaBiomarkerType.values,
-              startDateTime: week,
-              endDateTime: DateTime.now())
-          .then((value) {
-        final data = jsonDecode(value);
-        debugPrint(data.toString());
-        showAlertDialog(context, value);
-      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
+  onTapGetBiomarkers(BuildContext context, bool isDaily) async {
+    try {
+      final startDateTime = isDaily
+          ? DateTime.now()
+          : DateTime.now().subtract(const Duration(days: 7));
+      final value = await SahhaFlutter.getBiomarkers(
+          categories: SahhaBiomarkerCategory.values,
+          types: SahhaBiomarkerType.values,
+          startDateTime: startDateTime,
+          endDateTime: DateTime.now());
+      final data = jsonDecode(value);
+      debugPrint(data.toString());
+      showAlertDialog(context, value);
+    } catch (error) {
+      debugPrint(error.toString());
     }
   }
 

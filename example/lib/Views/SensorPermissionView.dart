@@ -17,56 +17,58 @@ class SensorPermissionState extends State<SensorPermissionView> {
     onTapGetSome(context);
   }
 
-  onTapGetSome(BuildContext context) {
-    SahhaFlutter.getSensorStatus(
-            [SahhaSensor.steps, SahhaSensor.sleep])
-        .then((value) {
+  onTapGetSome(BuildContext context) async {
+    try {
+      final value = await SahhaFlutter.getSensorStatus(
+          SahhaSensor.values);
       setState(() {
         sensorStatus = value;
       });
       debugPrint('Get Some Sensors ' + sensorStatus.name);
-    }).catchError((error) {
+    } catch (error) {
       debugPrint(error.toString());
-      showAlertDialog(context,"Error",error.toString());
-    });
+      showAlertDialog(context, "Error", error.toString());
+    }
   }
 
-  onTapGetEmpty(BuildContext context) {
-    SahhaFlutter.getSensorStatus([]).then((value) {
+  onTapGetEmpty(BuildContext context) async {
+    try {
+      final value = await SahhaFlutter.getSensorStatus([]);
       setState(() {
         sensorStatus = value;
       });
       debugPrint('Get Empty Sensors ' + sensorStatus.name);
-    }).catchError((error) {
+    } catch (error) {
       debugPrint(error.toString());
-      showAlertDialog(context,"Error",error.toString());
-    });
+      showAlertDialog(context, "Error", error.toString());
+    }
   }
 
-  onTapEnableSome(BuildContext context) {
-    SahhaFlutter.enableSensors(
-            [SahhaSensor.steps, SahhaSensor.sleep])
-        .then((value) {
+  onTapEnableSome(BuildContext context) async {
+    try {
+      final value = await SahhaFlutter.enableSensors(
+          SahhaSensor.values);
       setState(() {
         sensorStatus = value;
       });
       debugPrint('Enable Some Sensors ' + sensorStatus.name);
-    }).catchError((error) {
+    } catch (error) {
       debugPrint(error.toString());
-      showAlertDialog(context,"Error",error.toString());
-    });
+      showAlertDialog(context, "Error", error.toString());
+    }
   }
 
-  onTapEnableEmpty(BuildContext context) {
-    SahhaFlutter.enableSensors([]).then((value) {
+  onTapEnableEmpty(BuildContext context) async {
+    try {
+      final value = await SahhaFlutter.enableSensors([]);
       setState(() {
         sensorStatus = value;
       });
       debugPrint('Enable Empty Sensors ' + sensorStatus.name);
-    }).catchError((error) {
+    } catch (error) {
       debugPrint(error.toString());
-      showAlertDialog(context,"Error",error.toString());
-    });
+      showAlertDialog(context, "Error", error.toString());
+    }
   }
 
   openAppSettings(BuildContext context) {

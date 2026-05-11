@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
 import 'package:sahha_flutter_example/Views/AuthenticationView.dart';
 import 'package:sahha_flutter_example/Views/BiomarkersView.dart';
+import 'package:sahha_flutter_example/Views/DiagnosticView.dart';
 import 'package:sahha_flutter_example/Views/HomeView.dart';
 import 'package:sahha_flutter_example/Views/ProfileView.dart';
 import 'package:sahha_flutter_example/Views/SamplesView.dart';
@@ -25,13 +26,18 @@ class AppState extends State<App> {
   @override
   void initState() {
     super.initState();
+    _configure();
+  }
 
-    // Use default values
-    SahhaFlutter.configure(
-      environment: SahhaEnvironment.sandbox
-    )
-        .then((success) => {debugPrint("Configure Success Result: $success")})
-        .catchError((error, stackTrace) => {debugPrint(error.toString())});
+  Future<void> _configure() async {
+    try {
+      final success = await SahhaFlutter.configure(
+        environment: SahhaEnvironment.development,
+      );
+      debugPrint("Configure Success Result: $success");
+    } catch (error) {
+      debugPrint(error.toString());
+    }
 
 /*
     // Android only
@@ -65,6 +71,7 @@ class AppState extends State<App> {
         '/stats': (BuildContext context) => const StatsView(),
         '/samples': (BuildContext context) => const SamplesView(),
         '/web': (BuildContext context) => const WebView(),
+        '/diagnostic': (BuildContext context) => const DiagnosticView(),
       },
     );
   }

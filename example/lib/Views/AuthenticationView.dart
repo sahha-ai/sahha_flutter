@@ -13,9 +13,10 @@ class AuthenticationState extends State<AuthenticationView> {
   TextEditingController appIdController = TextEditingController();
   TextEditingController appSecretController = TextEditingController();
   TextEditingController externalIdController = TextEditingController();
-  String appId = '';
-  String appSecret = '';
+  String appId = 'dJ52F2MXsQ6xjJ6IPRahBG1S3ayzYUSo';
+  String appSecret = 'bodDOI8MwQkIlZycZWAlzO7T6CamQ2fl6SpWt9U6vZc1itbqeECfslnecMRPyfDz';
   String externalId = '';
+  bool _isAuthenticated = false;
 
   @override
   void initState() {
@@ -24,20 +25,29 @@ class AuthenticationState extends State<AuthenticationView> {
     getPrefs();
   }
 
-  void getPrefs() async {
+  Future<void> getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      appId = (prefs.getString('appId') ?? '');
+      appId = (prefs.getString('appId') ?? 'dJ52F2MXsQ6xjJ6IPRahBG1S3ayzYUSo');
       appIdController.text = appId;
-      appSecret = (prefs.getString('appSecret') ?? '');
+      appSecret = (prefs.getString('appSecret') ?? 'bodDOI8MwQkIlZycZWAlzO7T6CamQ2fl6SpWt9U6vZc1itbqeECfslnecMRPyfDz');
       appSecretController.text = appSecret;
       externalId = (prefs.getString('externalId') ?? '');
       externalIdController.text = externalId;
     });
 
-    SahhaFlutter.isAuthenticated().then((success) {
-      showAlertDialog(context, 'AUTHENTICATED', success.toString());
-    }).catchError((error, stackTrace) => {debugPrint(error.toString())});
+    _checkAuthentication();
+  }
+
+  Future<void> _checkAuthentication() async {
+    try {
+      final success = await SahhaFlutter.isAuthenticated();
+      setState(() {
+        _isAuthenticated = success;
+      });
+    } catch (error) {
+      debugPrint(error.toString());
+    }
   }
 
   void setPrefs() async {
@@ -49,7 +59,7 @@ class AuthenticationState extends State<AuthenticationView> {
     });
   }
 
-  onTapSave(BuildContext context) {
+  onTapSave(BuildContext context) async {
     if (appId.isEmpty) {
       showAlertDialog(context, 'MISSING INFO', "You need to input an APP ID");
     } else if (appSecret.isEmpty) {
@@ -59,12 +69,16 @@ class AuthenticationState extends State<AuthenticationView> {
       showAlertDialog(
           context, 'MISSING INFO', "You need to input an EXTERNAL ID");
     } else {
-      SahhaFlutter.authenticate(
-              appId: appId, appSecret: appSecret, externalId: externalId)
-          .then((success) {
+      try {
+        final success = await SahhaFlutter.authenticate(
+            appId: appId, appSecret: appSecret, externalId: externalId);
         showAlertDialog(context, 'AUTHENTICATED', success.toString());
         setPrefs();
-      }).catchError((error, stackTrace) => {debugPrint(error.toString())});
+        await _checkAuthentication();
+      } catch (error) {
+        debugPrint(error.toString());
+        showAlertDialog(context, 'ERROR', error.toString());
+      }
     }
   }
 
@@ -101,6 +115,33 @@ class AuthenticationState extends State<AuthenticationView> {
         child: Center(
           child: Column(
             children: <Widget>[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: _isAuthenticated ? Colors.green : Colors.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _isAuthenticated ? Icons.check_circle : Icons.cancel,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _isAuthenticated ? 'Authenticated' : 'Not Authenticated',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const Spacer(),
               const Icon(
                 Icons.lock,
@@ -161,8 +202,9 @@ class AuthenticationState extends State<AuthenticationView> {
                       const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                   textStyle: const TextStyle(fontSize: 16),
                 ),
-                onPressed: () {
-                  SahhaFlutter.deauthenticate().then((success) {
+                onPressed: () async {
+                  try {
+                    final success = await SahhaFlutter.deauthenticate();
                     showAlertDialog(
                         context, 'DEAUTHENTICATED', success.toString());
                     setState(() {
@@ -170,8 +212,11 @@ class AuthenticationState extends State<AuthenticationView> {
                       externalId = '';
                     });
                     setPrefs();
-                  }).catchError(
-                      (error, stackTrace) => {debugPrint(error.toString())});
+                    await _checkAuthentication();
+                  } catch (error) {
+                    debugPrint(error.toString());
+                    showAlertDialog(context, 'ERROR', error.toString());
+                  }
                 },
                 child: const Text('DEAUTHENTICATE'),
               ),

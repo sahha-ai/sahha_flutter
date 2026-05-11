@@ -24,11 +24,17 @@ class ProfileState extends State<ProfileView> {
   void initState() {
     super.initState();
 
-    SahhaFlutter.getDemographic()
-        .then((value) => debugPrint(value))
-        .catchError((error, stackTrace) => debugPrint(error.toString()));
-
+    _initDemographic();
     getPrefs();
+  }
+
+  Future<void> _initDemographic() async {
+    try {
+      final value = await SahhaFlutter.getDemographic();
+      debugPrint(value);
+    } catch (error) {
+      debugPrint(error.toString());
+    }
   }
 
   void getPrefs() async {
@@ -77,7 +83,7 @@ class ProfileState extends State<ProfileView> {
     });
   }
 
-  void onTapSave(BuildContext context) {
+  void onTapSave(BuildContext context) async {
     if (birthDate.isEmpty) {
       showAlertDialog(context, 'MISSING INFO', "You need to input a BIRTH DATE");
       return;
@@ -107,23 +113,25 @@ class ProfileState extends State<ProfileView> {
       'birthDate': birthDate,
     };
 
-    SahhaFlutter.postDemographic(demographic).then((success) {
+    try {
+      final success = await SahhaFlutter.postDemographic(demographic);
       debugPrint(success.toString());
       showAlertDialog(context, "SAVE", success.toString());
-    }).catchError((error, stackTrace) {
+    } catch (error) {
       debugPrint(error.toString());
       showAlertDialog(context, "SAVE", error.toString());
-    });
+    }
   }
 
-  void onTapFetch(BuildContext context) {
-    SahhaFlutter.getDemographic().then((value) {
+  void onTapFetch(BuildContext context) async {
+    try {
+      final value = await SahhaFlutter.getDemographic();
       debugPrint(value);
       showAlertDialog(context, "FETCH", value ?? "empty");
-    }).catchError((error, stackTrace) {
+    } catch (error) {
       debugPrint(error.toString());
       showAlertDialog(context, "FETCH", error.toString());
-    });
+    }
   }
 
   void showAlertDialog(BuildContext context, String title, String message) {

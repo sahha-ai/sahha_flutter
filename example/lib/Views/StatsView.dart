@@ -21,23 +21,22 @@ class StatsState extends State<StatsView> {
     super.initState();
   }
 
-  onTapGetStats(BuildContext context) {
-    SahhaFlutter.getStats(
-            sensor: SahhaSensor.values
-                .firstWhere((element) => element.name == sensor),
-            startDateTime:
-                DateTime.timestamp().subtract(const Duration(days: 7)),
-            endDateTime: DateTime.timestamp())
-        .then((value) {
+  onTapGetStats(BuildContext context) async {
+    try {
+      final value = await SahhaFlutter.getStats(
+          sensor: SahhaSensor.values
+              .firstWhere((element) => element.name == sensor),
+          startDateTime:
+              DateTime.timestamp().subtract(const Duration(days: 7)),
+          endDateTime: DateTime.timestamp());
       List<dynamic> data = jsonDecode(value);
       debugPrint(data.firstOrNull?.toString());
       const encoder = JsonEncoder.withIndent('      ');
       final prettyJson = encoder.convert(data);
       showAlertDialog(context, "STATS", prettyJson);
-    }).catchError((error, stackTrace) {
+    } catch (error) {
       showAlertDialog(context, "Error", error.toString());
-      return null;
-    });
+    }
   }
 
   showAlertDialog(BuildContext context, String title, String message) {

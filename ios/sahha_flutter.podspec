@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'Sahha', '1.3.7'
+  s.dependency 'Sahha', '1.3.9-beta.1'
   s.platform = :ios, '15.0'
 
   # Flutter.framework does not contain a i386 slice.

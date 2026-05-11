@@ -1,29 +1,28 @@
 PODS:
   - Flutter (1.0.0)
-  - Sahha (1.3.7)
+  - Sahha (1.3.9-beta.1)
   - sahha_flutter (1.3.7):
     - Flutter
-    - Sahha (= 1.3.7)
+    - Sahha (= 1.3.9-beta.1)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - Sahha (from `../../../sahha-ios/`)
   - sahha_flutter (from `.symlinks/plugins/sahha_flutter/ios`)
-
-SPEC REPOS:
-  trunk:
-    - Sahha
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  Sahha:
+    :path: "../../../sahha-ios/"
   sahha_flutter:
     :path: ".symlinks/plugins/sahha_flutter/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  Sahha: f1938ca563d764674e6b800c0858fdf54083d5a4
-  sahha_flutter: a04ec4b541e05693883af1817d7f320d26f452de
+  Sahha: fee291d29d9a5578c3f08fb6d4708c11c3a2bf99
+  sahha_flutter: fdb22db2155f4e56601027044a4a9a3c39bb1f9f
 
-PODFILE CHECKSUM: 3e9409b67ba5801961716bfaf81c42bfee93d9a9
+PODFILE CHECKSUM: 50bd107bfd465dfc9d20ac85ae51851090647eb0
 
 COCOAPODS: 1.16.2

@@ -96,7 +96,12 @@ Page resource error:
 
     _controller = controller;
 
-    SahhaFlutter.getProfileToken().then((value) {
+    _loadWebView(controller);
+  }
+
+  Future<void> _loadWebView(WebViewController controller) async {
+    try {
+      final value = await SahhaFlutter.getProfileToken();
       debugPrint(value);
       if (value != null) {
         controller.loadRequest(
@@ -108,9 +113,9 @@ Page resource error:
           Uri.parse("https://development.webview.sahha.ai/app"),
         );
       }
-    }).catchError((error, stackTrace) {
+    } catch (error) {
       debugPrint(error.toString());
-    });
+    }
   }
 
   @override
