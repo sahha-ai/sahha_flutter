@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-enum SahhaEnvironment { sandbox, production}
+enum SahhaEnvironment {  sandbox, production}
 
 enum SahhaSensor {
   gender,
@@ -56,7 +56,105 @@ enum SahhaSensor {
   walking_asymmetry_percentage,
   walking_double_support_percentage,
   walking_step_length,
-  energy_consumed
+
+  // Nutrition
+  energy_intake,
+  protein_intake,
+  fat_intake,
+  fat_saturated_intake,
+  fat_monounsaturated_intake,
+  fat_polyunsaturated_intake,
+  cholesterol_intake,
+  carbohydrate_intake,
+  sugar_intake,
+  fiber_intake,
+  vitamin_a_intake,
+  vitamin_c_intake,
+  vitamin_d_intake,
+  vitamin_e_intake,
+  vitamin_k_intake,
+  vitamin_b6_intake,
+  vitamin_b12_intake,
+  thiamin_intake,
+  riboflavin_intake,
+  niacin_intake,
+  pantothenic_acid_intake,
+  folate_intake,
+  biotin_intake,
+  calcium_intake,
+  iron_intake,
+  magnesium_intake,
+  phosphorus_intake,
+  potassium_intake,
+  sodium_intake,
+  zinc_intake,
+  chloride_intake,
+  copper_intake,
+  manganese_intake,
+  chromium_intake,
+  molybdenum_intake,
+  selenium_intake,
+  iodine_intake,
+  caffeine_intake,
+  water_intake,
+
+  // Reproductive
+  menstrual_flow,
+  menstrual_period,
+  intermenstrual_bleeding,
+  cervical_mucus,
+  ovulation_test,
+  sexual_activity,
+  pregnancy,
+  pregnancy_test,
+  progesterone_test,
+  lactation,
+  contraceptive,
+  infrequent_menstrual_cycles,
+  irregular_menstrual_cycles,
+  persistent_intermenstrual_bleeding,
+  prolonged_menstrual_periods,
+
+  // Symptoms
+  abdominal_cramps,
+  acne,
+  appetite_changes,
+  bladder_incontinence,
+  bloating,
+  breast_pain,
+  chest_tightness_or_pain,
+  chills,
+  constipation,
+  coughing,
+  diarrhea,
+  dizziness,
+  dry_skin,
+  fainting,
+  fatigue,
+  fever,
+  generalized_body_ache,
+  hair_loss,
+  headache,
+  heartburn,
+  hot_flashes,
+  loss_of_smell,
+  loss_of_taste,
+  lower_back_pain,
+  memory_lapse,
+  mood_changes,
+  nausea,
+  night_sweats,
+  pelvic_pain,
+  rapid_pounding_or_fluttering_heartbeat,
+  runny_nose,
+  shortness_of_breath,
+  sinus_congestion,
+  skipped_heartbeat,
+  sleep_changes,
+  sore_throat,
+  vaginal_dryness,
+  vomiting,
+  wheezing,
 }
 
 enum SahhaScoreType {
@@ -89,13 +187,6 @@ enum SahhaBiomarkerType {
   age,
   biological_sex,
   date_of_birth,
-  menstrual_cycle_length,
-  menstrual_cycle_start_date,
-  menstrual_cycle_end_date,
-  menstrual_phase,
-  menstrual_phase_start_date,
-  menstrual_phase_end_date,
-  menstrual_phase_length,
   sleep_start_time,
   sleep_end_time,
   sleep_duration,
@@ -265,32 +356,12 @@ static Future<SahhaSensorStatus> getSensorStatus(List<SahhaSensor> sensors) asyn
 
 
 static SahhaSensorStatus _statusFromNative(dynamic raw) {
-  if (raw is int) {
-    return SahhaSensorStatus.values[raw];
-  }
-
-  if (raw is String) {
-    final s = raw.trim().toLowerCase();
-
-    // If native ever returns "0", "1", etc.
-    final asInt = int.tryParse(s);
-    if (asInt != null) return SahhaSensorStatus.values[asInt];
-
-    // If native returns enum names like "enabled"
-    return SahhaSensorStatus.values.firstWhere(
-      (e) => e.name.toLowerCase() == s,
-      orElse: () => throw StateError('Unknown SahhaSensorStatus: "$raw"'),
-    );
-  }
-  if (raw is bool){
-    if(raw) {
-      return SahhaSensorStatus.enabled;
-    } else {
-      return SahhaSensorStatus.pending;
-    }
-  }
-
-  throw StateError('Unexpected status type: ${raw.runtimeType} ($raw)');
+  final name = raw.toString().trim().toLowerCase();
+  // Unknown/future statuses (e.g. iOS "indeterminate") fall back to pending.
+  return SahhaSensorStatus.values.firstWhere(
+    (e) => e.name == name,
+    orElse: () => SahhaSensorStatus.pending,
+  );
 }
 
 static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async {

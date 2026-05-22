@@ -315,18 +315,20 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
 
+    // Skips sensor names the SDK doesn't recognise, matching the iOS bridge.
+    private fun List<String>.toSahhaSensors(): Set<SahhaSensor> =
+        mapNotNull { name ->
+            try {
+                SahhaSensor.valueOf(name.uppercase())
+            } catch (e: IllegalArgumentException) {
+                Log.w(TAG, "Unknown sensor skipped: $name")
+                null
+            }
+        }.toSet()
+
     private fun getSensorStatus(@NonNull call: MethodCall, @NonNull result: Result) {
         val sensors: List<String>? = call.argument<List<String>>("sensors")
-        var sensorsList: Set<SahhaSensor>? = null
-
-        if (sensors != null) {
-            try {
-                sensorsList = sensors.map { SahhaSensor.valueOf(it.uppercase()) }.toSet()
-            } catch (e: Exception) {
-                result.error("Sahha Error", e.message, e)
-                return
-            }
-        } else {
+        if (sensors == null) {
             result.error(
                 "Sahha Error",
                 "SahhaFlutter.getSensorStatus() sensors parameter must not be null",
@@ -335,28 +337,18 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
 
-        Sahha.getSensorStatus( sensorsList) { error, sensorStatus ->
+        Sahha.getSensorStatus(sensors.toSahhaSensors()) { error, sensorStatus ->
             if (error != null) {
                 result.error("Sahha Error", error, null)
             } else {
-                Log.d("getSensorStatus Result", sensorStatus.name);
-                result.success(sensorStatus.ordinal)
+                result.success(sensorStatus.name.lowercase())
             }
         }
     }
 
     private fun enableSensors(@NonNull call: MethodCall, @NonNull result: Result) {
         val sensors: List<String>? = call.argument<List<String>>("sensors")
-        var sensorsList: Set<SahhaSensor>? = null
-
-        if (sensors != null) {
-            try {
-                sensorsList = sensors.map { SahhaSensor.valueOf(it.uppercase()) }.toSet()
-            } catch (e: Exception) {
-                result.error("Sahha Error", e.message, e)
-                return
-            }
-        } else {
+        if (sensors == null) {
             result.error(
                 "Sahha Error",
                 "SahhaFlutter.enableSensors() sensors parameter must not be null",
@@ -365,12 +357,20 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
 
-        Sahha.enableSensors(sensorsList) { error, sensorStatus ->
-            Log.d("Sahha", "enableSensors result: error=$error | sensor status=$sensorStatus")
+        val sensorsList = sensors.toSahhaSensors()
+
+        Sahha.enableSensors(sensorsList) { error, _ ->
             if (error != null) {
                 result.error("Sahha Error", error, null)
-            } else {
-                result.success(sensorStatus)
+                return@enableSensors
+            }
+            // enableSensors only returns a Boolean; query status for iOS parity.
+            Sahha.getSensorStatus(sensorsList) { statusError, sensorStatus ->
+                if (statusError != null) {
+                    result.error("Sahha Error", statusError, null)
+                } else {
+                    result.success(sensorStatus.name.lowercase())
+                }
             }
         }
     }
@@ -612,8 +612,14 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         if (sensor != null && startDateTime != null && endDateTime != null) {
+            val sahhaSensor = try {
+                SahhaSensor.valueOf(sensor.uppercase())
+            } catch (e: IllegalArgumentException) {
+                result.error("Sahha Error", "SahhaFlutter.getStats() unknown sensor: $sensor", null)
+                return
+            }
             Sahha.getStats(
-                SahhaSensor.valueOf(sensor.uppercase()),
+                sahhaSensor,
                 Pair(Date(startDateTime), Date(endDateTime)),
             ) { error, stats ->
                 if (error != null) {
@@ -701,8 +707,14 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         if (sensor != null && startDateTime != null && endDateTime != null) {
+            val sahhaSensor = try {
+                SahhaSensor.valueOf(sensor.uppercase())
+            } catch (e: IllegalArgumentException) {
+                result.error("Sahha Error", "SahhaFlutter.getSamples() unknown sensor: $sensor", null)
+                return
+            }
             Sahha.getSamples(
-                SahhaSensor.valueOf(sensor.uppercase()),
+                sahhaSensor,
                 Pair(Date(startDateTime), Date(endDateTime)),
             ) { error, samples ->
                 if (error != null) {
