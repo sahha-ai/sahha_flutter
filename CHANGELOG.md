@@ -1,3 +1,37 @@
+## 1.3.9-beta.2
+
+### Added
+
+- 
+
+### Changed
+
+- Updated IOS to 1.3.9-beta.2 check release notes https://github.com/sahha-ai/sahha-ios/releases
+- Updated Android to 1.3.9-beta.2 check release notes https://github.com/sahha-ai/sahha-android-sdk/releases
+
+### Fixed
+
+- 
+
+---
+
+## 1.3.9-beta.1
+
+### Added
+
+- 
+
+### Changed
+
+- Updated IOS to 1.3.9-beta.1 check release notes https://github.com/sahha-ai/sahha-ios/releases
+- Updated Android to 1.3.9-beta.1 check release notes https://github.com/sahha-ai/sahha-android-sdk/releases
+
+### Fixed
+
+- 
+
+---
+
 ## 1.3.8
 
 ### Added

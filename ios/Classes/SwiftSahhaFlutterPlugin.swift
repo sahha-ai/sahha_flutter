@@ -341,78 +341,92 @@ public class SwiftSahhaFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     private func getStats(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
-            if let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
-                let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
-                let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
-                if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-                    Sahha.getStats(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, value in
-                        if let error = error {
-                            result(FlutterError(code: "Sahha Error", message: error, details: nil))
-                        } else {
-                            var string: String?
-                            do {
-                                let jsonEncoder = JSONEncoder()
-                                jsonEncoder.outputFormatting = .prettyPrinted
-                                let jsonData = try jsonEncoder.encode(value)
-                                string = String(data: jsonData, encoding: .utf8)
-                            } catch let encodingError {
-                                print(encodingError)
-                                Sahha.postError(
-                                    framework: .flutter,
-                                    message: encodingError.localizedDescription,
-                                    path: "SahhaFlutter", method: "getStats",
-                                    body: "jsonEncoder")
-                                result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
-                                return
-                            }
-                            result(string)
-                        }
-                    }
-                }
-            }
-        } else {
+        guard let values = params as? [String: Any?], let sensor = values["sensor"] as? String,
+              let startDateNumber = values["startDateTime"] as? NSNumber,
+              let endDateNumber = values["endDateTime"] as? NSNumber else {
             let message = "SahhaFlutter.getStats() parameters are invalid"
             Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getStats", body: params.debugDescription)
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
+            return
+        }
+
+        guard let sahhaSensor = SahhaSensor(rawValue: sensor) else {
+            let message = "SahhaFlutter.getStats() unknown sensor: \(sensor)"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getStats", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
+            return
+        }
+
+        let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+        let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
+
+        Sahha.getStats(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, value in
+            if let error = error {
+                result(FlutterError(code: "Sahha Error", message: error, details: nil))
+            } else {
+                var string: String?
+                do {
+                    let jsonEncoder = JSONEncoder()
+                    jsonEncoder.outputFormatting = .prettyPrinted
+                    let jsonData = try jsonEncoder.encode(value)
+                    string = String(data: jsonData, encoding: .utf8)
+                } catch let encodingError {
+                    print(encodingError)
+                    Sahha.postError(
+                        framework: .flutter,
+                        message: encodingError.localizedDescription,
+                        path: "SahhaFlutter", method: "getStats",
+                        body: "jsonEncoder")
+                    result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
+                    return
+                }
+                result(string)
+            }
         }
     }
     
     private func getSamples(_ params: Any?, result: @escaping FlutterResult) {
-        if let values = params as? [String: Any?], let sensor = values["sensor"] as? String {
-            if let startDateNumber = values["startDateTime"] as? NSNumber, let endDateNumber = values["endDateTime"] as? NSNumber {
-                let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
-                let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
-                if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-                    Sahha.getSamples(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, value in
-                        if let error = error {
-                            result(FlutterError(code: "Sahha Error", message: error, details: nil))
-                        } else {
-                            var string: String?
-                            do {
-                                let jsonEncoder = JSONEncoder()
-                                jsonEncoder.outputFormatting = .prettyPrinted
-                                let jsonData = try jsonEncoder.encode(value)
-                                string = String(data: jsonData, encoding: .utf8)
-                            } catch let encodingError {
-                                print(encodingError)
-                                Sahha.postError(
-                                    framework: .flutter,
-                                    message: encodingError.localizedDescription,
-                                    path: "SahhaFlutter", method: "getStats",
-                                    body: "jsonEncoder")
-                                result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
-                                return
-                            }
-                            result(string)
-                        }
-                    }
-                }
-            }
-        } else {
+        guard let values = params as? [String: Any?], let sensor = values["sensor"] as? String,
+              let startDateNumber = values["startDateTime"] as? NSNumber,
+              let endDateNumber = values["endDateTime"] as? NSNumber else {
             let message = "SahhaFlutter.getSamples() parameters are invalid"
             Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getSamples", body: params.debugDescription)
             result(FlutterError(code: "Sahha Error", message: message, details: nil))
+            return
+        }
+
+        guard let sahhaSensor = SahhaSensor(rawValue: sensor) else {
+            let message = "SahhaFlutter.getSamples() unknown sensor: \(sensor)"
+            Sahha.postError(framework: .flutter, message: message, path: "SwiftSahhaFlutterPlugin", method: "getSamples", body: params.debugDescription)
+            result(FlutterError(code: "Sahha Error", message: message, details: nil))
+            return
+        }
+
+        let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber.doubleValue / 1000))
+        let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber.doubleValue / 1000))
+
+        Sahha.getSamples(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, value in
+            if let error = error {
+                result(FlutterError(code: "Sahha Error", message: error, details: nil))
+            } else {
+                var string: String?
+                do {
+                    let jsonEncoder = JSONEncoder()
+                    jsonEncoder.outputFormatting = .prettyPrinted
+                    let jsonData = try jsonEncoder.encode(value)
+                    string = String(data: jsonData, encoding: .utf8)
+                } catch let encodingError {
+                    print(encodingError)
+                    Sahha.postError(
+                        framework: .flutter,
+                        message: encodingError.localizedDescription,
+                        path: "SahhaFlutter", method: "getSamples",
+                        body: "jsonEncoder")
+                    result(FlutterError(code: "Sahha Error", message: encodingError.localizedDescription, details: nil))
+                    return
+                }
+                result(string)
+            }
         }
     }
     
