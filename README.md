@@ -124,6 +124,26 @@ Only include the sensor permissions required by your project, what is declared h
 
 You must be able to justify reasons behind requiring the sensor permissions, [these](https://docs.sahha.ai/docs/data-flow/sdk/app-store-submission/google-play-store#data-type-justifications) justifications may be used to clearly articulate the reasoning behind your required sensor permissions.
 
+#### Background data collection notification
+
+On Android, Sahha collects sensor data using a foreground service, which Android requires to show a persistent notification while it runs. The notification's small icon is resolved from a drawable in your app's `res/drawable/` folder:
+
+- By default Sahha looks for a drawable named `notification` — e.g. `android/app/src/main/res/drawable/notification.png`.
+- To use a different drawable, pass its name via `notificationSettings` when you call `configure(...)`:
+
+```dart
+SahhaFlutter.configure(
+  environment: SahhaEnvironment.production,
+  notificationSettings: {
+    'icon': 'my_notification_icon', // name of a drawable in res/drawable/
+    'title': 'My App',
+    'shortDescription': 'Collecting health insights',
+  },
+);
+```
+
+If the named drawable cannot be found, Sahha falls back to a bundled default icon so your app keeps running. Adding your own `notification` drawable (or passing a valid `icon` name) is recommended so the persistent notification matches your branding.
+
 ### Apple iOS
 
 #### Enable HealthKit
