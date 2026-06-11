@@ -194,11 +194,16 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 framework = SahhaFramework.FLUTTER,
                 environment = SahhaEnvironment.valueOf(environment.uppercase()),
                 notificationSettings = SahhaNotificationConfiguration(
+                    // Fall back to the SDK's bundled icon (ic_sahha_no_bg) when the host app ships
+                    // no matching drawable. Passing 0 here persists an invalid icon id that later
+                    // reaches Notification.Builder.setSmallIcon(), throwing
+                    // "Invalid notification (no valid small icon)" and crashing the host app —
+                    // including the headless background sync worker, which reads the same id.
                     iconResourceId =
                         stringToDrawableResource(
                             context,
-                            notificationSettings["icon"] ?:"notification"
-                        ) ?: 0,
+                            notificationSettings["icon"] ?: "notification"
+                        ) ?: SahhaNotificationConfiguration.DEFAULT.iconResourceId,
                     title = notificationSettings["title"] ?: "Title",
                     shortDescription = notificationSettings["shortDescription"] ?: "Short description"
                 )
@@ -757,9 +762,13 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
     }
 
+    // Resolves a host-app drawable by name to its resource id, or null when the host app ships no
+    // such drawable. getIdentifier() returns 0 (not an exception) when nothing matches, so we map
+    // that to null — callers must never pass 0 to setSmallIcon(), which crashes the host app.
     fun stringToDrawableResource(context: Context, iconString: String?): Int? {
         return try {
-            context.resources.getIdentifier(iconString, "drawable", context.packageName)
+            val resourceId = context.resources.getIdentifier(iconString, "drawable", context.packageName)
+            if (resourceId != 0) resourceId else null
         } catch (e: Exception) {
             null
         }
