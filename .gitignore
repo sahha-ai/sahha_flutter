@@ -27,3 +27,7 @@
 .dart_tool/
 .packages
 build/
+
+# Claude Code — local/machine-specific files (shared commands in .claude/commands/ stay tracked)
+.claude/settings.local.json
+.claude/worktrees/
