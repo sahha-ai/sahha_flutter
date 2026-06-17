@@ -1,3 +1,20 @@
+## 1.3.9
+
+### Added
+
+-
+
+### Changed
+
+- Updated IOS to 1.3.9 check release notes https://github.com/sahha-ai/sahha-ios/releases
+- Updated Android to 1.3.9 check release notes https://github.com/sahha-ai/sahha-android-sdk/releases
+
+### Fixed
+
+- Fixed an Android crash in host apps that don't include a `res/drawable/notification` icon — the background collection and sync notifications now fall back to a bundled Sahha icon instead of crashing with `Invalid notification (no valid small icon)`.
+
+---
+
 ## 1.3.9-beta.5
 
 ### Added
