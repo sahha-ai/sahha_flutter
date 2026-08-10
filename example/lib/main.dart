@@ -6,9 +6,11 @@ import 'package:sahha_flutter_example/Views/HomeView.dart';
 import 'package:sahha_flutter_example/Views/ProfileView.dart';
 import 'package:sahha_flutter_example/Views/SamplesView.dart';
 import 'package:sahha_flutter_example/Views/ScoresView.dart';
+import 'package:sahha_flutter_example/Views/SensorDiagnosticsView.dart';
 import 'package:sahha_flutter_example/Views/SensorPermissionView.dart';
 import 'package:sahha_flutter_example/Views/StatsView.dart';
 import 'package:sahha_flutter_example/Views/WebView.dart';
+import 'package:sahha_flutter_example/theme.dart';
 
 void main() {
   runApp(const App());
@@ -27,13 +29,11 @@ class AppState extends State<App> {
     super.initState();
 
     // Use default values
-    SahhaFlutter.configure(
-      environment: SahhaEnvironment.sandbox
-    )
+    SahhaFlutter.configure(environment: SahhaEnvironment.sandbox)
         .then((success) => {debugPrint("Configure Success Result: $success")})
         .catchError((error, stackTrace) => {debugPrint(error.toString())});
 
-/*
+    /*
     // Android only
     var notificationSettings = {
       'icon': 'Custom Icon',
@@ -54,12 +54,17 @@ class AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Sahha Demo',
+      theme: SahhaAppTheme.light(),
+      darkTheme: SahhaAppTheme.dark(),
+      themeMode: ThemeMode.system,
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) => const HomeView(),
         '/authentication': (BuildContext context) => const AuthenticationView(),
         '/profile': (BuildContext context) => const ProfileView(),
         '/permissions': (BuildContext context) => const SensorPermissionView(),
+        '/diagnostics': (BuildContext context) => const SensorDiagnosticsView(),
         '/scores': (BuildContext context) => const ScoresView(),
         '/biomarkers': (BuildContext context) => const BiomarkersView(),
         '/stats': (BuildContext context) => const StatsView(),

@@ -331,6 +331,27 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         }.toSet()
 
+    // Skips biomarker names the SDK doesn't recognise, matching the iOS bridge.
+    private fun List<String>.toSahhaBiomarkerCategories(): Set<SahhaBiomarkerCategory> =
+        mapNotNull { name ->
+            try {
+                SahhaBiomarkerCategory.valueOf(name.uppercase())
+            } catch (e: IllegalArgumentException) {
+                Log.w(TAG, "Unknown biomarker category skipped: $name")
+                null
+            }
+        }.toSet()
+
+    private fun List<String>.toSahhaBiomarkerTypes(): Set<SahhaBiomarkerType> =
+        mapNotNull { name ->
+            try {
+                SahhaBiomarkerType.valueOf(name.uppercase())
+            } catch (e: IllegalArgumentException) {
+                Log.w(TAG, "Unknown biomarker type skipped: $name")
+                null
+            }
+        }.toSet()
+
     private fun getSensorStatus(@NonNull call: MethodCall, @NonNull result: Result) {
         val sensors: List<String>? = call.argument<List<String>>("sensors")
         if (sensors == null) {
@@ -362,20 +383,11 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
 
-        val sensorsList = sensors.toSahhaSensors()
-
-        Sahha.enableSensors(sensorsList) { error, _ ->
+        Sahha.enableSensors(sensors.toSahhaSensors()) { error, sensorStatus ->
             if (error != null) {
                 result.error("Sahha Error", error, null)
-                return@enableSensors
-            }
-            // enableSensors only returns a Boolean; query status for iOS parity.
-            Sahha.getSensorStatus(sensorsList) { statusError, sensorStatus ->
-                if (statusError != null) {
-                    result.error("Sahha Error", statusError, null)
-                } else {
-                    result.success(sensorStatus.name.lowercase())
-                }
+            } else {
+                result.success(sensorStatus.name.lowercase())
             }
         }
     }
@@ -534,8 +546,8 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         if (startDateTime != null && endDateTime != null && categories != null && types != null) {
-            val biomarkerCategories = categories.map { SahhaBiomarkerCategory.valueOf(it.uppercase()) }.toSet()
-            val biomarkerTypes = types.map { SahhaBiomarkerType.valueOf(it.uppercase()) }.toSet()
+            val biomarkerCategories = categories.toSahhaBiomarkerCategories()
+            val biomarkerTypes = types.toSahhaBiomarkerTypes()
             Sahha.getBiomarkers(
                 biomarkerCategories,
                 biomarkerTypes,

@@ -8,7 +8,7 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 class WebView extends StatefulWidget {
-  const WebView({Key? key}) : super(key: key);
+  const WebView({super.key});
 
   @override
   WebState createState() => WebState();
@@ -80,9 +80,9 @@ Page resource error:
       ..addJavaScriptChannel(
         'Toaster',
         onMessageReceived: (JavaScriptMessage message) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(message.message)));
         },
       );
 
@@ -96,21 +96,23 @@ Page resource error:
 
     _controller = controller;
 
-    SahhaFlutter.getProfileToken().then((value) {
-      debugPrint(value);
-      if (value != null) {
-        controller.loadRequest(
-          Uri.parse("https://development.webview.sahha.ai/app"),
-          headers: {"Authorization": value},
-        );
-      } else {
-        controller.loadRequest(
-          Uri.parse("https://development.webview.sahha.ai/app"),
-        );
-      }
-    }).catchError((error, stackTrace) {
-      debugPrint(error.toString());
-    });
+    SahhaFlutter.getProfileToken()
+        .then((value) {
+          debugPrint(value);
+          if (value != null) {
+            controller.loadRequest(
+              Uri.parse("https://development.webview.sahha.ai/app"),
+              headers: {"Authorization": value},
+            );
+          } else {
+            controller.loadRequest(
+              Uri.parse("https://development.webview.sahha.ai/app"),
+            );
+          }
+        })
+        .catchError((error, stackTrace) {
+          debugPrint(error.toString());
+        });
   }
 
   @override
