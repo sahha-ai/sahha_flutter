@@ -1,37 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
+import 'package:sahha_flutter_example/widgets/response_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:selectpicker/models/select_picker_item.dart';
-import 'package:selectpicker/selectpicker.dart';
-import 'package:selectpicker/styles/input_style.dart';
 
+/// Exercises `postDemographic` and `getDemographic`.
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
   @override
-  ProfileState createState() => ProfileState();
+  State<ProfileView> createState() => ProfileState();
 }
 
 class ProfileState extends State<ProfileView> {
-  // Replace age with birthDate
+  /// Values posted to the API, paired with their display labels.
+  static const List<DropdownMenuEntry<String>> genderEntries = [
+    DropdownMenuEntry(value: 'male', label: 'Male'),
+    DropdownMenuEntry(value: 'female', label: 'Female'),
+    DropdownMenuEntry(value: 'gender diverse', label: 'Gender Diverse'),
+  ];
+
   String birthDate = ''; // "YYYY-MM-DD"
   DateTime? birthDateValue;
-
   String gender = '';
+
+  bool _isSaving = false;
+  bool _isFetching = false;
 
   @override
   void initState() {
     super.initState();
 
     SahhaFlutter.getDemographic()
-        .then((value) => debugPrint(value))
-        .catchError((error, stackTrace) => debugPrint(error.toString()));
+        .then((value) => debugPrint('Get Demographic Result: $value'))
+        .catchError(
+          (error, stackTrace) => debugPrint('Get Demographic Error: $error'),
+        );
 
     getPrefs();
   }
 
-  void getPrefs() async {
+  // 'birthDate' / 'gender' keys are kept as-is for backward compatibility.
+  Future<void> getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
 
     final storedBirthDate = prefs.getString('birthDate') ?? '';
@@ -44,14 +54,22 @@ class ProfileState extends State<ProfileView> {
       }
     }
 
+    // Older builds stored the display label ("Male"), so normalise before
+    // handing the value to the dropdown.
+    final storedGender = (prefs.getString('gender') ?? '').toLowerCase();
+    final knownGender = genderEntries.any((e) => e.value == storedGender)
+        ? storedGender
+        : '';
+
+    if (!mounted) return;
     setState(() {
       birthDate = storedBirthDate;
       birthDateValue = parsed;
-      gender = (prefs.getString('gender') ?? '');
+      gender = knownGender;
     });
   }
 
-  void setPrefs() async {
+  Future<void> setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('birthDate', birthDate);
     await prefs.setString('gender', gender);
@@ -59,7 +77,8 @@ class ProfileState extends State<ProfileView> {
 
   Future<void> pickBirthDate(BuildContext context) async {
     final now = DateTime.now();
-    final initial = birthDateValue ?? DateTime(now.year - 25, now.month, now.day);
+    final initial =
+        birthDateValue ?? DateTime(now.year - 25, now.month, now.day);
 
     final selected = await showDatePicker(
       context: context,
@@ -68,7 +87,7 @@ class ProfileState extends State<ProfileView> {
       lastDate: now,
     );
 
-    if (selected == null) return;
+    if (selected == null || !mounted) return;
 
     final formatted = DateFormat('yyyy-MM-dd').format(selected);
     setState(() {
@@ -77,13 +96,12 @@ class ProfileState extends State<ProfileView> {
     });
   }
 
-  void onTapSave(BuildContext context) {
+  Future<void> onTapSave() async {
     if (birthDate.isEmpty) {
-      showAlertDialog(context, 'MISSING INFO', "You need to input a BIRTH DATE");
-      return;
+      return _showMissingInfo('You need to input a BIRTH DATE');
     }
 
-    // Basic validation: ensure it's parseable and looks like YYYY-MM-DD
+    // Basic validation: ensure it's parseable and looks like YYYY-MM-DD.
     DateTime? parsed;
     try {
       parsed = DateTime.parse(birthDate);
@@ -91,141 +109,155 @@ class ProfileState extends State<ProfileView> {
       parsed = null;
     }
     if (parsed == null || birthDate.length != 10) {
-      showAlertDialog(context, 'MISSING INFO', "BIRTH DATE must be YYYY-MM-DD");
-      return;
+      return _showMissingInfo('BIRTH DATE must be YYYY-MM-DD');
     }
 
     if (gender.isEmpty) {
-      showAlertDialog(context, 'MISSING INFO', "You need to input a GENDER");
-      return;
+      return _showMissingInfo('You need to input a GENDER');
     }
 
-    setPrefs();
+    setState(() => _isSaving = true);
+    await setPrefs();
 
-    final demographic = {
-      'gender': gender,
-      'birthDate': birthDate,
-    };
+    final demographic = {'gender': gender, 'birthDate': birthDate};
 
-    SahhaFlutter.postDemographic(demographic).then((success) {
-      debugPrint(success.toString());
-      showAlertDialog(context, "SAVE", success.toString());
-    }).catchError((error, stackTrace) {
-      debugPrint(error.toString());
-      showAlertDialog(context, "SAVE", error.toString());
-    });
-  }
+    bool? success;
+    Object? failure;
+    try {
+      success = await SahhaFlutter.postDemographic(demographic);
+      debugPrint('Post Demographic Result: $success');
+    } catch (error) {
+      failure = error;
+      debugPrint('Post Demographic Error: $error');
+    }
 
-  void onTapFetch(BuildContext context) {
-    SahhaFlutter.getDemographic().then((value) {
-      debugPrint(value);
-      showAlertDialog(context, "FETCH", value ?? "empty");
-    }).catchError((error, stackTrace) {
-      debugPrint(error.toString());
-      showAlertDialog(context, "FETCH", error.toString());
-    });
-  }
+    if (!mounted) return;
+    setState(() => _isSaving = false);
 
-  void showAlertDialog(BuildContext context, String title, String message) {
-    final alert = AlertDialog(
-      title: Text(title),
-      content: Text(message),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('OK'),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
+    await showResponseSheet(
+      context,
+      title: failure == null ? 'Saved' : 'Save failed',
+      subtitle: 'SahhaFlutter.postDemographic',
+      body: (failure ?? success).toString(),
+      isError: failure != null,
     );
+  }
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => alert,
+  Future<void> onTapFetch() async {
+    setState(() => _isFetching = true);
+
+    String? value;
+    Object? failure;
+    try {
+      value = await SahhaFlutter.getDemographic();
+      debugPrint('Get Demographic Result: $value');
+    } catch (error) {
+      failure = error;
+      debugPrint('Get Demographic Error: $error');
+    }
+
+    if (!mounted) return;
+    setState(() => _isFetching = false);
+
+    await showResponseSheet(
+      context,
+      title: failure == null ? 'Demographic' : 'Fetch failed',
+      subtitle: 'SahhaFlutter.getDemographic',
+      body: failure != null
+          ? failure.toString()
+          : tryPrettyJson(value ?? 'empty'),
+      isError: failure != null,
+    );
+  }
+
+  Future<void> _showMissingInfo(String message) {
+    return showResponseSheet(
+      context,
+      title: 'Missing info',
+      body: message,
+      isError: true,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final birthDateLabel = birthDate.isEmpty ? 'BIRTH DATE' : birthDate;
+    final theme = Theme.of(context);
+    final busy = _isSaving || _isFetching;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              const Spacer(),
-              const Icon(Icons.person, size: 64),
-              const SizedBox(height: 20),
-
-              // Birth date picker field
-              InkWell(
-                onTap: () => pickBirthDate(context),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'BIRTH DATE',
-                    border: OutlineInputBorder(),
+      appBar: AppBar(title: const Text('Profile')),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  InkWell(
+                    onTap: () => pickBirthDate(context),
+                    borderRadius: BorderRadius.circular(12),
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'BIRTH DATE',
+                        suffixIcon: Icon(Icons.calendar_today, size: 18),
+                      ),
+                      child: Text(
+                        birthDate.isEmpty ? 'Not set' : birthDate,
+                        style: birthDate.isEmpty
+                            ? theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              )
+                            : theme.textTheme.bodyMedium,
+                      ),
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(birthDateLabel),
-                      const Icon(Icons.calendar_today),
-                    ],
+                  const SizedBox(height: 16),
+                  DropdownMenu<String>(
+                    initialSelection: gender.isEmpty ? null : gender,
+                    label: const Text('GENDER'),
+                    hintText: 'Not set',
+                    enableSearch: false,
+                    requestFocusOnTap: false,
+                    expandedInsets: EdgeInsets.zero,
+                    dropdownMenuEntries: genderEntries,
+                    onSelected: (value) {
+                      if (value == null) return;
+                      setState(() => gender = value);
+                    },
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              SelectPicker(
-                hint: gender.isEmpty ? "GENDER" : gender,
-                list: [
-                  SelectPickerItem("Male", "male", null),
-                  SelectPickerItem("Female", "female", null),
-                  SelectPickerItem("Gender Diverse", "gender diverse", null),
                 ],
-                selectFirst: false,
-                showId: false,
-                onSelect: (value) {
-                  setState(() {
-                    // Use value.value if you want "male/female" instead of title
-                    gender = value.title.toString();
-                  });
-                },
-                selectPickerInputStyle: SelectPickerInputStyle(),
-                initialItem: gender,
               ),
-
-              const SizedBox(height: 40),
-
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(40),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                onPressed: () => onTapSave(context),
-                child: const Text('SAVE'),
-              ),
-
-              const SizedBox(height: 40),
-
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(40),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                onPressed: () => onTapFetch(context),
-                child: const Text('FETCH'),
-              ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: 24),
+          FilledButton(
+            onPressed: busy ? null : onTapSave,
+            child: _busyLabel(context, busy: _isSaving, label: 'SAVE'),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: busy ? null : onTapFetch,
+            child: _busyLabel(context, busy: _isFetching, label: 'FETCH'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _busyLabel(
+    BuildContext context, {
+    required bool busy,
+    required String label,
+  }) {
+    if (!busy) return Text(label);
+    return SizedBox(
+      height: 20,
+      width: 20,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
     );
   }
