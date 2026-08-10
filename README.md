@@ -427,7 +427,7 @@ static Future<String> getBiomarkers(
 
 **Example usage**:
 ```dart
-    const cateories = [
+    const categories = [
       SahhaBiomarkerCategory.activity,
       SahhaBiomarkerCategory.sleep,
     ];
@@ -453,6 +453,8 @@ static Future<String> getBiomarkers(
 
 ### getStats(...)
 
+> **Deprecated:** Use `getBiomarkers` to read server-processed biomarkers instead.
+
 ```dart
 static Future<String> getStats(
       {required SahhaSensor sensor,
@@ -476,6 +478,8 @@ static Future<String> getStats(
 ---
 
 ### getSamples(...)
+
+> **Deprecated:** Use `getBiomarkers` to read server-processed biomarkers instead.
 
 ```dart
 static Future<String> getSamples(

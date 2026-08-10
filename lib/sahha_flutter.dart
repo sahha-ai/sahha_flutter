@@ -431,6 +431,7 @@ static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async 
     }
   }
 
+  @Deprecated('Use getBiomarkers to read server-processed biomarkers instead.')
   static Future<String> getStats(
       {required SahhaSensor sensor,
       required DateTime startDateTime,
@@ -451,6 +452,7 @@ static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async 
     }
   }
 
+  @Deprecated('Use getBiomarkers to read server-processed biomarkers instead.')
   static Future<String> getSamples(
       {required SahhaSensor sensor,
       required DateTime startDateTime,

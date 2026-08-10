@@ -22,6 +22,8 @@ class StatsState extends State<StatsView> {
   }
 
   onTapGetStats(BuildContext context) {
+    // The demo intentionally shows the deprecated APIs alongside getBiomarkers.
+    // ignore: deprecated_member_use
     SahhaFlutter.getStats(
             sensor: SahhaSensor.values
                 .firstWhere((element) => element.name == sensor),

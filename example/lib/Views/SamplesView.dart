@@ -22,6 +22,8 @@ class SamplesState extends State<SamplesView> {
   }
 
   onTapGetSamples(BuildContext context) {
+    // The demo intentionally shows the deprecated APIs alongside getBiomarkers.
+    // ignore: deprecated_member_use
     SahhaFlutter.getSamples(
             sensor: SahhaSensor.values
                 .firstWhere((element) => element.name == sensor),
