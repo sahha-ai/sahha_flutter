@@ -171,7 +171,7 @@ enum SahhaBiomarkerType {
   active_hours,
   active_duration,
   activity_low_intensity_duration,
-  activity_mid_intensity_duration,
+  activity_medium_intensity_duration,
   activity_high_intensity_duration,
   activity_sedentary_duration,
   active_energy_burned,
