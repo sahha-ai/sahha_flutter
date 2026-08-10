@@ -25,21 +25,23 @@ class StatsState extends State<StatsView> {
     // The demo intentionally shows the deprecated APIs alongside getBiomarkers.
     // ignore: deprecated_member_use
     SahhaFlutter.getStats(
-            sensor: SahhaSensor.values
-                .firstWhere((element) => element.name == sensor),
-            startDateTime:
-                DateTime.timestamp().subtract(const Duration(days: 7)),
-            endDateTime: DateTime.timestamp())
+          sensor: SahhaSensor.values.firstWhere(
+            (element) => element.name == sensor,
+          ),
+          startDateTime: DateTime.timestamp().subtract(const Duration(days: 7)),
+          endDateTime: DateTime.timestamp(),
+        )
         .then((value) {
-      List<dynamic> data = jsonDecode(value);
-      debugPrint(data.firstOrNull?.toString());
-      const encoder = JsonEncoder.withIndent('      ');
-      final prettyJson = encoder.convert(data);
-      showAlertDialog(context, "STATS", prettyJson);
-    }).catchError((error, stackTrace) {
-      showAlertDialog(context, "Error", error.toString());
-      return null;
-    });
+          List<dynamic> data = jsonDecode(value);
+          debugPrint(data.firstOrNull?.toString());
+          const encoder = JsonEncoder.withIndent('      ');
+          final prettyJson = encoder.convert(data);
+          showAlertDialog(context, "STATS", prettyJson);
+        })
+        .catchError((error, stackTrace) {
+          showAlertDialog(context, "Error", error.toString());
+          return null;
+        });
   }
 
   showAlertDialog(BuildContext context, String title, String message) {
@@ -67,25 +69,20 @@ class StatsState extends State<StatsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Stats'),
-      ),
+      appBar: AppBar(title: const Text('Stats')),
       body: Padding(
         padding: const EdgeInsets.all(40),
         child: Center(
           child: Column(
             children: <Widget>[
               const Spacer(),
-              const Icon(
-                Icons.pie_chart,
-                size: 64,
-              ),
+              const Icon(Icons.pie_chart, size: 64),
               const SizedBox(height: 20),
               SelectPicker(
                 hint: sensor.isEmpty ? "SENSOR" : sensor,
                 list: [
                   for (var sensor in SahhaSensor.values)
-                    SelectPickerItem(sensor.name, sensor.name, null)
+                    SelectPickerItem(sensor.name, sensor.name, null),
                 ],
                 selectFirst: false,
                 showId: false,
@@ -102,8 +99,10 @@ class StatsState extends State<StatsView> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(40),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 20,
+                  ),
                   textStyle: const TextStyle(fontSize: 16),
                 ),
                 onPressed: () {

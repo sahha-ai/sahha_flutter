@@ -383,20 +383,11 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
 
-        val sensorsList = sensors.toSahhaSensors()
-
-        Sahha.enableSensors(sensorsList) { error, _ ->
+        Sahha.enableSensors(sensors.toSahhaSensors()) { error, sensorStatus ->
             if (error != null) {
                 result.error("Sahha Error", error, null)
-                return@enableSensors
-            }
-            // enableSensors only returns a Boolean; query status for iOS parity.
-            Sahha.getSensorStatus(sensorsList) { statusError, sensorStatus ->
-                if (statusError != null) {
-                    result.error("Sahha Error", statusError, null)
-                } else {
-                    result.success(sensorStatus.name.lowercase())
-                }
+            } else {
+                result.success(sensorStatus.name.lowercase())
             }
         }
     }
