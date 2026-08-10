@@ -427,7 +427,7 @@ static Future<String> getBiomarkers(
 
 **Example usage**:
 ```dart
-    const cateories = [
+    const categories = [
       SahhaBiomarkerCategory.activity,
       SahhaBiomarkerCategory.sleep,
     ];
@@ -453,6 +453,8 @@ static Future<String> getBiomarkers(
 
 ### getStats(...)
 
+> **Deprecated:** Use `getBiomarkers` to read server-processed biomarkers instead.
+
 ```dart
 static Future<String> getStats(
       {required SahhaSensor sensor,
@@ -476,6 +478,8 @@ static Future<String> getStats(
 ---
 
 ### getSamples(...)
+
+> **Deprecated:** Use `getBiomarkers` to read server-processed biomarkers instead.
 
 ```dart
 static Future<String> getSamples(
@@ -707,10 +711,10 @@ enum SahhaScoreType {
 enum SahhaBiomarkerCategory {
   activity,
   body,
-  characteristic,
-  reproductive,
+  engagement,
+  nutrition,
   sleep,
-  vitals
+  vitals,
 }
 ```
 
@@ -723,7 +727,7 @@ enum SahhaBiomarkerType {
   active_hours,
   active_duration,
   activity_low_intensity_duration,
-  activity_mid_intensity_duration,
+  activity_medium_intensity_duration,
   activity_high_intensity_duration,
   activity_sedentary_duration,
   active_energy_burned,

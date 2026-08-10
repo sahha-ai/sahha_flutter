@@ -1,3 +1,26 @@
+## 1.4.0-beta.1
+
+### Added
+
+- `engagement` biomarker category in `SahhaBiomarkerCategory`.
+
+### Changed
+
+- **Breaking:** `SahhaBiomarkerCategory` now contains exactly the six documented categories (`activity`, `body`, `engagement`, `nutrition`, `sleep`, `vitals`). Removed `characteristic` and `reproductive`, which never returned biomarker data.
+- **Breaking:** renamed `SahhaBiomarkerType.activity_mid_intensity_duration` to `activity_medium_intensity_duration`. The old name was outside the documented vocabulary and silently returned no data.
+- Deprecated `getStats` and `getSamples` — use `getBiomarkers` to read server-processed biomarkers instead.
+- Stat and sample `category` values are now labeled with the sensor's data-log logType: heart rate types report `heart`, blood pressure/glucose report `blood`, oxygen/VO2 max/respiratory rate report `oxygen`, temperature types report `temperature`, and energy/daylight types report `energy`. `vitals` no longer appears.
+- Rebuilt the example app as a full testing harness — biomarker, score, stats and samples query screens with type selectors and date ranges, a checked-list sensor permissions screen, a per-sensor diagnostics screen, and a Material 3 UI.
+- Updated iOS to 1.4.0-beta.1 — check release notes https://github.com/sahha-ai/sahha-ios/releases
+- Updated Android to 1.4.0-beta.1 — check release notes https://github.com/sahha-ai/sahha-android-sdk/releases
+
+### Fixed
+
+- iOS: `enableSensors` callback no longer hangs indefinitely; hardened token refresh and session-expiry handling.
+- Android: `enableSensors` reports sensor status reliably, plus Health Connect read-robustness fixes from the native 1.4.0-beta.1 release.
+
+---
+
 ## 1.3.9
 
 ### Added

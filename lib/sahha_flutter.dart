@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-enum SahhaEnvironment {  sandbox, production}
+enum SahhaEnvironment { sandbox, production }
 
 enum SahhaSensor {
   gender,
@@ -157,13 +157,7 @@ enum SahhaSensor {
   wheezing,
 }
 
-enum SahhaScoreType {
-  wellbeing,
-  activity,
-  sleep,
-  readiness,
-  mental_wellbeing,
-}
+enum SahhaScoreType { wellbeing, activity, sleep, readiness, mental_wellbeing }
 
 enum SahhaBiomarkerType {
   steps,
@@ -171,7 +165,7 @@ enum SahhaBiomarkerType {
   active_hours,
   active_duration,
   activity_low_intensity_duration,
-  activity_mid_intensity_duration,
+  activity_medium_intensity_duration,
   activity_high_intensity_duration,
   activity_sedentary_duration,
   active_energy_burned,
@@ -219,11 +213,10 @@ enum SahhaBiomarkerType {
 enum SahhaBiomarkerCategory {
   activity,
   body,
-  characteristic,
-  reproductive,
+  engagement,
+  nutrition,
   sleep,
   vitals,
-  nutrition
 }
 
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
@@ -231,8 +224,11 @@ enum SahhaSensorStatus { pending, unavailable, disabled, enabled }
 class SahhaNotificationSettings {
   final String? icon, title, shortDescription;
 
-  const SahhaNotificationSettings(
-      {this.icon, this.title, this.shortDescription});
+  const SahhaNotificationSettings({
+    this.icon,
+    this.title,
+    this.shortDescription,
+  });
 }
 
 class SahhaFlutter {
@@ -241,7 +237,7 @@ class SahhaFlutter {
   static Future<bool> configure({
     required SahhaEnvironment environment,
     Map<String, String> notificationSettings = const <String, String>{},
-    bool enableMotionTrigger = false, 
+    bool enableMotionTrigger = false,
   }) async {
     try {
       final bool success = await _channel.invokeMethod('configure', {
@@ -257,7 +253,6 @@ class SahhaFlutter {
     }
   }
 
-
   static Future<bool> isAuthenticated() async {
     try {
       bool success = await _channel.invokeMethod('isAuthenticated');
@@ -269,13 +264,17 @@ class SahhaFlutter {
     }
   }
 
-  static Future<bool> authenticate(
-      {required String appId,
-      required String appSecret,
-      required String externalId}) async {
+  static Future<bool> authenticate({
+    required String appId,
+    required String appSecret,
+    required String externalId,
+  }) async {
     try {
-      bool success = await _channel.invokeMethod('authenticate',
-          {'appId': appId, 'appSecret': appSecret, 'externalId': externalId});
+      bool success = await _channel.invokeMethod('authenticate', {
+        'appId': appId,
+        'appSecret': appSecret,
+        'externalId': externalId,
+      });
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);
@@ -284,11 +283,15 @@ class SahhaFlutter {
     }
   }
 
-  static Future<bool> authenticateToken(
-      {required String profileToken, required String refreshToken}) async {
+  static Future<bool> authenticateToken({
+    required String profileToken,
+    required String refreshToken,
+  }) async {
     try {
-      bool success = await _channel.invokeMethod('authenticateToken',
-          {'profileToken': profileToken, 'refreshToken': refreshToken});
+      bool success = await _channel.invokeMethod('authenticateToken', {
+        'profileToken': profileToken,
+        'refreshToken': refreshToken,
+      });
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);
@@ -332,8 +335,10 @@ class SahhaFlutter {
 
   static Future<bool> postDemographic(Map demographic) async {
     try {
-      bool success =
-          await _channel.invokeMethod('postDemographic', demographic);
+      bool success = await _channel.invokeMethod(
+        'postDemographic',
+        demographic,
+      );
       return success;
     } on PlatformException catch (error) {
       return Future.error(error);
@@ -342,40 +347,46 @@ class SahhaFlutter {
     }
   }
 
-static Future<SahhaSensorStatus> getSensorStatus(List<SahhaSensor> sensors) async {
-  try {
-    final sensorStrings = sensors.map((s) => s.name).toList();
-    final raw = await _channel.invokeMethod('getSensorStatus', {'sensors': sensorStrings});
-    return _statusFromNative(raw);
-  } on PlatformException catch (error) {
-    return Future.error(error);
-  } catch (error) {
-    return Future.error(error);
+  static Future<SahhaSensorStatus> getSensorStatus(
+    List<SahhaSensor> sensors,
+  ) async {
+    try {
+      final sensorStrings = sensors.map((s) => s.name).toList();
+      final raw = await _channel.invokeMethod('getSensorStatus', {
+        'sensors': sensorStrings,
+      });
+      return _statusFromNative(raw);
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    } catch (error) {
+      return Future.error(error);
+    }
   }
-}
 
-
-static SahhaSensorStatus _statusFromNative(dynamic raw) {
-  final name = raw.toString().trim().toLowerCase();
-  // Unknown/future statuses (e.g. iOS "indeterminate") fall back to pending.
-  return SahhaSensorStatus.values.firstWhere(
-    (e) => e.name == name,
-    orElse: () => SahhaSensorStatus.pending,
-  );
-}
-
-static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async {
-  try {
-    final sensorStrings = sensors.map((s) => s.name).toList();
-    final raw = await _channel.invokeMethod('enableSensors', {'sensors': sensorStrings});
-    return _statusFromNative(raw);
-  } on PlatformException catch (error) {
-    return Future.error(error);
-  } catch (error) {
-    return Future.error(error);
+  static SahhaSensorStatus _statusFromNative(dynamic raw) {
+    final name = raw.toString().trim().toLowerCase();
+    // Unknown/future statuses (e.g. iOS "indeterminate") fall back to pending.
+    return SahhaSensorStatus.values.firstWhere(
+      (e) => e.name == name,
+      orElse: () => SahhaSensorStatus.pending,
+    );
   }
-}
 
+  static Future<SahhaSensorStatus> enableSensors(
+    List<SahhaSensor> sensors,
+  ) async {
+    try {
+      final sensorStrings = sensors.map((s) => s.name).toList();
+      final raw = await _channel.invokeMethod('enableSensors', {
+        'sensors': sensorStrings,
+      });
+      return _statusFromNative(raw);
+    } on PlatformException catch (error) {
+      return Future.error(error);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
 
   static void postSensorData() {
     _channel.invokeMethod('postSensorData');
@@ -385,10 +396,11 @@ static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async 
     _channel.invokeMethod('openAppSettings');
   }
 
-  static Future<String> getScores(
-      {required List<SahhaScoreType> types,
-      required DateTime startDateTime,
-      required DateTime endDateTime}) async {
+  static Future<String> getScores({
+    required List<SahhaScoreType> types,
+    required DateTime startDateTime,
+    required DateTime endDateTime,
+  }) async {
     try {
       List<String> scoreTypeStrings = types.map((type) => type.name).toList();
       int startDateInt = startDateTime.millisecondsSinceEpoch;
@@ -396,7 +408,7 @@ static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async 
       String value = await _channel.invokeMethod('getScores', {
         'types': scoreTypeStrings,
         'startDateTime': startDateInt,
-        'endDateTime': endDateInt
+        'endDateTime': endDateInt,
       });
       return value;
     } on PlatformException catch (error) {
@@ -406,23 +418,26 @@ static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async 
     }
   }
 
-  static Future<String> getBiomarkers(
-      {required List<SahhaBiomarkerCategory> categories,
-      required List<SahhaBiomarkerType> types,
-      required DateTime startDateTime,
-      required DateTime endDateTime}) async {
+  static Future<String> getBiomarkers({
+    required List<SahhaBiomarkerCategory> categories,
+    required List<SahhaBiomarkerType> types,
+    required DateTime startDateTime,
+    required DateTime endDateTime,
+  }) async {
     try {
-      List<String> biomarkerCategoryStrings =
-          categories.map((category) => category.name).toList();
-      List<String> biomarkerTypeStrings =
-          types.map((type) => type.name).toList();
+      List<String> biomarkerCategoryStrings = categories
+          .map((category) => category.name)
+          .toList();
+      List<String> biomarkerTypeStrings = types
+          .map((type) => type.name)
+          .toList();
       int startDateInt = startDateTime.millisecondsSinceEpoch;
       int endDateInt = endDateTime.millisecondsSinceEpoch;
       String value = await _channel.invokeMethod('getBiomarkers', {
         'categories': biomarkerCategoryStrings,
         'types': biomarkerTypeStrings,
         'startDateTime': startDateInt,
-        'endDateTime': endDateInt
+        'endDateTime': endDateInt,
       });
       return value;
     } on PlatformException catch (error) {
@@ -432,17 +447,19 @@ static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async 
     }
   }
 
-  static Future<String> getStats(
-      {required SahhaSensor sensor,
-      required DateTime startDateTime,
-      required DateTime endDateTime}) async {
+  @Deprecated('Use getBiomarkers to read server-processed biomarkers instead.')
+  static Future<String> getStats({
+    required SahhaSensor sensor,
+    required DateTime startDateTime,
+    required DateTime endDateTime,
+  }) async {
     try {
       int startDateInt = startDateTime.millisecondsSinceEpoch;
       int endDateInt = endDateTime.millisecondsSinceEpoch;
       String stats = await _channel.invokeMethod('getStats', {
         'sensor': sensor.name,
         'startDateTime': startDateInt,
-        'endDateTime': endDateInt
+        'endDateTime': endDateInt,
       });
       return stats;
     } on PlatformException catch (error) {
@@ -452,17 +469,19 @@ static Future<SahhaSensorStatus> enableSensors(List<SahhaSensor> sensors) async 
     }
   }
 
-  static Future<String> getSamples(
-      {required SahhaSensor sensor,
-      required DateTime startDateTime,
-      required DateTime endDateTime}) async {
+  @Deprecated('Use getBiomarkers to read server-processed biomarkers instead.')
+  static Future<String> getSamples({
+    required SahhaSensor sensor,
+    required DateTime startDateTime,
+    required DateTime endDateTime,
+  }) async {
     try {
       int startDateInt = startDateTime.millisecondsSinceEpoch;
       int endDateInt = endDateTime.millisecondsSinceEpoch;
       String samples = await _channel.invokeMethod('getSamples', {
         'sensor': sensor.name,
         'startDateTime': startDateInt,
-        'endDateTime': endDateInt
+        'endDateTime': endDateInt,
       });
       return samples;
     } on PlatformException catch (error) {
