@@ -219,11 +219,10 @@ enum SahhaBiomarkerType {
 enum SahhaBiomarkerCategory {
   activity,
   body,
-  characteristic,
-  reproductive,
+  engagement,
+  nutrition,
   sleep,
   vitals,
-  nutrition
 }
 
 enum SahhaSensorStatus { pending, unavailable, disabled, enabled }

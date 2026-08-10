@@ -707,10 +707,10 @@ enum SahhaScoreType {
 enum SahhaBiomarkerCategory {
   activity,
   body,
-  characteristic,
-  reproductive,
+  engagement,
+  nutrition,
   sleep,
-  vitals
+  vitals,
 }
 ```
 
