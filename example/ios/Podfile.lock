@@ -1,9 +1,9 @@
 PODS:
   - Flutter (1.0.0)
-  - Sahha (1.4.0-beta.1)
-  - sahha_flutter (1.4.0-beta.1):
+  - Sahha (1.4.0-beta.2)
+  - sahha_flutter (1.4.0-beta.2):
     - Flutter
-    - Sahha (= 1.4.0-beta.1)
+    - Sahha (= 1.4.0-beta.2)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -21,8 +21,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  Sahha: 62e9ceca5431682ddfc55fd5768ebf8c63e84e3f
-  sahha_flutter: 95bbf357e431eecc164d09d6a61f7e1fdcc7bb52
+  Sahha: 4c76bc33ab9e1e1e6f7800e3b400c8887df96961
+  sahha_flutter: 593d8d998464d133e4fa307be5a2894e5e77f39e
 
 PODFILE CHECKSUM: 3e9409b67ba5801961716bfaf81c42bfee93d9a9
 
