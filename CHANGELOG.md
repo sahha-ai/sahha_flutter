@@ -1,3 +1,20 @@
+## 1.4.0-beta.2
+
+### Added
+
+-
+
+### Changed
+
+- Updated iOS to 1.4.0-beta.2 — check release notes https://github.com/sahha-ai/sahha-ios/releases
+- Updated Android to 1.4.0-beta.2 — check release notes https://github.com/sahha-ai/sahha-android-sdk/releases
+
+### Fixed
+
+- Android: `getSamples` for steps no longer returns empty or partial results — step queries previously shared the background upload pipeline's de-duplication state, hiding records already collected by sync (fixed in the native 1.4.0-beta.2 release).
+
+---
+
 ## 1.4.0-beta.1
 
 ### Added
