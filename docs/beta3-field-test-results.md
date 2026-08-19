@@ -62,23 +62,23 @@ Both tokens carry `exp` and the `profileId` claim, which is exactly what
 | A4 | Foreign value | **PASS** |
 | A5 | Undecodable bytes | **PASS** |
 | A6 | Anchors under pre-rename keys | **PASS** |
-| B1 | Offline cold launch recovers | PENDING |
-| B2 | Backoff cadence and event bypasses | PENDING |
+| B1 | Offline cold launch recovers | BLOCKED (rig) |
+| B2 | Backoff cadence and event bypasses | BLOCKED (rig) |
 | C1 | Steady state is quiet and single-flight | **PASS** |
 | C2 | Externally dropped delivery re-armed | PENDING |
 | C3 | Background delivery end to end | PENDING |
 | D1 | Auth-gated calls wait for configure | **PASS** |
 | D2 | Deauthentication is total | **PASS** |
 | D3 | Deauthenticate mid-upload | PENDING |
-| D4 | Deauth idempotent under abuse | PENDING |
+| D4 | Deauth idempotent under abuse | **PASS** |
 | D5a | Locally expired profile token refreshes | **PASS** |
 | D5a-soon | Proactive refresh inside the 30m window (extra) | **PASS** |
 | D5b | Server-rejected profile token heals | **PASS** |
 | D6a | Locally expired refresh token expires session | **PASS** (re-run, see F-8) |
 | D6b | Server-authoritative rejection | **PASS (guard)** — see note |
-| E1 | Declarative replace | PENDING |
-| E2 | Non-HealthKit-only set | PENDING |
-| E3 | Empty set is a guarded error | PENDING |
+| E1 | Declarative replace | **PASS** |
+| E2 | Non-HealthKit-only set | **PASS** |
+| E3 | Empty set is a guarded error | **PASS** |
 | F1 | Large historical backfill | PENDING |
 | F2 | Dense-day stress | PENDING |
 | G1 | 48-hour ambient soak | PENDING |
@@ -592,6 +592,156 @@ it did not.
 > To exercise the positive path, either a server that returns 401/403 for an invalid refresh
 > token is needed, or the classifier's terminal branch should be unit-tested in the SDK. Logged
 > as F-11.
+
+### D4 — Deauthentication is idempotent under abuse
+
+**Status: PASS**
+
+Four hammer runs of five concurrent `deauthenticate()` calls each — 20 calls total, every one
+returning `true`:
+
+| Leg | Condition | Result |
+| --- | --- | --- |
+| 1 | Authenticated, online | 5/5 `true` |
+| 2 | Already deauthenticated, online | 5/5 `true` |
+| 3 | Airplane mode on (offline) | 5/5 `true` |
+| 4 | Airplane mode on, repeat | 5/5 `true` |
+
+Leg 1 output, representative of all four:
+
+```
+StressLab: D4 call 1/5 -> true
+StressLab: D4 call 2/5 -> true
+StressLab: D4 call 3/5 -> true
+StressLab: D4 call 4/5 -> true
+StressLab: D4 call 5/5 -> true
+StressLab: D4 -> all 5 calls succeeded
+```
+
+Concurrent callers join the single in-flight teardown rather than each reconfiguring and
+orphaning a container. The scenario's three conditions — concurrency, no prior session, and no
+network — all converge, matching the SDK's stated contract that deauthentication "never throws
+and requires no session or prior configure: logout is a convergent operation, and wrappers
+fire-and-forget it."
+
+The offline legs are the most load-bearing: deauthentication must not depend on reaching the
+server, or a signed-out user on a plane stays signed in.
+
+### B1 / B2 — Offline cold launch and backoff cadence
+
+**Status: BLOCKED** — rig constraint, not a product result
+
+Both scenarios require a **cold launch while offline**. That is unreachable on this rig, for a
+reason that compounds the debug-launch constraint recorded above:
+
+1. A debug-mode Flutter app cannot be launched by `devicectl` — iOS forbids JIT without an
+   attached debugger — so every cold launch must go through `flutter run`.
+2. `flutter run` reinstalls the app each time, and iOS requires **network connectivity to
+   verify a development-signed app's certificate** before a newly installed build may run:
+   *"an internet connection is required to verify trust of the developer — this app will not be
+   available until verified."*
+
+So the only mechanism available for cold-launching the build is the one mechanism that cannot
+work without a network. Attempting B1 produced no bring-up narration at all: the app never
+started.
+
+**What would unblock them.** A **profile-mode** build launches standalone from the home screen
+(AOT, no debugger, no reinstall per launch), so trust is verified once and later cold launches
+work offline. That needs two changes: `SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG` added to
+the **Profile** build configuration only (never Release, which must not ship the chaos
+channel), and the Dart-side `ChaosChannel.isSupported` gate widened from `kDebugMode`, which is
+false in profile. It also changes the runtime under test from JIT to AOT, which is a real
+difference worth stating when the results are read.
+
+Neither scenario was attempted further. F-3 remains the run's only evidence touching network
+transitions, and it is worth noting that F-3 predicts these scenarios would be awkward to
+interpret anyway: the `[Network Monitor]` start/stop churn means the transition event B1 and B2
+depend on may not behave as the plan assumes.
+
+### E1 — Declarative replace
+
+**Status: PASS**
+
+| Stage | Store bytes | Decoded |
+| --- | --- | --- |
+| Select All → ENABLE | 2636 | 144 sensors |
+| Select `[steps]` → ENABLE | **9** | `["steps"]` |
+
+`enableSensors(144 sensors) -> enabled` then `enableSensors(1 sensors) -> enabled`. The second
+call **replaced** the set rather than merging into it, which is the declarative contract and the
+support story for accidental narrowing.
+
+**The 29 canonical anchors survived the narrowing**, and that is correct rather than incidental.
+Anchors record collection *position*, not enablement, so discarding them when a sensor leaves
+the set would force a full historical re-backfill whenever the set was widened again — the A6
+failure mode arriving by a different route. Keeping them means re-enabling resumes where
+collection left off.
+
+### E2 — Non-HealthKit-only set
+
+**Status: PASS**
+
+Replacing an HK-backed set (`["steps"]`) with a set containing no HealthKit-backed sensors:
+
+```
+flutter: Permissions: enableSensors(1 sensors) -> enabled
+```
+
+| Signal | Observed |
+| --- | --- |
+| Store after | 15 bytes, `["device_lock"]` |
+| Error "Health data types not specified" | none |
+| HealthKit sheet | none |
+| Observer arming / teardown narration | none |
+| Canonical anchors | 29, unchanged |
+
+The write stood and HealthKit teardown was skipped, which is the zero-HK replacement guard
+behaving as specified. Anchors surviving matters for the same reason as in E1: a later
+re-widening to HK-backed sensors resumes from stored positions rather than re-backfilling.
+
+The dashboard notice arrived as the plan's section 6 predicts:
+
+```
+"sdk" null "enableSensors replaced 1 HealthKit-backed sensor(s) with a set containing none;
+ the new set was persisted, but HealthKit teardown was skipped and the replaced sensors may
+ keep collecting until the next launch."
+```
+
+> **Worth a deliberate decision (O-2).** That notice is honest and the behaviour is by design,
+> so it is not recorded as a defect. But it states that HK-backed sensors removed from the set
+> **keep collecting until the next cold launch**. Read as a privacy property rather than a
+> correctness one, that means a user who removes `heart_rate` continues to have heart rate
+> collected for an unbounded period — until the app happens to be force-quit and relaunched,
+> which a user may never do. The persisted set says the sensor is off while the observer says
+> otherwise. Recommend the team decide explicitly whether "off" should take effect immediately
+> for HK-backed sensors on this path, or whether the disclosure is considered sufficient.
+
+### E3 — Empty set is a guarded error
+
+**Status: PASS**
+
+```
+flutter: Permissions: enableSensors(0 sensors) failed ->
+  PlatformException(Sahha Error, Sensor set cannot be empty., null, null)
+```
+
+The persisted set was byte-identical either side of the failed call:
+
+```
+before E3: e2a1fd5c33fbe09e15f3c71ba91a9de0  15 bytes
+after  E3: e2a1fd5c33fbe09e15f3c71ba91a9de0  15 bytes
+UNTOUCHED: True
+```
+
+The guard fires before any write or teardown, so collection continues on the previously enabled
+set rather than being silently cleared.
+
+**This validates the copy fix delivered with the Stress Lab work.** `SensorPermissionView`
+previously claimed an empty list "exercises the SDK's default-set behaviour"; the corrected
+caption at `SensorPermissionView.dart:509` states that `enableSensors([])` fails with
+"Sensor set cannot be empty." and leaves the stored set untouched. Both halves are now verified
+on-device — the message matches verbatim, and the bytes are provably unchanged rather than
+assumed to be.
 
 ### S1 — End-to-end pipeline comes up clean
 
