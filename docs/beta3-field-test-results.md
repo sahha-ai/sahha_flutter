@@ -66,10 +66,10 @@ Both tokens carry `exp` and the `profileId` claim, which is exactly what
 | B2 | Backoff cadence and event bypasses | BLOCKED (rig) |
 | C1 | Steady state is quiet and single-flight | **PASS** |
 | C2 | Externally dropped delivery re-armed | PENDING |
-| C3 | Background delivery end to end | PENDING |
+| C3 | Background delivery end to end | **PASS** (with O-3 open) |
 | D1 | Auth-gated calls wait for configure | **PASS** |
 | D2 | Deauthentication is total | **PASS** |
-| D3 | Deauthenticate mid-upload | PENDING |
+| D3 | Deauthenticate mid-upload | **PASS** |
 | D4 | Deauth idempotent under abuse | **PASS** |
 | D5a | Locally expired profile token refreshes | **PASS** |
 | D5a-soon | Proactive refresh inside the 30m window (extra) | **PASS** |
@@ -104,6 +104,22 @@ plan: a force-quit cannot be followed by tapping the icon — the relaunch has t
 the tooling. Hot restart (`R`) is *not* a substitute, because it re-runs Dart `main()`
 without re-running native SDK bring-up, which is the thing most A- and D-series scenarios
 are actually testing.
+
+**`Sahha.debugLogging` is an uncommitted local edit and can be silently lost.** Partway
+through the run all native SDK narration stopped: 0 `[Sahha…]` lines where earlier sessions had
+94. The cause was the `sahha-ios` working copy moving to a new branch, which discarded the
+uncommitted `debugLogging = true` tweak that step 5 of the plan requires. Nothing announces
+this — the app still runs, Dart logs still print, and only the SDK's own narration disappears,
+which is exactly the channel several scenarios use as their pass/fail signal. It invalidated one
+D3 run before being caught. **Any scenario whose evidence is an absent native log line should
+first assert that native lines are present at all.**
+
+**`flutter run` detaches when the app is backgrounded.** Backgrounding produced
+`Lost connection to device.` and froze the log. This makes every background-delivery scenario
+(C2, C3, F2's regression probe, G1) unobservable through the tooling used for the rest of this
+run, and it silently yields *stale* data rather than an error — counts simply stop changing,
+which reads like "nothing happened". The plan anticipates this in section 1.6 and prescribes
+running the `Runner` scheme from Xcode or watching Console.app. That route was not set up here.
 
 **The app data container is readable over `devicectl`.** `Library/Preferences/
 sahha.flutter.ios.plist` can be pulled directly, so the `sensors` key, anchor-key counts and
@@ -743,6 +759,94 @@ caption at `SensorPermissionView.dart:509` states that `enableSensors([])` fails
 on-device — the message matches verbatim, and the bytes are provably unchanged rather than
 assumed to be.
 
+### D3 — Deauthenticate mid-upload
+
+**Status: PASS**
+
+The first attempt was **discarded as invalid**, and the reason is worth recording. Sensors had
+not actually been enabled (a missed tap), so no upload was in flight — and separately, that
+session captured **zero** native SDK narration. Since "Max retry attempts exceeded" is a native
+`Sahha.log` line, grepping a silent channel for it proves nothing. Both faults were fixed before
+re-running (see the narration note below).
+
+Valid run — payload genuinely in flight when the teardown landed:
+
+| Signal | First (invalid) run | Valid run |
+| --- | --- | --- |
+| Native narration lines | 0 | **107** |
+| Initial syncs | 0 | 3 |
+| Observer queries | 0 | 3 (146 sleep + 733 heart_rate + 174 steps = 1053 samples) |
+| Upload chunks | 0 | 12 |
+| `Max retry attempts exceeded` | 0 (meaningless) | **0 (meaningful)** |
+
+The deauthentication landed two log lines after the final upload chunk, so the teardown
+genuinely raced an active flight. Teardown narration:
+
+```
+[DataLog Persistent Queue] Cleared all persisted batches
+[Tag Persistent Queue] Cleared all persisted batches
+[HealthKitObserverStore] removeAllObservers called (3 observers)
+[Sahha] Background Coordinator stopped
+flutter: StressLab: D3 deauthenticate() -> true
+```
+
+Both persistent queues were **cleared** rather than left behind. That is the mechanism behind
+the scenario's "no ghost re-upload after re-auth" expectation: the torn-down batches cannot
+resurrect because they no longer exist, rather than depending on a later dedup check.
+
+The ghost-upload assertion is taken as satisfied by that mechanism rather than by observation,
+and deliberately so: deauthentication also wipes the anchors and `sentLogIds`, so any
+re-authenticate-and-re-enable legitimately triggers a full backfill. A post-re-auth upload
+burst is therefore expected behaviour and cannot be distinguished from a ghost by volume alone.
+The queue-clear narration is the stronger evidence.
+
+### C3 — Background delivery end to end
+
+**Status: PASS** on its stated assertion; an unexplained observation is recorded as O-3
+
+With the app backgrounded and fresh heart-rate samples dripped, delivery fired and samples
+uploaded **without the app being opened**:
+
+```
+[HealthKitObserver] Background delivery triggered for heart_rate
+[HealthKitDataLogCoordinator] Background observer query completed for heart_rate: success, samples: 144, logs: 144
+[DataLogUploader] Successfully uploaded chunk with 52 items (priority: high)
+```
+
+102 delivery triggers and 12+ upload chunks were observed while backgrounded, which satisfies
+the scenario: the observer fires in the background and data reaches the server unattended.
+
+### O-3 — 96 of 98 background queries returned an identical 144 samples (unresolved)
+
+During C3, `heart_rate` observer queries returned **exactly 144 samples 96 times** out of 98
+queries, against 102 delivery triggers. Control sensors behaved completely differently in the
+same session: `steps` and `sleep` ran **2 queries each**. Cumulative unique items tracked reached
+only ~1170, so roughly 13,800 sample-reads produced ~1,170 distinct logs.
+
+Two explanations remain open, and they differ in severity:
+
+- **Benign.** Each drip writes 144 *new* HealthKit objects — new UUIDs even at identical
+  timestamps — so an anchored query legitimately returns 144 new objects per drip, the anchor
+  advances correctly, and the SDK's deterministic log IDs dedup the value-identical results
+  downstream. The heart-rate skew then simply reflects that heart rate was the sensor being
+  dripped repeatedly.
+- **Serious.** The anchor is not advancing across delivery triggers, so every background wake
+  re-reads and re-builds the same 144 logs indefinitely. That would be a real battery and CPU
+  cost incurred precisely when the app is backgrounded, and a plausible mechanism for the F2
+  wedge the plan is built to detect.
+
+**Why it could not be settled here.** The discriminator is a query with *no* new data: a
+correctly-advancing anchor must return `noSamples, samples: 0`. Attempting it failed for a rig
+reason — `flutter run` printed `Lost connection to device.` when the app was backgrounded, so
+the log froze and no post-drip query was captured. The apparently unchanged counts were an
+artifact of a dead capture, not a measurement.
+
+**How to settle it.** Run the `Runner` scheme from Xcode, or watch Console.app filtered to
+process `Runner`, as the plan's section 1.6 already advises for background scenarios. Then, with
+no new samples written, force one collection pass (Post Sensor Data or a background wake) and
+read the sample count. `0` confirms the benign reading; `144` confirms the anchor is stuck and
+should be raised as a defect.
+
 ### S1 — End-to-end pipeline comes up clean
 
 **Status: IN PROGRESS** — arming and collection verified, upload confirmation pending
@@ -1020,6 +1124,27 @@ plan uses as its pass/fail instrument.
 Possible fixes: make `postError` awaitable and await it inside `expireSession` before clearing;
 or resolve and capture the token for the post before the clear; or route the expiry error
 through the persistent queue so it survives re-authentication and uploads later.
+
+### F-12 — Debug backtraces are printed on the deauthentication teardown path (low)
+
+Two call sites dump a raw stack trace into the log whenever they run:
+
+```swift
+Thread.callStackSymbols.prefix(10).forEach { Sahha.log("  \($0)") }
+```
+
+- `HealthKitObserverStore.swift:30` — in `removeAllObservers`
+- `HealthKitObserverService.swift:177` — in `dispose`
+
+Observed during D3: ~20 lines of mangled Swift symbols and hex addresses interleaved with the
+teardown narration, e.g.
+`0 Sahha 0x0000000105589d48 $s5Sahha24HealthKitObserverServiceC7disposeyyYaFTY0_ + 88`.
+
+This reads as leftover instrumentation from debugging the dispose path rather than intentional
+product logging. It is gated behind `debugLogging`, so severity is low, but it makes the
+teardown sequence materially harder to read at exactly the moment an engineer is most likely to
+be reading it — and this plan instructs testers to enable that logging. Recommend removing both
+call sites, or reducing them to a single line naming the caller.
 
 ### F-11 — D6b's positive path (clean 401/403 expiry) is unverifiable on development (test-coverage)
 
