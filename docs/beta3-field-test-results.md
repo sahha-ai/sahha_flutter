@@ -60,21 +60,22 @@ Both tokens carry `exp` and the `profileId` claim, which is exactly what
 | A2 | Mixed unknown | **PASS** |
 | A3 | All-unknown (downgrade simulation) | **PASS** |
 | A4 | Foreign value | **PASS** |
-| A5 | Undecodable bytes | PENDING |
-| A6 | Anchors under pre-rename keys | PENDING |
+| A5 | Undecodable bytes | **PASS** |
+| A6 | Anchors under pre-rename keys | **PASS** |
 | B1 | Offline cold launch recovers | PENDING |
 | B2 | Backoff cadence and event bypasses | PENDING |
 | C1 | Steady state is quiet and single-flight | **PASS** |
 | C2 | Externally dropped delivery re-armed | PENDING |
 | C3 | Background delivery end to end | PENDING |
-| D1 | Auth-gated calls wait for configure | PENDING |
-| D2 | Deauthentication is total | PENDING |
+| D1 | Auth-gated calls wait for configure | **PASS** |
+| D2 | Deauthentication is total | **PASS** |
 | D3 | Deauthenticate mid-upload | PENDING |
 | D4 | Deauth idempotent under abuse | PENDING |
-| D5a | Locally expired profile token refreshes | PENDING |
-| D5b | Server-rejected profile token heals | PENDING |
-| D6a | Locally expired refresh token expires session | PENDING |
-| D6b | Server-authoritative rejection | PENDING |
+| D5a | Locally expired profile token refreshes | **PASS** |
+| D5a-soon | Proactive refresh inside the 30m window (extra) | **PASS** |
+| D5b | Server-rejected profile token heals | **PASS** |
+| D6a | Locally expired refresh token expires session | **PASS** (re-run, see F-8) |
+| D6b | Server-authoritative rejection | **PASS (guard)** — see note |
 | E1 | Declarative replace | PENDING |
 | E2 | Non-HealthKit-only set | PENDING |
 | E3 | Empty set is a guarded error | PENDING |
@@ -258,6 +259,340 @@ reach the dashboard.
 The storage inspector deliberately reports the value's type without its contents, mirroring the
 same discipline; that is why the snapshots above are hashed rather than printed.
 
+### A5 — Undecodable bytes
+
+**Status: PASS**
+
+`poisonStoreGarbage` wrote 32 random bytes as `Data`. Across a cold launch:
+
+```
+sha256 before: a43c833077feae8e94182e1cdd047ce4  32 bytes
+sha256 after : a43c833077feae8e94182e1cdd047ce4  32 bytes
+IDENTICAL: True
+```
+
+Configure completed normally — no crash, no thrown read, no observers armed, and
+`getSensorStatus` returned `pending` for the full 8-sensor set. This is the
+subtlest of the A-series contracts: the lenient store must degrade quietly rather than fail
+loudly, and the plan notes the "could not be read" error path is reserved for a store disposed
+mid-call, which external sabotage cannot reach. Nothing in the console suggested otherwise.
+
+Together A1–A5 exercise the store in four directions — repair what is renameable (A1), drop
+what is unknown while keeping the rest (A2), and refuse to touch either unrecognised contents
+(A3) or a wrong type (A4/A5). The destructive and non-destructive instincts are both correct,
+which is the pairing most at risk in a refactor.
+
+### A6 — Anchors under pre-rename keys
+
+**Status: PASS**
+
+`relocateAnchorsToLegacyKeys` moved all three anchors to their pre-rename prefix, verified from
+the container before the relaunch:
+
+```
+anchors: modern hkAnchor.=0 hkAnchorDate.=0 | legacy sahha_hkAnchor.=3 date_hkAnchorDate.=0
+```
+
+After a cold launch:
+
+```
+[HealthKitObserver] startObservers called for 3 sensors: ["heart_rate", "sleep", "steps"]
+[HealthKitDataLogCoordinator] Background observer query completed for heart_rate: noSamples, samples: 0, logs: 0
+[HealthKitDataLogCoordinator] Background observer query completed for sleep: noSamples, samples: 0, logs: 0
+[HealthKitDataLogCoordinator] Background observer query completed for steps: noSamples, samples: 0, logs: 0
+```
+
+**The decisive evidence is an absent line.** `Initial sync … Limiting to 30 days history` fires
+whenever `loadAnchor` returns nil — all three appeared at S1, when the anchors genuinely did not
+exist. None appeared here, so the anchors were found through the legacy prefix and every query
+resumed from its stored position. The pre-fix symptom would have been three initial syncs and a
+re-query of ~505 historical samples.
+
+Sample counts alone would have been weaker evidence than this: `SentLogStore` dedups
+already-sent items, so a re-queried flood could show near-zero *uploads* while the anchor read
+was in fact broken. The query counts and the missing initial-sync lines are what distinguish
+the two.
+
+The alias read under test:
+
+```swift
+private func data(forUnprefixedKey key: String) -> Data? {
+    storage.data(forKey: prefix + key) ?? storage.data(forKey: legacyPrefix + key)
+}
+```
+
+Anchors were **read** from the legacy keys without being **migrated** to canonical ones — the
+counts are unchanged afterwards. That matches `loadAnchor`'s stated design: saves are canonical
+but not prompt, and the old key is deliberately never deleted because deletion is worse on
+downgrade.
+
+**Fresh drip confirms the resume is live, not just quiet.** One hour of new steps produced
+exactly one sample, and the anchor keys moved:
+
+```
+[HealthKitDataLogCoordinator] Background observer query completed for steps: success, samples: 1, logs: 1
+```
+
+| Key family | Before drip | After drip |
+| --- | --- | --- |
+| `hkAnchor.` (canonical) | 0 | **1** |
+| `sahha_hkAnchor.` (legacy) | 3 | 3 |
+
+The anchor was read from the legacy key, the query returned samples, and the advanced anchor
+was saved to the **canonical** key while the legacy key was left in place. Only `steps`
+migrated because only `steps` had samples — `sleep` and `heart_rate` returned none and skipped
+their saves. That is the lazy, per-sensor migration `loadAnchor` describes, observed directly.
+
+This also resolves the drip question raised during A1, where a drip reported `noSamples`. Drips
+do flow; that reading was a timing artifact of the observer firing before HealthKit surfaced
+the write, not a collection failure.
+
+Scope note: `loadAnchor` carries a second, independent alias for renamed sensor *names* via
+`currentToLegacyRawValue`. A6 exercises only the *prefix* alias, so this result does not cover
+that path.
+
+### D1 — Auth-gated calls wait for configure
+
+**Status: PASS**
+
+Warm races (Stress Lab "Race: configure → gated call", fired several times) produced no failure
+of any kind. Three further cold launches with the persisted cold-launch race toggle on, each a
+genuine bring-up (`configure() starting fresh (container exists: false)`), each firing
+`getScores()` immediately after `configure()` without awaiting it:
+
+| Cycle | `Unauthorized` occurrences | `getScores` outcome |
+| --- | --- | --- |
+| 1 | 0 | Real score payload |
+| 2 | 0 | Real score payload |
+| 3 | 0 | Real score payload |
+
+The in-app record after cycle 2 read `getScores returned 10548 chars`. Every run returned
+scores, never the SDK's unauthorized message — which is the exact regression D1 exists to catch.
+
+**This run also isolates F-2 conclusively.** On the same cold launch, at the same moment:
+
+```
+[SahhaActor] configure() starting fresh (container exists: false)
+flutter: isAuthenticated: false                                  <- property: wrong
+flutter: Cold-launch race getScores Result: [{"state":"medium","type":"wellbeing",...   <- call: correct
+```
+
+The auth-gated *call* waits for configure and succeeds; the `isAuthenticated` *property* does
+not wait and answers `false` for the very session that call is about to use successfully. Same
+process, same instant, opposite answers. That is the D13a gate being applied to
+`runAsyncWithCallback` and not to the public properties, observed as a controlled comparison
+rather than inferred from a single reading. Across every session in this run the property answered
+`false` 14 times and `true` 21 times — the false readings clustered at cold launch, before
+bring-up completes.
+
+So D1's own contract holds, and the defect it was designed to detect survives one API layer
+across — see F-2.
+
+### D2 — Deauthentication is total
+
+**Status: PASS**
+
+Read from the device container either side of `deauthenticate()`:
+
+| Surface | Pre | Post | Required |
+| --- | --- | --- | --- |
+| `sensors` | 30 bytes, `["sleep","steps","heart_rate"]` | **ABSENT** | gone |
+| `hkAnchor.` (canonical) | 1 | **0** | gone |
+| `sahha_hkAnchor.` (legacy) | 3 | **0** | gone |
+| `deviceInfo` | present | gone | — |
+| `com.sahha.diagnostic_report` | present | gone | — |
+| `sentLogIds` | present | gone | — |
+| `deviceId` | present | **present** | **retained** |
+| Keychain `token` | true | **false** | gone |
+| Keychain `demographic` | false | **false** | gone |
+
+`deviceId` survived while every other SDK-owned key went, which is the asymmetry the scenario
+is built around.
+
+**A6 made this a sharper test than the plan assumes.** Deauthentication ran with anchors under
+*both* prefixes — 1 canonical and 3 legacy. `HealthKitAnchorStore.dispose()` claims to sweep
+the legacy family precisely because "a legacy-key anchor that survives deauth would be
+resurrected by the fallback read" in `loadAnchor`. Both families went to zero, so that claim
+holds against the exact state that would expose it. Running D2 from a clean install would have
+left the legacy sweep untested.
+
+The keychain `demographic` item being absent *before* deauthentication is consistent with F-5:
+there is genuinely no demographic for this profile, which is why that endpoint keeps returning
+204.
+
+Re-authentication afterwards succeeded and `getSensorStatus` returned `pending` across the
+board — the sensor set is account-scoped and must be re-enabled by design, which is the
+post-condition the scenario asks for. The Authentication screen's new "Signed in as" row
+tracked the change correctly in both directions, confirming the F-6 fix.
+
+### D5a — Locally expired profile token refreshes proactively
+
+**Status: PASS**
+
+The forge rewrote the *real* server-issued profile token, preserving every other claim:
+
+```
+StressLab: expireProfileToken -> { "profileToken": "expired 60m ago", "profileIdPreserved": true, ... }
+```
+
+After a cold launch:
+
+| Signal | Observed |
+| --- | --- |
+| `POST /v1/oauth/profile/refreshToken` | **1** |
+| `getScores` result | `[]` — empty, not an error |
+| `Session expired` | none |
+| `[Sahha Error] HTTP …` | none |
+| `Unauthorized …` | none |
+
+Exactly one refresh, fired *before* the call rather than in response to a rejection — the
+`AuthManager.swift:73` proactive path. The empty array is a successful response: this is a
+newly created profile with no scores yet, and the assertion is that the call completes rather
+than that it returns data.
+
+This also validates the forging design against a real token rather than a synthetic one. The
+`https://api.sahha.ai/claims/profileId` claim survived the rewrite, and the re-encoded
+`TokenResponse` blob stayed decodable — had it not, the run would have exercised the D10
+unreadable-keychain path instead, which is a different test entirely.
+
+### D5a-soon — Proactive refresh fires inside the 30-minute window (extra)
+
+**Status: PASS** — not a plan scenario; added to isolate the `expiryOffset`
+
+`expireProfileTokenSoon` sets `exp` to five minutes in the future, so the token is **not**
+expired in absolute terms:
+
+```
+StressLab: expireProfileTokenSoon -> { "profileToken": "expires in 5m — inside the 30m proactive-refresh window", ... }
+```
+
+A refresh fired anyway:
+
+| Signal | Observed |
+| --- | --- |
+| `POST /v1/oauth/profile/refreshToken` | **1** |
+| `getScores` result | `[]` — successful |
+| `Session expired` | none |
+
+This isolates `AuthManager`'s `expiryOffset: .minutes(30)` default, which `AuthDI` does not
+override. D5a cannot demonstrate it: a hard-expired token would refresh under any offset, so it
+cannot distinguish "the 30-minute window works" from "the clock passed". A token still valid for
+five minutes can only be refreshed *because* of the offset.
+
+It also settles the design question behind the forgers. No server-issued short-lived token is
+needed, because `JWT.isExpired` never verifies signatures — it base64url-decodes the payload and
+reads `exp`. The local decision is therefore entirely controlled by the `exp` written into an
+otherwise-real token, and the signature only governs whether the *server* accepts it, which is
+what separates D5a from D5b.
+
+### D5b — Server-rejected profile token heals reactively
+
+**Status: PASS**
+
+`invalidateProfileToken` writes a future `exp` with a bogus signature, so the token passes every
+local check and only the server can reject it.
+
+```
+[Sahha Error] HTTP 401 | Response:
+[Sahha Error] HTTP 401 | Response:
+```
+
+| Signal | D5a (proactive) | D5b (reactive) |
+| --- | --- | --- |
+| HTTP 401s | 0 | **2** |
+| `POST /v1/oauth/profile/refreshToken` | 1 | **1** |
+| `getScores` result | `[]` | `[]` |
+| Session expired | no | no |
+
+The call succeeded and the session stayed alive, which is the scenario's assertion.
+
+**Two 401s produced one refresh.** That is the single-flight guarantee in `runRefreshFlight`
+holding under real concurrency — two in-flight requests were rejected independently, joined the
+same refresh flight, and only one refresh-token rotation was spent. Without it each failing
+request would burn its own rotation, which is the behaviour `minRefreshInterval` and the
+single-flight actor exist to prevent. The plan does not ask for this; it fell out of the
+scenario because bring-up happens to issue concurrent authenticated requests.
+
+D5a and D5b together reach opposite paths by changing only *which part* of the JWT is wrong —
+`exp` for the local check at `:73`, signature for the server's verdict. That separation is what
+made forging real three-part JWTs necessary rather than writing garbage.
+
+### D6a — Locally expired refresh token expires the session cleanly
+
+**Status: PASS** — on the corrected setup; see F-8 for why the plan's own setup does not reach this code
+
+Run with **both** tokens forged: the profile token expired to force a refresh flight at `:73`,
+the refresh token expired so that flight short-circuits at `:143`.
+
+| Signal | Observed | Required |
+| --- | --- | --- |
+| `POST /v1/oauth/profile/refreshToken` | **0** | 0 — no server round trip |
+| HTTP errors | **0** | none |
+| Session | expired, store cleared | expired |
+
+```
+flutter: Cold-launch race getScores Error: PlatformException(Sahha Error,
+  Unauthorized. Please call `Sahha.authenticate(...)` first., null, null)
+```
+
+The session died entirely locally with zero network traffic, which is the scenario's central
+claim: the dead-session verdict is independent of the server's status-code choice.
+
+Two observations on the surfaced error. The message is the *unauthenticated* one rather than
+`sessionExpiredMessage` — by the time the race's `getScores` read the store, `clearToken()` had
+already run, so it took the nil-token branch at `AuthManager:71`. This is **not** a D1
+violation: D1 forbids that message from a launch-time race *while a profile is signed in*, and
+here the session is genuinely dead. But it does tell a host "you never authenticated" when the
+truth is "your session expired", which are different remedies from an integrator's point of
+view.
+
+The second observation is more serious and is recorded as F-9.
+
+### D6b — Server-authoritative rejection
+
+**Status: PASS (anti-regression guard)** — the clean-expiry path is not reachable on the
+development server; see the note below.
+
+First attempt was **BLOCKED** by F-10: with the refresh endpoint accepting a signature-invalid
+token (HTTP 200), the forged session healed and stayed alive, so `isSessionTerminal` was never
+consulted. After the platform team fixed the development refresh endpoint (see F-10), the
+tampered-signature refresh token is rejected with **HTTP 400** (independently re-confirmed by
+`curl`: tampered-sig refresh → 400, was 200).
+
+Re-run with both tokens forged (future `exp`, bogus signatures):
+
+```
+flutter: Cold-launch race getScores Error: PlatformException(Sahha Error, HTTP Error:
+  {"title":"Invalid refresh token.","statusCode":400,"location":"domain", ... })
+```
+
+| Signal | Observed | Meaning |
+| --- | --- | --- |
+| Surfaced error | raw upstream `400 Invalid refresh token` | **not** the SDK's `Session expired…` message |
+| Keychain `token` after the run (in-app inspector) | **true** | session retained |
+| Same 400 on a second fresh cold launch | yes | bogus tokens still stored — confirms retention |
+
+Two distinct code paths could have run, and the evidence points at one:
+
+- **Terminal** → `isSessionTerminal` returns true → `expireSession()` → throws
+  `"Session expired. Please authenticate again."` and clears the keychain.
+- **Transient** → returns false → re-throws the raw `APIErrorResponse`, keeping the tokens.
+
+The raw 400 surfaced (not `sessionExpiredMessage`) and the keychain `token` stayed `true`, so
+the classifier took the **transient** branch. That is correct and is exactly the guard D6b
+protects: `invalidateBothTokens` gives the refresh token a *future* `exp`, so
+`JWT.isExpired(refreshToken)` is false, so a 400 resolves through the `400...499` corroboration
+branch to **not terminal**. A session dying on that bare 400 would have been the regression;
+it did not.
+
+> **Note — the "clean 401/403 expiry" half of D6b cannot be demonstrated on development.** The
+> server rejects a bad refresh token with **400**, never 401/403, so the authoritative-terminal
+> branch (`case 401, 403: return true`) is unreachable from the refresh endpoint here. What was
+> verified is the negative guard (no expiry on a bare 400 with a valid-looking refresh token).
+> To exercise the positive path, either a server that returns 401/403 for an invalid refresh
+> token is needed, or the classifier's terminal branch should be unit-tested in the SDK. Logged
+> as F-11.
+
 ### S1 — End-to-end pipeline comes up clean
 
 **Status: IN PROGRESS** — arming and collection verified, upload confirmation pending
@@ -437,6 +772,158 @@ no repairs" and then "A healthy device staying silent is the pass." No healthy-p
 exists — every log site in `SensorHealthCheckService` and its lifecycle listener is inside a
 failure branch. The first clause should be struck so the scenario cannot be read as requiring
 output that the code never emits.
+
+### F-7 — Signing out wrote the app secret to disk in plaintext (medium, this repo)
+
+Introduced by the `--dart-define` credential seeding added for this run, and caught by the D2
+container snapshot. After `deauthenticate()`, the app container held:
+
+```
+'flutter.appId', 'flutter.appSecret', 'flutter.externalId'
+```
+
+`onTapDeauthenticate` ends with `setPrefs()`, which unconditionally writes all three fields.
+Because `getPrefs()` seeds empty fields from `SahhaBuildCredentials`, the build-time app secret
+was persisted to a plaintext plist inside the app container — as a side effect of *signing
+out*, and without anyone having typed it.
+
+An app secret mints profile tokens for any external id in the account, so it is the one value
+that should never be written to disk casually. Before the seeding change this could only happen
+if a user typed the secret in themselves.
+
+Fixed by tracking which fields still hold an unedited build-time seed and skipping those in
+`setPrefs`; editing a field clears its flag, so typed credentials persist exactly as before. A
+secret already written by an affected build is not removed by the fix — reinstalling the app
+clears it.
+
+### F-8 — D6a as written cannot reach the code it names (plan defect)
+
+D6a says: "`expireRefreshToken` → force-quit → relaunch → `getScores`. *Expect:*
+`AuthManager:143` short-circuits, the session expires without a server round trip."
+
+Run exactly that way, nothing happened:
+
+| Signal | Observed |
+| --- | --- |
+| `POST /v1/oauth/profile/refreshToken` | 0 |
+| HTTP errors | 0 |
+| `getScores` | `[]` — succeeded |
+| Session | still alive |
+
+The short-circuit at `:143` lives *inside* `runRefreshFlight`, which only runs when
+`getValidProfileToken()` decides at `:73` that the **profile** token needs refreshing:
+
+```swift
+guard JWT.isExpired(token.profileToken, offset: expiryOffset) else { return token.profileToken }
+return try await refresh(replacing: token.profileToken)   // :73-74
+```
+
+Because D5b's reactive refresh had just minted a fresh 30-day profile token, `:73` was
+satisfied, no flight ran, and the expired refresh token was never examined. Expiring the
+refresh token alone is **inert** until something independently forces a refresh attempt.
+
+This is a defect in the scenario, not in the SDK — arguably the SDK behaving correctly, since
+it declined to spend a round trip it did not need. But a tester following D6a literally would
+record a false pass: zero round trips is exactly what the scenario predicts, for entirely the
+wrong reason.
+
+D6a should specify expiring **both** tokens — the profile token to force a flight, the refresh
+token to make that flight short-circuit — or state that it must run from a state where the
+profile token is already due for refresh. The same caveat applies to D6b, which depends on a
+refresh actually being attempted.
+
+### F-9 — Session-expiry errors never reach the dashboard (high)
+
+Observed twice during D6a's re-run:
+
+```
+[Sahha] - ERROR: Failed to post error log: SahhaError(message: "Unauthorized. Please call
+  `Sahha.authenticate(...)` first.", ... function: "getValidProfileToken()", line: 71)
+```
+
+`AuthManager.expireSession` is explicitly ordered to prevent this:
+
+```swift
+private func expireSession(cause: Error?) async -> SahhaError {
+    let sessionError = SahhaError(message: Self.sessionExpiredMessage, error: cause)
+    logger.postError(cause ?? sessionError)   // "Reports the cause first — once the store is
+    await tokenStore.clearToken()             //  cleared, no authenticated request can carry it."
+    return sessionError
+}
+```
+
+But `postError` is **synchronous** and hands off to `spawnPost`, which is
+`Task.detached(priority: .background)`. That detached task awaits a circuit-breaker check and
+then resolves an auth token, while `clearToken()` — a direct `await` on the actor — completes
+first. The post then finds a nil token and fails. Background priority makes losing the race
+close to certain.
+
+So the stated ordering guarantee is defeated by its own dispatch, and the failure is
+**structural, not incidental**: every session expiry clears the credentials that its own error
+report needs. Session death is the single event a support engineer most needs to see, and it is
+systematically invisible.
+
+It also compounds F-5. The dashboard reliably receives a benign 204 on every launch, and
+reliably loses genuine session expiry — noise arrives, signal does not, on the channel this
+plan uses as its pass/fail instrument.
+
+Possible fixes: make `postError` awaitable and await it inside `expireSession` before clearing;
+or resolve and capture the token for the post before the clear; or route the expiry error
+through the persistent queue so it survives re-authentication and uploads later.
+
+### F-11 — D6b's positive path (clean 401/403 expiry) is unverifiable on development (test-coverage)
+
+`isSessionTerminal` treats 401/403 as authoritative-terminal and expires the session. The
+development refresh endpoint returns **400** for every bad refresh token (tampered signature,
+and — per the SDK's own comment at `AuthManager:190` — expired tokens too), never 401/403. So
+the terminal branch that D6b's expectation ("session expires cleanly") depends on is never
+reachable through this endpoint in this environment.
+
+The negative guard is well covered on-device (D6a locally, D6b reactively). The positive
+terminal path is not, and cannot be without either a server that returns 401/403 for an invalid
+refresh token or a direct unit test of `isSessionTerminal` in the SDK. Recommend the latter as
+the durable fix — it pins the classifier's full truth table independently of server behaviour,
+which this run has shown varies.
+
+### F-10 — The development refresh endpoint does not validate the refresh token's signature (security — verify production)
+
+Found when D6b's forged-both-tokens session refused to die. Isolated from the SDK entirely and
+reproduced with `curl` against `https://development-api.sahha.ai`, using a throwaway profile
+created for the test.
+
+| # | Request | Token | Result |
+| --- | --- | --- | --- |
+| 1 | `POST /v1/oauth/profile/refreshToken` | valid header+payload, **signature replaced** with `abcdef` | **HTTP 200 + fresh valid token pair** |
+| 2 | `GET /v1/profile/demographic` | profile token, same signature tamper | HTTP 401 (correctly rejected) |
+| 3 | `POST /v1/oauth/profile/refreshToken` | payload `exp` pushed +10 years, real signature | HTTP 200 |
+| 4 | `POST /v1/oauth/profile/refreshToken` | `"garbage"` (not a JWT) | HTTP 400 |
+
+Test 1 is the finding: the refresh token is an HS256 JWT, and altering its signature does not
+cause rejection — the endpoint mints a new session anyway. Test 2 is the control: the resource
+server validates the *profile* token's signature and returns 401 for the same tamper, so the
+platform does verify signatures in general — the refresh endpoint specifically does not. Test 4
+shows it does parse (non-JWT → 400), so acceptance in test 1 is signature-specific, not a
+blanket accept.
+
+**Why this matters.** A refresh token is the long-lived credential; the whole point of its
+signature is that the server minted it. If the signature is unchecked, any party holding a
+token's header and payload — both of which are base64url, not encrypted — can keep a session
+alive indefinitely, and by test 3 can alter payload claims while doing so. The remediation being
+field-tested here hardens the *client's* handling of expired and rejected tokens; this is the
+server counterpart, and it undercuts the trust boundary the client-side work assumes.
+
+**Scope and caution.** Reproduced only on **development**. I did **not** test sandbox or
+production — that is the platform team's call, and probing a production auth server for a
+signature-bypass is not something to do without explicit authorization. I also did **not**
+attempt to mint a token for a different profile's id; tests 1 and 3 establish the mechanism
+(signature unchecked, payload mutable) without exercising cross-profile access, which would mean
+reaching for data that is not mine. Recommend the platform team confirm signature verification
+on the production refresh endpoint as a priority, and treat the dev finding as in-scope for the
+same auth hardening.
+
+**Update (2026-08-20):** fixed on **development** — a tampered-signature refresh token now
+returns HTTP 400 instead of 200, re-confirmed by `curl`. Sandbox and production were explicitly
+**not** changed and remain to be verified by the platform team.
 
 ### F-5 — HTTP 204 is thrown as an error, flooding the dashboard on every launch (high)
 

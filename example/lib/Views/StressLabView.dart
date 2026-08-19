@@ -51,6 +51,10 @@ class StressLabState extends State<StressLabView> {
   // ---------------------------------------------------------------- logging
 
   void _appendLog(String message, {bool isError = false}) {
+    // Mirrored to the console so a run driven from `flutter run` is legible
+    // from the host, not only from the device screen. Several scenarios are
+    // verified by relaunching, which discards the on-screen log.
+    debugPrint('StressLab: $message');
     final entry = _LogEntry(
       _logTimeFormat.format(DateTime.now()),
       message,
@@ -78,7 +82,6 @@ class StressLabState extends State<StressLabView> {
     } else {
       _appendLog('$action FAILED: $text', isError: true);
     }
-    debugPrint('StressLab: $action failed -> $text');
   }
 
   void _reportError(String action, Object error, {String? subtitle}) {

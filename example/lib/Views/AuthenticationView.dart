@@ -28,6 +28,15 @@ class AuthenticationState extends State<AuthenticationView> {
   String appSecret = '';
   String externalId = '';
 
+  // Build-time credentials seed empty fields for convenience, but must not be
+  // written to disk: the app secret can mint profile tokens for any external
+  // id in the account, and shared_preferences is a plaintext plist inside the
+  // app container. These track which fields still hold an unedited seed so
+  // setPrefs can skip them.
+  bool _appIdFromBuild = false;
+  bool _appSecretFromBuild = false;
+  bool _externalIdFromBuild = false;
+
   bool _obscureAppSecret = true;
   bool _isAuthenticating = false;
   bool _isDeauthenticating = false;
@@ -70,16 +79,20 @@ class AuthenticationState extends State<AuthenticationView> {
     var storedAppId = prefs.getString('appId') ?? '';
     var storedAppSecret = prefs.getString('appSecret') ?? '';
     var storedExternalId = prefs.getString('externalId') ?? '';
-    if (storedAppId.isEmpty) storedAppId = SahhaBuildCredentials.appId;
-    if (storedAppSecret.isEmpty) {
-      storedAppSecret = SahhaBuildCredentials.appSecret;
-    }
-    if (storedExternalId.isEmpty) {
+    final bool appIdSeeded = storedAppId.isEmpty;
+    final bool appSecretSeeded = storedAppSecret.isEmpty;
+    final bool externalIdSeeded = storedExternalId.isEmpty;
+    if (appIdSeeded) storedAppId = SahhaBuildCredentials.appId;
+    if (appSecretSeeded) storedAppSecret = SahhaBuildCredentials.appSecret;
+    if (externalIdSeeded) {
       storedExternalId = SahhaBuildCredentials.externalId;
     }
 
     if (!mounted) return;
     setState(() {
+      _appIdFromBuild = appIdSeeded;
+      _appSecretFromBuild = appSecretSeeded;
+      _externalIdFromBuild = externalIdSeeded;
       appId = storedAppId;
       appIdController.text = appId;
       appSecret = storedAppSecret;
@@ -91,9 +104,9 @@ class AuthenticationState extends State<AuthenticationView> {
 
   Future<void> setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('appId', appId);
-    await prefs.setString('appSecret', appSecret);
-    await prefs.setString('externalId', externalId);
+    if (!_appIdFromBuild) await prefs.setString('appId', appId);
+    if (!_appSecretFromBuild) await prefs.setString('appSecret', appSecret);
+    if (!_externalIdFromBuild) await prefs.setString('externalId', externalId);
   }
 
   /// Re-reads `isAuthenticated` and `getProfileToken` for the status card.
@@ -343,7 +356,10 @@ class AuthenticationState extends State<AuthenticationView> {
                     autocorrect: false,
                     enableSuggestions: false,
                     decoration: const InputDecoration(labelText: 'APP ID'),
-                    onChanged: (text) => setState(() => appId = text),
+                    onChanged: (text) => setState(() {
+                      appId = text;
+                      _appIdFromBuild = false;
+                    }),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -368,7 +384,10 @@ class AuthenticationState extends State<AuthenticationView> {
                         ),
                       ),
                     ),
-                    onChanged: (text) => setState(() => appSecret = text),
+                    onChanged: (text) => setState(() {
+                      appSecret = text;
+                      _appSecretFromBuild = false;
+                    }),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -376,7 +395,10 @@ class AuthenticationState extends State<AuthenticationView> {
                     autocorrect: false,
                     enableSuggestions: false,
                     decoration: const InputDecoration(labelText: 'EXTERNAL ID'),
-                    onChanged: (text) => setState(() => externalId = text),
+                    onChanged: (text) => setState(() {
+                      externalId = text;
+                      _externalIdFromBuild = false;
+                    }),
                   ),
                 ],
               ),
