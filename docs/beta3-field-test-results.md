@@ -53,6 +53,7 @@ paths behaved as designed.
 | F-2 | `isAuthenticated` / `profileToken` bypass the D13a configure gate | high | sahha-ios |
 | F-5 | HTTP 204 thrown as an error, flooding the dashboard every launch | high | sahha-ios |
 | F-9 | Session-expiry errors can never reach the dashboard | high | sahha-ios |
+| F-14 | `configure()` must be called every launch, and nothing says so | high | sahha-ios + docs |
 | F-1 | Debug logging prints bearer tokens and identity claims | medium | sahha-ios |
 | F-3 | Every batch persisted as "while offline" on an online device | medium | sahha-ios |
 | F-6 | Auth screen showed an identity the SDK was not using | medium | this repo — **fixed** |
@@ -1191,6 +1192,49 @@ plan uses as its pass/fail instrument.
 Possible fixes: make `postError` awaitable and await it inside `expireSession` before clearing;
 or resolve and capture the token for the post before the clear; or route the expiry error
 through the persistent queue so it survives re-authentication and uploads later.
+
+### F-14 — `configure()` must be called every launch, and nothing says so (high, docs + API design)
+
+`configure()` builds per-process state: the DI container, and the in-memory `AuthSnapshot` that
+`TokenStore` populates from the keychain during configuration. The keychain survives process
+death; the snapshot does not.
+
+An integrator who calls `configure()` once during onboarding and never again gets a **permanently
+dead SDK on every subsequent launch**, while the user is genuinely signed in:
+
+```swift
+// No configure ever requested means nothing to await — the guard evaluates immediately.
+await configurationTaskBox.awaitCurrent()      // returns instantly, no task captured
+try authGuard(snapshot)                        // empty snapshot → throws
+```
+
+`ConfigurationTaskBox.awaitCurrent()` documents the same thing: *"Returns immediately when no
+configure was ever requested."* So every auth-gated call fails with "Unauthorized. Please call
+`Sahha.authenticate(...)` first.", `isAuthenticated` is `false` forever, and no collection,
+upload or observer arming occurs. `deauthenticate()` is the only exception, being explicitly
+contracted to need no session or prior configure.
+
+**The README gives no guidance on call frequency at all** — no "every app launch", no "once",
+nothing. The documented example is a bare `SahhaFlutter.configure(environment:)` with no
+lifecycle context, so "call it during onboarding" is a reasonable reading of the docs as written.
+
+**This compounds F-2 rather than being independent of it.** The natural way to decide whether to
+show onboarding is:
+
+```dart
+if (await SahhaFlutter.isAuthenticated()) { /* skip onboarding */ }
+else { /* onboard → configure → authenticate */ }
+```
+
+F-2 makes that check return `false` at launch for a signed-in user, routing to onboarding every
+time — and onboarding is exactly where `configure()` lives in this architecture. The developer
+sees "the session never persists", not "the SDK answered too early", and the likely response is
+to re-authenticate on every launch, minting profiles or burning refresh-token rotations.
+
+Recommended: state the per-launch requirement prominently in the README and the `configure`
+docstring; and consider making the failure legible at runtime — an auth-gated call made with no
+configure ever requested could say so specifically rather than reporting "Unauthorized", which
+misdirects toward the authentication code.
 
 ### F-13 — The plan's Console.app fallback for background scenarios is unlikely to work (plan defect)
 
