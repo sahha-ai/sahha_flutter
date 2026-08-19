@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
+import 'package:sahha_flutter_example/services/stress_lab.dart';
 import 'package:sahha_flutter_example/widgets/response_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -60,9 +61,19 @@ class AuthenticationState extends State<AuthenticationView> {
   Future<void> getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
 
-    final storedAppId = prefs.getString('appId') ?? '';
-    final storedAppSecret = prefs.getString('appSecret') ?? '';
-    final storedExternalId = prefs.getString('externalId') ?? '';
+    // Build-time credentials only seed empty fields, so anything typed in on
+    // device still wins. They are passed with --dart-define and never stored
+    // in the repo.
+    var storedAppId = prefs.getString('appId') ?? '';
+    var storedAppSecret = prefs.getString('appSecret') ?? '';
+    var storedExternalId = prefs.getString('externalId') ?? '';
+    if (storedAppId.isEmpty) storedAppId = SahhaBuildCredentials.appId;
+    if (storedAppSecret.isEmpty) {
+      storedAppSecret = SahhaBuildCredentials.appSecret;
+    }
+    if (storedExternalId.isEmpty) {
+      storedExternalId = SahhaBuildCredentials.externalId;
+    }
 
     if (!mounted) return;
     setState(() {
