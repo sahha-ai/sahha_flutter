@@ -20,6 +20,72 @@ what was observed.
 | BLOCKED | Could not run; the blocker is named in the scenario section |
 | PENDING | Not yet attempted |
 
+
+## Summary
+
+23 of 28 scenarios were executed. Everything attempted either passed or is recorded with the
+specific reason it could not conclude.
+
+| Group | Result |
+| --- | --- |
+| S1, C1, E4 | PASS — baseline, steady state, permission contract |
+| A1–A6 | PASS — all six store-poisoning and anchor scenarios |
+| D1, D2, D3, D4, D5a, D5b, D6a | PASS |
+| D5a-soon | PASS — extra scenario isolating the 30-minute refresh offset |
+| D6b | PASS on its anti-regression guard; the positive expiry path is unreachable here (F-11) |
+| E1, E2, E3 | PASS — sensor-set contracts |
+| C3 | PASS, with O-3 unresolved |
+| B1, B2 | BLOCKED by the rig — a debug build cannot cold-launch offline |
+| C2, F1, F2, G1 | NOT RUN |
+
+**The remediation itself held up well.** Every scenario targeting the 1.3.9 store-corruption
+incident class passed, including the two that are easiest to get backwards — A3 and A4 require
+the store to *preserve* state it cannot interpret, the opposite instinct to A1's self-heal, and
+both were verified by sha256 rather than inferred. Anchor aliasing (A6), deauthentication
+completeness (D2), the configure gate for auth-gated calls (D1) and all four token-lifecycle
+paths behaved as designed.
+
+### Findings
+
+| # | Finding | Severity | Where |
+| --- | --- | --- | --- |
+| F-10 | Development refresh endpoint did not validate token signatures | **security** | server — *fixed on dev during this run* |
+| F-2 | `isAuthenticated` / `profileToken` bypass the D13a configure gate | high | sahha-ios |
+| F-5 | HTTP 204 thrown as an error, flooding the dashboard every launch | high | sahha-ios |
+| F-9 | Session-expiry errors can never reach the dashboard | high | sahha-ios |
+| F-1 | Debug logging prints bearer tokens and identity claims | medium | sahha-ios |
+| F-3 | Every batch persisted as "while offline" on an online device | medium | sahha-ios |
+| F-6 | Auth screen showed an identity the SDK was not using | medium | this repo — **fixed** |
+| F-7 | Signing out wrote the app secret to disk in plaintext | medium | this repo — **fixed** |
+| F-12 | Debug backtraces printed on the deauthentication path | low | sahha-ios |
+| F-4 | C1's expectation contradicts itself | plan | docs |
+| F-8 | D6a as written cannot reach the code it names | plan | docs |
+| F-11 | D6b's positive path is unverifiable on development | plan/coverage | docs |
+| F-13 | Console.app fallback for background scenarios likely does not work | plan | docs |
+| O-2 | Removed HK sensors keep collecting until next launch | decision | sahha-ios |
+| O-3 | 96 of 98 background queries returned identical results | unresolved | needs Xcode console |
+
+Three findings — F-2, F-5 and F-9 — share a theme worth stating plainly. The remediation's
+stated purpose is that formerly-swallowed failures become visible. F-5 fills the error channel
+with a benign 204 on every launch, F-9 ensures the single most important event (session death)
+can never be reported, and F-2 leaves a silent wrong answer on the most commonly used auth API.
+The channel this plan relies on as its pass/fail instrument is therefore noisier and less
+complete than the remediation intends.
+
+### Outstanding work
+
+- **C2, F1, F2, G1** were not run. C2 and F2 need the background-capable console (F-13); F1 and
+  F2 need heavy generator seeding; G1 is a 48-hour soak.
+- **O-3** needs one measurement under Xcode: force a collection pass with no new samples and
+  read the count. `0` is benign, `144` is a defect.
+- **F-10 on sandbox and production** is unverified and is the highest-priority follow-up.
+- **E4's motion-trigger leg** was skipped by request.
+- **Before merging**, revert the Podfile commit pointing at the local `sahha-ios` checkout, and
+  restore `Sahha.debugLogging` to `false` in that working copy (it is an uncommitted edit and
+  was already lost once mid-run).
+- The **app secret written to the device** by the pre-fix build (F-7) is not removed by the fix;
+  reinstalling the example app clears it.
+
 ## Rig provenance
 
 Facts established before the first scenario, each with how it was checked.
@@ -54,7 +120,7 @@ Both tokens carry `exp` and the `profileId` claim, which is exactly what
 
 | ID | Scenario | Status |
 | --- | --- | --- |
-| E4 | Permission sheet has exactly one door | **PASS** |
+| E4 | Permission sheet has exactly one door | **PASS** (motion leg skipped) |
 | S1 | End-to-end pipeline comes up clean | **PASS** |
 | A1 | Legacy 1.3.7 names heal in place | **PASS** |
 | A2 | Mixed unknown | **PASS** |
@@ -65,7 +131,7 @@ Both tokens carry `exp` and the `profileId` claim, which is exactly what
 | B1 | Offline cold launch recovers | BLOCKED (rig) |
 | B2 | Backoff cadence and event bypasses | BLOCKED (rig) |
 | C1 | Steady state is quiet and single-flight | **PASS** |
-| C2 | Externally dropped delivery re-armed | PENDING |
+| C2 | Externally dropped delivery re-armed | NOT RUN |
 | C3 | Background delivery end to end | **PASS** (with O-3 open) |
 | D1 | Auth-gated calls wait for configure | **PASS** |
 | D2 | Deauthentication is total | **PASS** |
@@ -79,9 +145,9 @@ Both tokens carry `exp` and the `profileId` claim, which is exactly what
 | E1 | Declarative replace | **PASS** |
 | E2 | Non-HealthKit-only set | **PASS** |
 | E3 | Empty set is a guarded error | **PASS** |
-| F1 | Large historical backfill | PENDING |
-| F2 | Dense-day stress | PENDING |
-| G1 | 48-hour ambient soak | PENDING |
+| F1 | Large historical backfill | NOT RUN |
+| F2 | Dense-day stress | NOT RUN |
+| G1 | 48-hour ambient soak | NOT RUN |
 
 ## Run order
 
@@ -164,8 +230,9 @@ Confirms the plan's device-state note: **the keychain survived app deletion.** T
 build came up already holding a valid session for a pre-existing development profile with no
 authentication step.
 
-Outstanding: the `enableMotionTrigger` toggle should produce a separate Motion & Fitness
-prompt — the one documented exception. Not yet run.
+The `enableMotionTrigger` leg — which should produce a separate Motion & Fitness prompt, the
+one documented exception to the single-door rule — was **skipped by request**. The HealthKit
+half of E4, which is the irreversible part, is complete.
 
 ### A1 — Legacy 1.3.7 names heal in place
 
@@ -1124,6 +1191,37 @@ plan uses as its pass/fail instrument.
 Possible fixes: make `postError` awaitable and await it inside `expireSession` before clearing;
 or resolve and capture the token for the post before the clear; or route the expiry error
 through the persistent queue so it survives re-authentication and uploads later.
+
+### F-13 — The plan's Console.app fallback for background scenarios is unlikely to work (plan defect)
+
+Section 1.6 advises: *"run the `Runner` scheme from Xcode instead — its console survives
+backgrounding, and Console.app (filter: process `Runner`) sees everything untethered once the
+build is on the phone."*
+
+The Xcode half is sound. The **Console.app half probably is not**, because of how the SDK logs:
+
+```swift
+static func log(_ message: @autoclosure () -> String) {
+    guard debugLogging else { return }
+    print(message())
+}
+```
+
+`print` writes to stdout. On iOS, stdout is not routed into the unified logging system — only
+`os_log`/`NSLog` output reaches it — so a process running **without an attached debugger**
+discards these lines rather than publishing them where Console.app can filter for them. An
+untethered device is precisely the case with no debugger attached.
+
+This was not settled empirically here: `log stream --device-name` no longer exists in current
+macOS (`log: unrecognized option '--device-name'`), so there is no CLI route to device logs to
+test it with, and Console.app itself was not driven. The mechanism is clear from the source
+though, and it matters because section 1.6 is the *only* fallback the plan offers for the
+scenarios that most need it — C2, C3's discriminator (O-3), F2's regression probe, and G1.
+
+Two options for whoever picks these up: run under Xcode with the debugger attached (which does
+capture `print` and does survive backgrounding), or change `Sahha.log` to emit via `os_log` so
+untethered capture genuinely works. The second is the more useful fix — it would also make
+field diagnostics possible on devices that were never attached to a Mac.
 
 ### F-12 — Debug backtraces are printed on the deauthentication teardown path (low)
 
