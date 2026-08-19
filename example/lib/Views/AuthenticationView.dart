@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
@@ -34,6 +36,7 @@ class AuthenticationState extends State<AuthenticationView> {
   bool _statusLoading = true;
   bool? _isAuthenticated;
   String? _profileToken;
+  String? _authenticatedExternalId;
 
   bool get _isBusy =>
       _isAuthenticating || _isDeauthenticating || _isTokenAuthenticating;
@@ -94,6 +97,32 @@ class AuthenticationState extends State<AuthenticationView> {
   }
 
   /// Re-reads `isAuthenticated` and `getProfileToken` for the status card.
+  /// The external id the SDK is *currently* authenticated as, read from the
+  /// profile token's claim.
+  ///
+  /// The external id text field above is an input — what the next
+  /// `authenticate()` call will use — and the two are not the same thing. The
+  /// keychain outlives app deletion, so a reinstall can come up authenticated
+  /// as an older profile without `authenticate()` ever being called, leaving
+  /// the field showing an id that no request has ever carried.
+  static String? _externalIdFromToken(String? token) {
+    if (token == null || token.isEmpty) return null;
+    final parts = token.split('.');
+    if (parts.length != 3) return null;
+    try {
+      final payload = json.decode(
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+      );
+      if (payload is! Map) return null;
+      final value = payload['https://api.sahha.ai/claims/externalId'];
+      return value is String && value.isNotEmpty ? value : null;
+    } catch (_) {
+      // A token we cannot decode is not worth surfacing an error for; the
+      // status chip already reports whether the SDK considers itself signed in.
+      return null;
+    }
+  }
+
   Future<void> refreshStatus() async {
     if (mounted) setState(() => _statusLoading = true);
 
@@ -118,6 +147,7 @@ class AuthenticationState extends State<AuthenticationView> {
     setState(() {
       _isAuthenticated = authenticated;
       _profileToken = profileToken;
+      _authenticatedExternalId = _externalIdFromToken(profileToken);
       _statusLoading = false;
     });
   }
@@ -455,6 +485,20 @@ class AuthenticationState extends State<AuthenticationView> {
                 else
                   _StatusChip(label: label, color: accent),
               ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Signed in as',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _authenticatedExternalId ?? 'None',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: monoStyle(context, fontSize: 13),
             ),
             const SizedBox(height: 12),
             Text(
