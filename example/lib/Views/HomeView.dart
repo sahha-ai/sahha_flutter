@@ -120,6 +120,14 @@ class HomeState extends State<HomeView> {
                 onTap: () => _open('/diagnostics'),
               ),
               _NavTile(
+                icon: Icons.science_outlined,
+                iconColor: scheme.onSecondaryContainer,
+                iconBackground: scheme.secondaryContainer,
+                title: 'Stress Lab',
+                subtitle: 'Races, deauth abuse and storage sabotage',
+                onTap: () => _open('/stress'),
+              ),
+              _NavTile(
                 icon: Icons.cloud_upload_outlined,
                 iconColor: scheme.onSecondaryContainer,
                 iconBackground: scheme.secondaryContainer,

@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sahha_flutter/sahha_flutter.dart';
+import 'package:sahha_flutter_example/services/stress_lab.dart';
 import 'package:sahha_flutter_example/widgets/response_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,6 +28,15 @@ class AuthenticationState extends State<AuthenticationView> {
   String appSecret = '';
   String externalId = '';
 
+  // Build-time credentials seed empty fields for convenience, but must not be
+  // written to disk: the app secret can mint profile tokens for any external
+  // id in the account, and shared_preferences is a plaintext plist inside the
+  // app container. These track which fields still hold an unedited seed so
+  // setPrefs can skip them.
+  bool _appIdFromBuild = false;
+  bool _appSecretFromBuild = false;
+  bool _externalIdFromBuild = false;
+
   bool _obscureAppSecret = true;
   bool _isAuthenticating = false;
   bool _isDeauthenticating = false;
@@ -33,6 +45,7 @@ class AuthenticationState extends State<AuthenticationView> {
   bool _statusLoading = true;
   bool? _isAuthenticated;
   String? _profileToken;
+  String? _authenticatedExternalId;
 
   bool get _isBusy =>
       _isAuthenticating || _isDeauthenticating || _isTokenAuthenticating;
@@ -60,12 +73,26 @@ class AuthenticationState extends State<AuthenticationView> {
   Future<void> getPrefs() async {
     final prefs = await SharedPreferences.getInstance();
 
-    final storedAppId = prefs.getString('appId') ?? '';
-    final storedAppSecret = prefs.getString('appSecret') ?? '';
-    final storedExternalId = prefs.getString('externalId') ?? '';
+    // Build-time credentials only seed empty fields, so anything typed in on
+    // device still wins. They are passed with --dart-define and never stored
+    // in the repo.
+    var storedAppId = prefs.getString('appId') ?? '';
+    var storedAppSecret = prefs.getString('appSecret') ?? '';
+    var storedExternalId = prefs.getString('externalId') ?? '';
+    final bool appIdSeeded = storedAppId.isEmpty;
+    final bool appSecretSeeded = storedAppSecret.isEmpty;
+    final bool externalIdSeeded = storedExternalId.isEmpty;
+    if (appIdSeeded) storedAppId = SahhaBuildCredentials.appId;
+    if (appSecretSeeded) storedAppSecret = SahhaBuildCredentials.appSecret;
+    if (externalIdSeeded) {
+      storedExternalId = SahhaBuildCredentials.externalId;
+    }
 
     if (!mounted) return;
     setState(() {
+      _appIdFromBuild = appIdSeeded;
+      _appSecretFromBuild = appSecretSeeded;
+      _externalIdFromBuild = externalIdSeeded;
       appId = storedAppId;
       appIdController.text = appId;
       appSecret = storedAppSecret;
@@ -77,12 +104,38 @@ class AuthenticationState extends State<AuthenticationView> {
 
   Future<void> setPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('appId', appId);
-    await prefs.setString('appSecret', appSecret);
-    await prefs.setString('externalId', externalId);
+    if (!_appIdFromBuild) await prefs.setString('appId', appId);
+    if (!_appSecretFromBuild) await prefs.setString('appSecret', appSecret);
+    if (!_externalIdFromBuild) await prefs.setString('externalId', externalId);
   }
 
   /// Re-reads `isAuthenticated` and `getProfileToken` for the status card.
+  /// The external id the SDK is *currently* authenticated as, read from the
+  /// profile token's claim.
+  ///
+  /// The external id text field above is an input — what the next
+  /// `authenticate()` call will use — and the two are not the same thing. The
+  /// keychain outlives app deletion, so a reinstall can come up authenticated
+  /// as an older profile without `authenticate()` ever being called, leaving
+  /// the field showing an id that no request has ever carried.
+  static String? _externalIdFromToken(String? token) {
+    if (token == null || token.isEmpty) return null;
+    final parts = token.split('.');
+    if (parts.length != 3) return null;
+    try {
+      final payload = json.decode(
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+      );
+      if (payload is! Map) return null;
+      final value = payload['https://api.sahha.ai/claims/externalId'];
+      return value is String && value.isNotEmpty ? value : null;
+    } catch (_) {
+      // A token we cannot decode is not worth surfacing an error for; the
+      // status chip already reports whether the SDK considers itself signed in.
+      return null;
+    }
+  }
+
   Future<void> refreshStatus() async {
     if (mounted) setState(() => _statusLoading = true);
 
@@ -107,6 +160,7 @@ class AuthenticationState extends State<AuthenticationView> {
     setState(() {
       _isAuthenticated = authenticated;
       _profileToken = profileToken;
+      _authenticatedExternalId = _externalIdFromToken(profileToken);
       _statusLoading = false;
     });
   }
@@ -302,7 +356,10 @@ class AuthenticationState extends State<AuthenticationView> {
                     autocorrect: false,
                     enableSuggestions: false,
                     decoration: const InputDecoration(labelText: 'APP ID'),
-                    onChanged: (text) => setState(() => appId = text),
+                    onChanged: (text) => setState(() {
+                      appId = text;
+                      _appIdFromBuild = false;
+                    }),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -327,7 +384,10 @@ class AuthenticationState extends State<AuthenticationView> {
                         ),
                       ),
                     ),
-                    onChanged: (text) => setState(() => appSecret = text),
+                    onChanged: (text) => setState(() {
+                      appSecret = text;
+                      _appSecretFromBuild = false;
+                    }),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -335,7 +395,10 @@ class AuthenticationState extends State<AuthenticationView> {
                     autocorrect: false,
                     enableSuggestions: false,
                     decoration: const InputDecoration(labelText: 'EXTERNAL ID'),
-                    onChanged: (text) => setState(() => externalId = text),
+                    onChanged: (text) => setState(() {
+                      externalId = text;
+                      _externalIdFromBuild = false;
+                    }),
                   ),
                 ],
               ),
@@ -444,6 +507,20 @@ class AuthenticationState extends State<AuthenticationView> {
                 else
                   _StatusChip(label: label, color: accent),
               ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Signed in as',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _authenticatedExternalId ?? 'None',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: monoStyle(context, fontSize: 13),
             ),
             const SizedBox(height: 12),
             Text(

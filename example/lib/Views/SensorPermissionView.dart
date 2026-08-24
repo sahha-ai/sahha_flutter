@@ -226,8 +226,9 @@ class SensorPermissionState extends State<SensorPermissionView> {
   void _enableSensors() =>
       unawaited(_run(_enableCall, SahhaFlutter.enableSensors));
 
-  /// Runs [call] with the checked list. An empty list is deliberately allowed:
-  /// it is a supported edge case of both native bridges.
+  /// Runs [call] with the checked list. An empty list is deliberately allowed
+  /// through: `enableSensors([])` is a guarded error, and seeing it fail
+  /// without disturbing the stored set is the point of the E3 check.
   Future<void> _run(
     String name,
     Future<SahhaSensorStatus> Function(List<SahhaSensor>) call,
@@ -504,8 +505,9 @@ class SensorPermissionState extends State<SensorPermissionView> {
         const SizedBox(height: 12),
         Text(
           'Both calls run on exactly the checked list. ENABLE SENSORS is the '
-          'one that triggers the OS permission prompt. Calling with an empty '
-          'list is allowed — it exercises the SDK\'s default-set behaviour.',
+          'one that triggers the OS permission prompt. An empty list is a '
+          'guarded error — enableSensors([]) fails with "Sensor set cannot be '
+          'empty." and leaves the stored set untouched.',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
