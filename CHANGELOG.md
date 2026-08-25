@@ -1,3 +1,34 @@
+## 1.4.0
+
+Stable release of the 1.4.0 line, consolidating the 1.4.0-beta.1 and 1.4.0-beta.2 changes with the final native 1.4.0 SDKs.
+
+### Added
+
+- `engagement` biomarker category in `SahhaBiomarkerCategory`.
+- Android: skipped unreadable Health Connect records are now reported to Sahha error telemetry, so affected devices are visible without device logs.
+
+### Changed
+
+- **Breaking:** `SahhaBiomarkerCategory` now contains exactly the six documented categories (`activity`, `body`, `engagement`, `nutrition`, `sleep`, `vitals`). Removed `characteristic` and `reproductive`, which never returned biomarker data.
+- **Breaking:** renamed `SahhaBiomarkerType.activity_mid_intensity_duration` to `activity_medium_intensity_duration`, matching the server vocabulary — the old name always returned no data.
+- Deprecated `getStats` and `getSamples` — use `getBiomarkers` to read server-processed biomarkers instead.
+- Stat and sample `category` values now carry the sensor's data-log logType — the same label stamped on uploaded data on both platforms: heart rate types report `heart`, blood pressure/glucose report `blood`, oxygen/VO2 max/respiratory rate report `oxygen`, temperature types report `temperature`, and energy/daylight types report `energy`. `vitals` no longer appears.
+- Rebuilt the example app as a full SDK testing harness.
+- Updated iOS to 1.4.0 — check release notes https://github.com/sahha-ai/sahha-ios/releases
+- Updated Android to 1.4.0 — check release notes https://github.com/sahha-ai/sahha-android-sdk/releases
+
+### Fixed
+
+- iOS: sensor sets with no HealthKit-backed types (such as `device_lock` alone, or Android-only sensors) no longer make permission requests throw "Health data types not specified" — requesting permissions now succeeds as a no-op and sensor status reports correctly through the normal lifecycle.
+- iOS: `enableSensors` no longer risks hanging indefinitely without invoking its callback; profile token refresh and session-expiry handling are hardened against transient network and server errors.
+- Android: `enableSensors` reports the real sensor status reliably (the native callback now returns a `SahhaSensorStatus`).
+- Android: eliminated phantom step spikes caused by step-counter regressions and implausible jumps; reboots are detected reliably, and steps recorded during collection outages are recovered.
+- Android: Health Connect reads now step around records the client library cannot parse instead of dropping the surrounding data, and an interrupted read no longer advances the sync marker past unread data.
+- Android: `getSamples` for steps no longer returns empty or partial results after background sync has run, and queries no longer interfere with upload de-duplication.
+- Android: device-lock events are now stamped with the correct phone form factor.
+
+---
+
 ## 1.4.0-beta.2
 
 ### Added
