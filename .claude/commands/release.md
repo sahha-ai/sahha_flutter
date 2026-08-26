@@ -73,9 +73,9 @@ A git guardrail blocks Claude from pushing/force-pushing `main` and `development
 - pub.dev publish is IRREVERSIBLE (retract only within 7 days, version never reusable). Get explicit user confirmation, then run `flutter pub publish --force`.
 - Betas publish as prereleases (stable stays "latest").
 
-## 9. GitHub Release (stable only)
-- For a STABLE `x.y.z`: create a GitHub Release — `gh release create $1 --title "$1" --notes "<this version's changelog section>"`.
-- For a beta/prerelease: skip the GitHub Release (this repo only cuts GitHub Releases for stable versions).
+## 9. GitHub Release (every version)
+- Create a GitHub Release for every version — `gh release create $1 --title "$1" --notes "<this version's changelog section>"` (notes = the changelog section without the `## $1` heading).
+- For a beta/prerelease, add `--prerelease` (matches how sahha-ios and sahha-android-sdk mark their betas). Stable releases stay "latest".
 
 ## 10. Wrap up
 - Summarize what shipped + the pub.dev URL (`https://pub.dev/packages/sahha_flutter/versions/$1`).
