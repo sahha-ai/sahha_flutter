@@ -1,2 +1,7 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include "Generated.xcconfig"
+
+// The Flutter template never defines DEBUG for the Runner's own Swift sources,
+// so `#if DEBUG` there is always false. The Stress Lab's chaos channel is
+// guarded by it and would otherwise compile away to nothing. Debug only.
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) DEBUG
