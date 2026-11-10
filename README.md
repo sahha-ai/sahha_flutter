@@ -144,6 +144,8 @@ SahhaFlutter.configure(
 
 If the named drawable cannot be found, Sahha falls back to a bundled default icon so your app keeps running. Adding your own `notification` drawable (or passing a valid `icon` name) is recommended so the persistent notification matches your branding.
 
+If you leave out `title` or `shortDescription`, Sahha uses its default notification text for that value.
+
 ### Apple iOS
 
 #### Enable HealthKit
