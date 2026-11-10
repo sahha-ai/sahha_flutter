@@ -204,8 +204,12 @@ class SahhaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                             context,
                             notificationSettings["icon"] ?: "notification"
                         ) ?: SahhaNotificationConfiguration.DEFAULT.iconResourceId,
-                    title = notificationSettings["title"] ?: "Title",
-                    shortDescription = notificationSettings["shortDescription"] ?: "Short description"
+                    // Text the app leaves unset falls back to the SDK's defaults, so the
+                    // foreground sync notification never shows placeholder copy.
+                    title = notificationSettings["title"]
+                        ?: SahhaNotificationConfiguration.DEFAULT.title,
+                    shortDescription = notificationSettings["shortDescription"]
+                        ?: SahhaNotificationConfiguration.DEFAULT.shortDescription
                 )
             )
 
